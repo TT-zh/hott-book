@@ -327,7 +327,11 @@
 \fi
 \renewcommand{\sectionmark}[1]{\markright{\textsc{\thesection\ #1}}}
 
+\ifOPTchinese
+\include{formal-cn}
+\else
 \include{formal}
+\fi
 
 % Joke
 \nocite{Angiuli13}

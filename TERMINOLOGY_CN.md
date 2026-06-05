@@ -360,3 +360,25 @@
 | monic | 单态射（monic） | 固定译法 |
 | stack completion | 层叠完备化 | 固定译法 |
 | n-connected axiom of choice | n-连通选择公理 | 固定译法 |
+| formal type theory | 形式类型论 | 固定译法 |
+| metatheory | 元理论 | 固定译法 |
+| logical consistency | 逻辑一致性 | 固定译法 |
+| syntax | 语法 | 固定译法 |
+| inference rule | 推断规则 | 固定译法 |
+| derivation | 推导 | 固定译法 |
+| premise | 前提 | 固定译法 |
+| conclusion | 结论 | 固定译法 |
+| well-formed | 良构 | 固定译法 |
+| well-formed context | 良构上下文 | 固定译法 |
+| convertibility | 可转换性 | 固定译法 |
+| admissible rule | 可容许规则 | 固定译法 |
+| weakening | 弱化 | 固定译法 |
+| normalization | 规范化 | 固定译法 |
+| normalizable | 可规范化的 | 固定译法 |
+| strongly normalizable | 强可规范化的 | 固定译法 |
+| normal form | 范式 | 固定译法 |
+| closed term | 封闭项 | 固定译法 |
+| implicit argument | 隐式参数 | 固定译法 |
+| elaboration | 精化 | 固定译法 |
+| type universe | 类型宇宙 | 固定译法 |
+| structural recursion | 结构递归 | 固定译法 |

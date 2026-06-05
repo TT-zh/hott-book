@@ -1,0 +1,1177 @@
+% !TeX root = hott-online.tex
+
+\titleformat{\chapter}[display]{\fontsize{23}{25}\fontseries{m}\fontshape{it}\selectfont}{\chaptertitlename}{20pt}{\fontsize{35}{35}\fontseries{b}\fontshape{n}\selectfont}
+\chapter{形式类型论}
+\label{cha:rules}
+
+\index{formal!type theory|(}%
+\index{type theory!formal|(}%
+\index{rules of type theory|(}%
+
+正如人们可以在不显式使用 Zermelo--Fraenkel 集合论公理的情况下在集合论中发展数学，
+在本书中，我们也在不显式诉诸同伦类型论形式系统的情况下，于泛等基础中发展了数学。尽管如此，\emph{拥有}一个将同伦类型论表述为形式系统的精确描述仍然很重要，例如为了
+%
+\begin{itemize}
+\item 陈述并证明其元理论性质，包括逻辑
+一致性，
+\item 构造模型，例如在单纯集、模型范畴、高阶托扑斯
+等中，以及
+\item 在 \Coq 或 \Agda 这样的证明助手中实现它。
+  \index{proof!assistant}
+\end{itemize}
+%
+即便是同伦类型论的逻辑一致性\index{consistency}，也就是在空上下文中不存在项 $a:\emptyt$，也并非显然：如果我们错误地选择了一种满足 $\eqv{\emptyt}{\unit}$ 的等价定义，那么泛等性将推出 $\emptyt$ 有元素，因为 $\unit$ 有元素。
+同样也不显然的是，例如，我们将 $\Sn^1$ 定义为高阶归纳类型所得到的类型，确实像通常的圆那样行事。
+
+在讨论此类问题之前，类型论有两个方面必须先加以明确。回忆引言中所述，类型论
+由一组规则组成，这些规则规定何时判断 $a:A$ 与 $a\jdeq a':A$
+成立 --- 例如，积类型由如下规则刻画：每当 $a:A$
+且 $b:B$，就有 $(a,b):A\times B$。要使这点精确化，我们首先必须精确定义项的语法 --- 即这些判断所关联的对象 $a,a',A,\dots$；
+然后，必须精确定义判断及其推理规则 --- 即如何由其他判断导出判断。
+
+在本附录中，我们给出 Martin-L\"{o}f 类型论及构成同伦类型论之扩展的两种表述。
+第一种表述（\cref{sec:syntax-informally}）将项与判断形式描述为无类型
+$\lambda$-演算的扩展，同时保持推理规则为非形式化叙述。
+第二种（\cref{sec:syntax-more-formally}）则以自然演绎风格归纳地定义项、判断
+与推理规则，这也是大量类型论文献中的惯常做法。
+
+\section*{预备知识}
+\label{sec:formal-prelim}
+
+
+在 \cref{cha:typetheory} 中，我们介绍了类型论的两个基本\define{判断}
+\index{judgment}
+。第一个是 $a:A$，断言项 $a$ 具有类型 $A$。第二个是
+$a\jdeq b:A$，表示两个项 $a$ 与 $b$ 在类型 $A$ 上\define{判定相等}%
+\index{equality!judgmental}
+\index{judgmental equality}
+。这些判断由一组推理规则归纳定义，详见 \cref{sec:syntax-more-formally}。
+
+构造类型 $A$ 的一个元素 $a$，就是导出 $a:A$；在本书中，我们
+给出描述 $a$ 之构造的非形式化论证，但在形式上，
+必须给出一个精确的项 $a$ 以及 $a:A$ 的完整推导。
+
+不过，本书正文中的类型论表述与本附录中的主要差别在于：此处判断被显式地
+置于一个环境\define{上下文}中，
+\index{context}
+即形如
+\[
+  x_1:A_1, x_2:A_2,\dots,x_n:A_n.
+\]
+的假设列表。上下文中的一项 $x_i : A_i$ 表达
+变量
+\index{variable}%
+$x_i$ 具有类型 $A_i$ 这一假设。出现在
+上下文中的变量 $x_1, \ldots, x_n$ 必须互不相同。我们以字母 $\Gamma$
+和 $\Delta$ 缩写上下文。
+
+上下文 $\Gamma$ 中的判断 $a:A$ 记作
+\[ \oftp\Gamma aA \]
+其含义是在 $\Gamma$ 列出的假设下有 $a:A$。当假设列表
+为空时，我们简记为
+\[ \oftp{}aA \]
+或
+\[ \oftp\emptyctx aA \]
+其中 $\emptyctx$ 表示空上下文。等式
+判断
+\[
+  \jdeqtp\Gamma{a}{b}{A}
+\]
+同理。
+
+不过，这类判断仅在\define{良构}上下文中才有意义，
+\index{context!well-formed}%
+这一概念由我们的第三个也是最后一个判断刻画：
+\[
+  \wfctx{(x_1:A_1, x_2:A_2,\dots,x_n:A_n)}
+\]
+其含义是：每个 $A_i$ 都是在上下文 $x_1:A_1,
+x_2:A_2,\dots,x_{i-1}:A_{i-1}$ 中的一个类型。特别地，因此若 $\oftp\Gamma aA$ 且
+$\wfctx\Gamma$，那么我们知道每个 $A_i$ 仅含变量
+$x_1,\dots,x_{i-1}$，而 $a$ 与 $A$ 仅含变量
+$x_1,\dots,x_n$。
+\index{variable!in context}
+
+在非形式化数学表述中，上下文通常是
+隐含的。证明的每一步中，数学家都知道
+哪些变量可用以及它们的类型，或者基于历史
+约定（$n$ 通常是数，$f$ 通常是函数，等等），或者
+因为变量通过诸如
+``设 $x$ 为一个实数'' 这样的语句被显式引入。我们在 \cref{sec:more-formal-pi,sec:more-formal-sigma} 中讨论使用显式
+上下文的一些好处。
+
+我们写 $B[a/x]$ 表示\define{代入}
+\index{substitution}%
+，即用项 $a$ 代替项 $B$ 中
+变量~$x$ 的自由出现，并在必要时对约束变量做避免捕获的
+重命名，
+\index{variable!and substitution}%
+如
+\cref{sec:function-types} 中所述。代入的一般形式
+%
+\[
+   B[a_1,\dots,a_n/x_1,\dots,x_n]
+\]
+%
+表示同时用表达式 $a_1,\dots,a_n$ 代替变量
+$x_1,\dots,x_n$。
+
+对\define{表达式 $B$ 约束变量 $x$}
+\indexdef{variable!bound}%
+是指把两者组合成一个更大的表达式，称为\define{抽象}，
+\indexdef{abstraction}%
+其目的是表达 $x$ 对 $B$ 是“局部”的这一事实，即它
+不应与其他地方出现的 $x$ 相混淆。约束变量对程序员较为熟悉，但对数学家较少见。
+约束可用多种记号表示，例如 $x \mapsto B$、
+$\lam x B$ 与 $x \, .\, B$，取决于具体情形。我们可以写 $C[a]$ 表示在抽象表达式中以项 $a$ 代替该变量，即
+可定义 $(x.B)[a]$ 为 $B[a/x]$。如
+\cref{sec:function-types} 所述，在一个表达式内部处处改变约束变量名称（“$\alpha$-转换”）
+\index{alpha-conversion@$\alpha $-conversion}%
+并不会改变该表达式。因此，严格地说，一个表达式是这样一类语法形式的等价类：
+它们仅在约束变量名上不同。
+
+也可以把判断中的每个变量 $x_i$
+\[
+  x_1:A_1, x_2:A_2,\dots,x_n:A_n \vdash a : A
+\]
+看作在其\define{作用域}中被约束，
+\indexdef{variable!scope of}%
+\index{scope}%
+该作用域由表达式 $A_{i+1},
+\ldots, A_n$、$a$ 与 $A$ 构成。
+\section{第一种表述}
+\label{sec:syntax-informally}
+
+我们类型论中的对象与类型可以写成项，采用如下语法；它是在 $\lambda$-演算基础上的扩展，包含
+\emph{变量} $x, x',\dots$，
+\index{variable}%
+\emph{原始常元}
+\index{primitive!constant}%
+\index{constant!primitive}%
+$c,c',\dots$、\emph{定义常元}\index{constant!defined} $f,f',\dots$，以及项构造
+运算
+%
+\[
+  t \production x \mid \lam{x} t \mid t(t') \mid c \mid f
+\]
+%
+此处记号的含义是：项 $t$ 要么是变量 $x$，要么
+形如 $\lam{x} t$（其中 $x$ 是变量、$t$ 是项），要么
+形如 $t(t')$（其中 $t$ 与 $t'$ 都是项），要么是原始常元
+$c$，要么是定义常元 $f$。语法标记“$\lambda$”、“(”、
+“)”与“.”只是帮助人眼阅读的标点。
+
+我们用 $t(t_1,\dots,t_n)$ 缩写重复应用
+$t(t_1)(t_2)\dots (t_n)$。我们也可使用\emph{中缀}\index{infix notation}记号：当 $\star$ 是原始或定义
+常元时，写 $t_1\;
+\star\; t_2$ 表示 $\star(t_1,t_2)$。
+
+每个定义常元都具有零个、一个或多个\define{定义方程}。
+\index{equation, defining}%
+\index{defining equation}%
+定义常元有两类。\emph{显式}
+\index{constant!explicit}
+定义常元 $f$ 只有一个定义方程
+  \[ f(x_1,\dots,x_n)\defeq t,\]
+其中 $t$ 不含 $f$。
+%
+例如，我们可以引入显式定义常元 $\circ$，其定义方程为
+  \[ \circ (x,y)(z) \defeq x(y(z)),\]
+并用中缀记号 $x\circ y$ 表示 $\circ(x,y)$。这当然就是函数复合。
+
+第二类定义常元用于给出（带参数的）映射
+$f(x_1,\dots,x_n,x)$，其中 $x$ 取值于一个由零个或多个原始常元生成元素的类型。对于每个这样的原始常元 $c$，都存在一个形如
+\[
+  f(x_1,\dots,x_n,c(y_1,\dots,y_m)) \defeq t,
+\]
+的定义方程。
+在这里 $f$ 可以出现在 $t$ 中，但只能以一种清楚表明这些
+方程确定了一个全定义函数的方式出现。这类
+定义函数的典型例子是按自然数进行原始递归所定义的函数。我们可将这种函数定义称为\emph{全
+  递归定义}。
+\index{total!recursive definition}%
+在计算机科学和逻辑中，这种在递归数据类型上对函数的定义
+被称为\define{按结构递归的定义}。
+\index{definition!by structural recursion}%
+\index{structural!recursion}%
+\index{recursion!structural}%
+
+\define{可转换性}
+\index{convertibility of terms}%
+\index{term!convertibility of}%
+$t \conv t'$（发生在项 $t$
+与 $t'$ 之间）是由常元的定义方程、
+计算规则\index{computation rule!for function types}
+%
+\[
+  (\lam{x} t)(u) \defeq t[u/x],
+\]
+%
+以及使其相对于应用与 $\lambda$-抽象\index{lambda abstraction@$\lambda$-abstraction}成为\emph{同余}的规则生成的等价关系：
+%
+\begin{itemize}
+\item 若 $t \conv t'$ 且 $s \conv s'$，则 $t(s) \conv t'(s')$；
+\item 若 $t \conv t'$，则 $(\lam{x} t) \conv (\lam{x} t')$。
+\end{itemize}
+\noindent
+于是，等式判断 $t \jdeq u : A$ 可由下列唯一规则导出：
+%
+\begin{itemize}
+\item 若 $t:A$、$u:A$ 且 $t \conv u$，则 $t \jdeq u : A$。
+\end{itemize}
+%
+判定相等是一个等价关系。
+
+注意，这一表述中的类型论与正文所用版本不同：它不包含函数的判定唯一性原理 $f \jdeq (\lam{x} f(x))$。
+这样的等式要求判定相等对相关项的类型敏感，因为该等式只有在已知 $f$ 是函数时才有意义；而在这一表述中，可转换关系与类型无关。
+\cref{sec:syntax-more-formally} 中的第二种表述包含这一唯一性原理。
+
+
+\subsection{类型宇宙}
+
+我们设定一个由原始常元表示的\define{宇宙}层级
+\index{type!universe}
+%
+\begin{equation*}
+  \UU_0, \quad \UU_1, \quad  \UU_2, \quad \ldots
+\end{equation*}
+%
+关于宇宙的前两条规则说明它们构成类型的累积层级：
+%
+\begin{itemize}
+\item 当 $m < n$ 时，$\UU_m : \UU_n$；
+\item 若 $A:\UU_m$ 且 $m \le n$，则 $A:\UU_n$；
+\end{itemize}
+%
+第三条表达了这样一个思想：宇宙中的对象可充当类型，并能出现在判断中冒号的
+右侧：
+%
+\begin{itemize}
+\item 若 $\Gamma \vdash A : \UU_n$，且 $x$ 是一个新变量，%
+\footnote{这里“新”是指它不出现在 $\Gamma$ 或 $A$ 中。}
+则 $\vdash (\Gamma, x:A)\; \ctx$。
+\end{itemize}
+%
+在本书正文中，类型之间的等式判断 $A \jdeq B : \UU_n$
+通常缩写为 $A \jdeq B$。这是典型歧义\index{typical ambiguity}的一个实例，因为我们总可以切换到更大的宇宙，而这并不影响该判断的有效性。
+
+下面的转换规则允许我们在类型判断中用与某类型相等的类型替换它：
+%
+\begin{itemize}
+\item 若 $a:A$ 且 $A \jdeq B$，则 $a:B$。
+\end{itemize}
+
+\subsection{依值函数类型 (\texorpdfstring{$\Pi$}{Π}-types)}
+
+我们引入一个原始常元 $c_\Pi$，并将
+$c_\Pi(A,\lam{x} B)$ 记作 $\tprd{x:A}B$。关于
+这类表达式以及形如 $\lam{x} b$ 的表达式的判断由下列规则引入：
+%
+\begin{itemize}
+\item 若 $\Gamma \vdash A:\UU_n$ 且 $\Gamma,x:A \vdash B:\UU_n$，则 $\Gamma \vdash \tprd{x:A}B : \UU_n$
+\item 若 $\Gamma, x:A \vdash b:B$，则 $\Gamma \vdash (\lam{x} b) : (\tprd{x:A} B)$
+\item 若 $\Gamma\vdash g:\tprd{x:A} B$ 且 $\Gamma\vdash t:A$，则 $\Gamma\vdash g(t):B[t/x]$
+\end{itemize}
+%
+若 $x$ 在 $B$ 中不自由出现，我们将 $\tprd{x:A} B$ 缩写为非依值函数类型
+$A\rightarrow B$，并导出如下规则：
+%
+\begin{itemize}
+\item 若 $\Gamma\vdash g:A \rightarrow B$ 且 $\Gamma\vdash t:A$，则 $\Gamma\vdash g(t):B$
+\end{itemize}
+使用非依值函数类型并将上下文 $\Gamma$ 隐去时，上述规则可写成下列替代风格；本附录本节其余部分都采用这种写法：
+%
+\begin{itemize}
+\item 若 $A:\UU_n$ 且 $B:A\to\UU_n$，则 $\tprd{x:A}B(x) : \UU_n$
+\item 若 $x:A \vdash b:B(x)$，则 $ \lam{x} b : \tprd{x:A} B(x)$
+\item 若 $g:\tprd{x:A} B(x)$ 且 $t:A$，则 $g(t):B(t)$
+\end{itemize}
+%
+
+\subsection{依值配对类型 (\texorpdfstring{$\Sigma$}{Σ}-types)}
+
+我们引入原始常元 $c_\Sigma$ 与 $c_{\mathsf{pair}}$。形如
+$c_\Sigma(A,\lam{a} B)$ 的表达式记作 $\sm{a:A}B$，
+形如 $c_{\mathsf{pair}}(a,b)$ 的表达式记作 $\tup
+a b$。当 $x$ 在 $B$ 中不自由时，我们以 $A\times B$ 代替 $\sm{x:A} B$。
+
+关于这类表达式的判断由下列
+规则引入：
+%
+\begin{itemize}
+\item 若 $A:\UU_n$ 且 $B: A \rightarrow \UU_n$，则 $\sm{x:A}B(x) : \UU_n$
+\item 在此基础上，若 $a:A$ 且 $b:B(a)$，则 $\tup a b:\sm{x:A}B(x)$
+\end{itemize}
+%
+若给定如上的 $A$ 与 $B$，再给定 $C : (\sm{x:A}B(x)) \rightarrow \UU_m$，以及
+\[
+  d:\tprd{x:A}{y:B(x)} C(\tup x y)
+\]
+则可引入一个定义常元
+\[
+  f:\tprd{p:\sm{x:A}B(x)} C(p)
+\]
+其定义方程为
+\[
+  f(\tup x y)\defeq d(x,y).
+\]
+%
+注意，如果这些对象是在某个非空上下文中得到的，那么 $C$、$d$、$x$ 与 $y$ 可能带有额外的隐式参数 $x_1,\ldots,x_n$；因此，完全显式的递归图式为
+%
+\begin{narrowmultline*}
+ f(x_1,\dots,x_n,\tup{x(x_1,\dots,x_n)}{y(x_1,\dots,x_n)}) \defeq
+ \narrowbreak
+ d(x_1,\dots,x_n,\tup{x(x_1,\dots,x_n)}{y(x_1,\dots,x_n)}).
+\end{narrowmultline*}
+
+\subsection{余积类型}
+
+我们引入原始常元 $c_+$、$c_\inlsym$ 与 $c_\inrsym$。
+我们用 $A+B$ 代替 $c_+(A,B)$，用 $\inl(a)$ 代替
+$c_\inlsym(a)$，并用 $\inr(a)$ 代替 $c_\inrsym(a)$：
+%
+\begin{itemize}
+\item 若 $A,B : \UU_n$，则 $A + B : \UU_n$
+\item 另外，$\inl: A \rightarrow A+B$ 且 $\inr: B \rightarrow A+B$
+\end{itemize}
+%
+若给定如上的 $A$ 与 $B$，以及 $C : A+B \rightarrow \UU_m$，
+$d:\tprd{x:A} C(\inl(x))$ 与 $e:\tprd{y:B} C(\inr(y))$，
+则可引入一个定义常元 $f:\tprd{z:A+B}C(z)$，其定义方程为
+%
+\begin{equation*}
+  f(\inl(x)) \defeq d(x)
+  \qquad\text{and}\qquad
+  f(\inr(y)) \defeq e(y).
+\end{equation*}
+
+\subsection{有限类型}
+
+我们引入原始常元 $\ttt$、$\emptyt$、$\unit$，满足下列规则：
+%
+\begin{itemize}
+\item $\emptyt : \UU_0$，$\unit : \UU_0$
+\item $\ttt:\unit$
+\end{itemize}
+
+给定 $C : \emptyt \rightarrow \UU_n$，可引入定义常元 $f:\tprd{x:\emptyt} C(x)$，且无定义方程。
+
+给定 $C : \unit \rightarrow \UU_n$ 与 $d : C(\ttt)$，可引入定义常元 $f:\tprd{x:\unit} C(x)$，其定义方程为 $f(\ttt) \defeq d$。
+
+\subsection{自然数}
+
+自然数类型通过引入原始常元
+$\N$、$0$ 与 $\suc$ 得到，并满足下列规则：
+%
+\begin{itemize}
+  \item $\N : \UU_0$,
+  \item $0:\N$,
+  \item $\suc:\N\rightarrow \N$.
+\end{itemize}
+%
+此外，我们可以用原始递归定义函数。若给定
+$C : \N \rightarrow \UU_k $，那么只要给定
+%
+\begin{align*}
+  d & : C(0) \\
+  e & : \tprd{x:\N}(C(x)\rightarrow C(\suc (x)))
+\end{align*}
+%
+即可引入定义常元 $f:\tprd{x:\N}C(x)$，其定义方程为
+%
+\begin{equation*}
+  f(0) \defeq d
+  \qquad\text{and}\qquad
+  f(\suc (x)) \defeq e(x,f(x)).
+\end{equation*}
+
+\subsection{\texorpdfstring{$W$}{W}-类型}
+
+对于 $W$-类型，我们引入原始常元 $c_\wtypesym$ 与 $c_\suppsym$。
+形如 $c_\wtypesym(A,\lam{x} B)$ 的表达式记作
+$\wtype{x:A}B$，形如 $c_\suppsym(x,u)$ 的表达式记作
+$\supp(x,u)$：
+%
+\begin{itemize}
+\item 若 $A:\UU_n$ 且 $B: A \rightarrow \UU_n$，则 $\wtype{x:A}B(x) : \UU_n$
+\item 另外，若 $a:A$ 且 $u:B(a)\rightarrow \wtype{x:A}B(x)$，则 $\supp(a,u):\wtype{x:A}B(x)$。
+\end{itemize}
+% 
+这里同样可以用全递归定义函数。若给定如上的 $A$ 与 $B$，并给定 $C : (\wtype{x:A}B(x)) \rightarrow \UU_m$，那么当我们有
+\[
+  d:\tprd{a:A}{u:B(a) \rightarrow \wtype{x:A}B(x)}((\tprd{y:B(a)}C(u(y))) \rightarrow C(\supp(a,u)))
+\]
+时，就可以引入定义常元
+\[
+  f:\tprd{z:\wtype{x:A}B(x)} C(z)
+\]
+其定义方程为
+\[
+  f(\supp(a,u)) \defeq d(a,u,f\circ u).
+\]
+
+\subsection{恒等类型}
+
+我们引入原始常元 $c_\idsym$ 与 $c_{\refl{}}$。当
+已知 $a:A$ 时，记 $c_\idsym(A,a,b)$ 为 $\id[A] a b$，记 $c_{\refl{}}(A,a)$ 为 $\refl a$：
+%
+\begin{itemize}
+\item 若 $A : \UU_n$、$a:A$ 且 $b:A$，则 $\id[A] a b : \UU_n$。
+\item 若 $a:A$，则 $\refl a :\id[A] a a $。
+\end{itemize}
+%
+给定 $a:A$，若有 $y:A, z:\id[A] a y \vdash C : \UU_m$ 且
+$\vdash d:C[a,\refl{a}/y,z]$，则可引入定义常元
+\[
+  f:\tprd{y:A}{z:\id[A] a y} C
+\]
+其定义方程为
+\[
+  f(a,\refl{a})\defeq d.
+\]
+\section{第二种表述}
+\label{sec:syntax-more-formally}
+
+在本节中，有三类判断
+\begin{mathpar}
+\wfctx\Gamma
+\and
+\oftp\Gamma{a}{A}
+\and
+\jdeqtp\Gamma{a}{a'}{A}
+\end{mathpar}
+我们通过给出导出它们的推断规则来规定这些判断。一个典型的 \define{推断规则}
+\indexsee{inference rule}{rule}%
+\indexdef{rule}%
+具有如下形式
+%
+\begin{equation*}
+  \inferrule*[right=\textsc{Name}]
+  {\mathcal{J}_1 \\ \cdots \\ \mathcal{J}_k}
+  {\mathcal{J}}
+\end{equation*}
+%
+它表示：只要我们已经导出了 \define{前提} $\mathcal{J}_1, \ldots, \mathcal{J}_k$，
+就可以导出 \define{结论} $\mathcal{J}$。
+（注意，这里是判断而非类型，因此它们不是 \cref{sec:types-vs-sets} 意义下类型论\emph{内部}的前提；而是演绎系统中的前提，即元理论中的前提。）
+在右侧我们写出该规则的 \textsc{Name}，并且在规则可用之前，可能还需要检查额外的旁条件。
+
+一个判断的 \define{推导}
+\index{derivation}%
+是由这类推断规则构成的一棵树，该判断位于树根。例如，在下述规则下，下面给出了
+$\oftp{\emptyctx}{\lamu{x:\unit} x}{\unit\to\unit}$
+的一种推导。
+%
+\begin{mathpar}
+\inferrule*[right=$\Pi$-\rintro]
+  {\inferrule*[right=$\Vble$]
+    {\inferrule*[right=\ctx-\textsc{ext}]
+      {\inferrule*[right=$\unit$-\rform]
+        {\inferrule*[right=\ctx-\textsc{emp}]
+          {\ }
+          {\wfctx {\emptyctx}}}
+        {\oftp{}{\unit}{\UU_0}}}
+      {\wfctx {\tmtp x\unit}}}
+   {\oftp{\tmtp x\unit}{x}{\unit}}}
+ {\oftp{\emptyctx}{\lamu{x:\unit} x}{\unit\to\unit}}
+\end{mathpar}
+
+\subsection{语境}
+\label{subsec:contexts}
+
+\index{context}%
+语境是一个列表
+%
+\begin{equation*}
+  \tmtp{x_1}{A_1}, \tmtp{x_2}{A_2}, \ldots, \tmtp{x_n}{A_n}
+\end{equation*}
+%
+表示彼此不同的变量
+\index{variable}%
+$x_1, \ldots, x_n$ 分别被假定具有类型 $A_1, \ldots, A_n$。该列表可以为空。我们用字母 $\Gamma$ 和 $\Delta$ 简记语境，也可以将它们并置形成更大的语境。
+
+判断 $\wfctx{\Gamma}$ 在形式上表达“$\Gamma$ 是良构语境”，其受如下推断规则支配：
+%
+\begin{mathpar}
+  \inferrule*[right=\ctx-\textsc{emp}]
+  {\ }
+  {\wfctx\emptyctx}
+\and
+  \inferrule*[right=\ctx-\textsc{ext}]
+  {\oftp{\tmtp{x_1}{A_1}, \ldots, \tmtp{x_{n-1}}{A_{n-1}}}{A_n}{\UU_i}}
+  {\wfctx{(\tmtp{x_1}{A_1}, \ldots, \tmtp{x_n}{A_n})}}
+\end{mathpar}
+%
+第二条规则有一个旁条件：变量 $x_n$ 必须与 $x_1, \ldots, x_{n-1}$ 两两不同。
+注意，$\ctx$-\textsc{ext} 的前提与结论是不同形式的判断：前提说的是在变量 $x_1, \ldots, x_{n-1}$ 的语境中，表达式 $A_n$ 具有类型 $\UU_i$；而结论说的是扩展后的语境 $(\tmtp{x_1}{A_1}, \ldots, \tmtp{x_n}{A_n})$ 是良构的。
+
+该系统的一个元理论性质是：若任一形如 $\oftp{\Gamma}{a}{A}$ 或 $\jdeqtp\Gamma{a}{a'}{A}$ 的判断可推导，则语境 $\Gamma$ 良构这一判断 $\wfctx\Gamma$ 也可推导。
+所有规则的前提都被选取得恰到好处：包含足以证明该性质的良构性假设，但不多加。
+例如，$\ctx$-\textsc{ext} 无需额外假设 $(\tmtp{x_1}{A_1}, \ldots, \tmtp{x_{n-1}}{A_{n-1}})$ 的良构性，因为这会由其前提的可推导性推出；但在下一小节的 $\Vble$ 规则中，前提中假设其语境良构则是必要的。
+这种选择只是精确定式化类型论的诸多可能方式之一；对这类问题作细致探讨超出了本附录的范围。
+
+\subsection{结构规则}
+
+\index{structural!rules|(}%
+\index{rule!structural|(}%
+
+语境承载假设这一事实由如下规则表达：我们可以导出语境中列出的那些类型判断。
+%
+\begin{mathpar}
+  \inferrule*[right=$\Vble$]
+  {\wfctx {(\tmtp{x_1}{A_1}, \ldots, \tmtp{x_n}{A_n})} }
+  {\oftp{\tmtp{x_1}{A_1}, \ldots, \tmtp{x_n}{A_n}}{x_i}{A_i}}
+\end{mathpar}
+%
+与 $\ctx$-\textsc{ext} 类似，规则 $\Vble$ 的前提与结论也是不同形式的判断，只是这次方向相反：我们从良构语境出发，导出一个类型判断。
+
+下面两个重要原则，称为 \define{代换}
+\indexdef{rule!of substitution}%
+和
+\define{弱化}，
+\indexdef{rule!of weakening}%
+不必显式作为公理假设。相反，可以对一切可能推导的结构作归纳证明：只要这些规则的前提可推导，其结论也可推导。\footnote{这类规则称为 \define{可容许的}\indexdef{rule!admissible}\indexsee{admissible!rule}{rule, admissible}。}
+对类型判断而言，这些原则体现为
+%
+\begin{mathpar}
+  \inferrule*[right=$\Subst_1$]
+  {\oftp\Gamma{a}{A} \\ \oftp{\Gamma,\tmtp xA,\Delta}{b}{B}}
+  {\oftp{\Gamma,\Delta[a/x]}{b[a/x]}{B[a/x]}}
+\and
+  \inferrule*[right=$\Weak_1$]
+  {\oftp\Gamma{A}{\UU_i} \\ \oftp{\Gamma,\Delta}{b}{B}}
+  {\oftp{\Gamma,\tmtp xA,\Delta}{b}{B}}
+\end{mathpar}
+而对判断相等而言，它们变为
+\begin{mathpar}
+  \inferrule*[right=$\Subst_2$]
+  {\oftp\Gamma{a}{A} \\ \jdeqtp{\Gamma,\tmtp xA,\Delta}{b}{c}{B}}
+  {\jdeqtp{\Gamma,\Delta[a/x]}{b[a/x]}{c[a/x]}{B[a/x]}}
+\and
+  \inferrule*[right=$\Subst_3$]
+  {\jdeqtp\Gamma{a}{b}{A} \\ \oftp{\Gamma,\tmtp xA,\Delta}{c}{C}}
+  {\jdeqtp{\Gamma,\Delta[a/x]}{c[a/x]}{c[b/x]}{C[a/x]}}
+\and
+  \inferrule*[right=$\Weak_2$]
+  {\oftp\Gamma{A}{\UU_i} \\ \jdeqtp{\Gamma,\Delta}{b}{c}{B}}
+  {\jdeqtp{\Gamma,\tmtp xA,\Delta}{b}{c}{B}}
+\end{mathpar}
+%
+除每个类型构造子各自给出的判断相等规则外，我们还假设判断相等是受类型保持的等价关系。
+\begin{mathparpagebreakable}
+  \inferrule*{\oftp\Gamma{a}{A}}{\jdeqtp\Gamma{a}{a}{A}}
+\and
+  \inferrule*{\jdeqtp\Gamma{a}{b}{A}}{\jdeqtp\Gamma{b}{a}{A}}
+\and
+  \inferrule*{\jdeqtp\Gamma{a}{b}{A} \\ \jdeqtp\Gamma{b}{c}{A}}{\jdeqtp\Gamma{a}{c}{A}}
+\and
+  \inferrule*{\oftp\Gamma{a}{A} \\ \jdeqtp\Gamma{A}{B}{\UU_i}}{\oftp\Gamma{a}{B}}
+\and
+  \inferrule*{\jdeqtp\Gamma{a}{b}{A} \\ \jdeqtp\Gamma{A}{B}{\UU_i}}{\jdeqtp\Gamma{a}{b}{B}}
+\end{mathparpagebreakable}
+%
+最后，我们还假设判断相等是受类型保持的合同关系，
+即每个类型构造子和项构造子在其每个参数上都保持判断相等。例如，除 $\Pi$-\rintro\ 规则外，我们还假设规则
+\[
+  \inferrule*[right=$\Pi$-\rintro-eq]
+  {\oftp\Gamma{A}{\UU_i} \\
+   \oftp{\Gamma,\tmtp xA}{B}{\UU_i} \\
+   \jdeqtp{\Gamma,\tmtp xA}{b}{b'}{B}}
+  {\jdeqtp\Gamma{\lamu{x:A} b}{\lamu{x:A'} b'}{\tprd{x:A} B}}
+\]
+为补全依值函数类型的情形，还需假设两条类似规则，
+$\Pi$-\textsc{form-eq}\ 与 $\Pi$-\textsc{elim-eq}。
+这些局部原则（对每个类型分别成立）合起来蕴含上面的全局合同原则
+$\Subst_2$ 和 $\Subst_3$。为简洁起见，我们省略这些局部规则。
+
+\index{rule!structural|)}%
+\index{structural!rules|)}%
+
+\subsection{类型宇宙}
+
+\index{type!universe}%
+
+我们设定一个无穷的类型宇宙层级
+%
+\begin{equation*}
+  \UU_0, \quad \UU_1, \quad  \UU_2, \quad \ldots
+\end{equation*}
+%
+每个宇宙都包含于下一个宇宙中，且任何位于 $\UU_i$ 的类型也位于 $\UU_{i+1}$：
+%
+\begin{mathpar}
+\inferrule*[right=\UU-\textsc{intro}]
+  {\wfctx \Gamma }
+  {\oftp\Gamma{\UU_i}{\UU_{i+1}}}
+\and
+\inferrule*[right=\UU-\textsc{cumul}]
+  {\oftp\Gamma{A}{\UU_i}}
+  {\oftp\Gamma{A}{\UU_{i+1}}}
+\end{mathpar}
+%
+我们将按如下方式建立类型论规则：$\oftp\Gamma{a}{A}$
+可推出对某个 $i$ 有 $\oftp\Gamma{A}{\UU_i}$。换言之，只要 $A$ 扮演类型的角色，它就属于某个宇宙。我们类型系统的另一个性质是：$\jdeqtp\Gamma{a}{b}{A}$
+可推出 $\oftp\Gamma{a}{A}$ 与 $\oftp\Gamma{b}{A}$。
+
+\subsection{依值函数类型 (\texorpdfstring{$\Pi$}{Π}-types)}
+\label{sec:more-formal-pi}
+
+\index{type!dependent function}%
+\index{type!function}%
+
+在 \cref{sec:function-types} 中，我们先引入了非依值函数 $A\to B$，
+以便把类型族定义成函数 $\lam{x:A} B:A\to\UU_i$，
+再由此得到依值函数类型 $\tprd{x:A} B$。但在显式语境下，
+我们可以把 $\lam{x:A} B:A\to\UU_i$ 替换为判断
+%
+\begin{equation*}
+  \oftp{\tmtp xA}{B}{\UU_i}.
+\end{equation*}
+%
+因此，我们可以直接定义依值函数，而不必借助非依值函数。这样做遵循一个一般原则：每个类型构造子及其常元与规则，都应独立于其他类型构造子来引入。
+%
+实际上，从现在起每个类型构造子都按如下系统方式引入：
+\begin{itemize}
+\item 一个 \define{形成规则}，说明该类型构造子何时可用；\index{formation rule}\index{rule!formation}
+\item 若干 \define{引入规则}，说明如何构造该类型的元素；\index{introduction rule}\index{rule!introduction}
+\item \define{消去规则}，或归纳原理，说明如何使用该类型的元素；
+  \index{induction principle}\index{eliminator}
+\item \define{计算规则}，它们是判断相等，用来说明把消去规则作用于引入规则结果时会发生什么；
+  \index{computation rule}
+  \indexsee{rule!computation}{computation rule}
+\item 可选的 \define{唯一性原理}，它们是判断相等，用来说明该类型的每个元素如何由对其应用消去规则的结果唯一确定。
+  \index{uniqueness!principle}
+  \indexsee{principle!uniqueness}{uniqueness principle}
+\end{itemize}
+（另见 \cref{rmk:introducing-new-concepts}。）
+
+对依值函数类型而言，规则如下：
+%
+\begin{mathparpagebreakable}
+  \def\premise{\oftp{\Gamma}{A}{\UU_i} \and \oftp{\Gamma,\tmtp xA}{B}{\UU_i}}
+  \inferrule*[right=$\Pi$-\rform]
+    \premise
+    {\oftp\Gamma{\tprd{x:A}B}{\UU_i}}
+\and
+  \inferrule*[right=$\Pi$-\rintro]
+  {\oftp{\Gamma,\tmtp xA}{b}{B}}
+  {\oftp\Gamma{\lam{x:A} b}{\tprd{x:A} B}}
+\and
+  \inferrule*[right=$\Pi$-\relim]
+  {\oftp\Gamma{f}{\tprd{x:A} B} \\ \oftp\Gamma{a}{A}}
+  {\oftp\Gamma{f(a)}{B[a/x]}}
+\and
+  \inferrule*[right=$\Pi$-\rcomp]
+  {\oftp{\Gamma,\tmtp xA}{b}{B} \\ \oftp\Gamma{a}{A}}
+  {\jdeqtp\Gamma{(\lam{x:A} b)(a)}{b[a/x]}{B[a/x]}}
+\and
+  \inferrule*[right=$\Pi$-\runiq]
+  {\oftp\Gamma{f}{\tprd{x:A} B}}
+  {\jdeqtp\Gamma{f}{(\lamu{x:A}f(x))}{\tprd{x:A} B}}
+\end{mathparpagebreakable}
+
+表达式 $\lam{x:A} b$ 会绑定 $b$ 中 $x$ 的自由出现；$\tprd{x:A} B$ 对
+$B$ 也同样如此。
+
+当 $x$ 在 $B$ 中不自由出现，从而 $B$ 不依赖于 $A$ 时，我们得到普通函数类型这一特例：$A\to B \defeq \tprd{x:A} B$。我们将此作为 $\to$ 的\emph{定义}。
+
+我们可以将表达式 $\lam{x:A} b$ 简写为 $\lamu{x:A} b$，其含义是：在类型检查之前，应根据上下文把省略的类型 $A$ 适当地补全。
+
+\subsection{依值对类型 (\texorpdfstring{$\Sigma$}{Σ}-types)}
+\label{sec:more-formal-sigma}
+
+\index{type!dependent pair}%
+\index{type!product}%
+
+在 \cref{sec:sigma-types} 中，我们需要 $\to$ 与 $\prdsym$ 类型来
+定义 $\smsym$ 的引入与消去规则；与 $\prdsym$ 一样，语境使我们可以独立地陈述 $\smsym$ 的规则。
+回忆一下，像 $\Sigma$ 这样的正类型的消去规则称为\emph{归纳}，记作 $\ind{}$。
+%
+\begin{mathparpagebreakable}
+  \def\premise{\oftp{\Gamma}{A}{\UU_i} \and \oftp{\Gamma,\tmtp xA}{B}{\UU_i}}
+  \inferrule*[right=$\Sigma$-\rform]
+    \premise
+    {\oftp\Gamma{\tsm{x:A} B}{\UU_i}}
+  \and
+  \inferrule*[right=$\Sigma$-\rintro]
+    {\oftp{\Gamma, \tmtp x A}{B}{\UU_i} \\
+     \oftp\Gamma{a}{A} \\ \oftp\Gamma{b}{B[a/x]}}
+    {\oftp\Gamma{\tup ab}{\tsm{x:A} B}}
+  \and
+  \inferrule*[right=$\Sigma$-\relim]
+    {\oftp{\Gamma, \tmtp z {\tsm{x:A} B}}{C}{\UU_i} \\
+     \oftp{\Gamma,\tmtp x A,\tmtp y B}{g}{C[\tup x y/z]} \\
+     \oftp\Gamma{p}{\tsm{x:A} B}}
+    {\oftp\Gamma{\ind{\tsm{x:A} B}(z.C,x.y.g,p)}{C[p/z]}}
+  \and
+  \inferrule*[right=$\Sigma$-\rcomp]
+    {\oftp{\Gamma, \tmtp z {\tsm{x:A} B}}{C}{\UU_i} \\
+     \oftp{\Gamma, \tmtp x A, \tmtp y B}{g}{C[\tup x y/z]} \\\\
+     \oftp\Gamma{a}{A} \\ \oftp\Gamma{b}{B[a/x]}}
+    {\jdeqtp\Gamma{\ind{\tsm{x:A} B}(z.C,x.y.g,\tup{a}{b})}{g[a,b/x,y]}{C[\tup {a} {b}/z]}}
+\end{mathparpagebreakable}
+%
+表达式 $\tsm{x:A} B$ 会绑定 $B$ 中 $x$ 的自由出现。此外，
+由于 $\ind{\tsm{x:A} B}$ 的某些参数含有超出 $\Gamma$ 的自由变量，
+我们（沿用上面的变量名）在 $C$ 中绑定 $z$，并在 $g$ 中绑定 $x$ 与 $y$。
+这些绑定写作 $z.C$ 与 $x.y.g$，以指明被绑定变量的名字。
+\index{variable!bound}%
+特别地，我们将 $\ind{\tsm{x:A} B}$ 视为一个原始项构造子，
+其中两个参数本身含有绑定子；这在表面上类似于、但不同于把 $\ind{\tsm{x:A} B}$ 看成“以函数为参数的函数”。
+
+当 $B$ 不含 $x$ 的自由出现时，我们得到笛卡尔积这一特例：
+$A \times B \defeq \tsm{x:A} B$。我们将此作为笛卡尔积的\emph{定义}。
+
+注意，我们没有为 $\Sigma$-类型设定判断性的唯一性原理，尽管本可以这样做；对应的命题性唯一性原理见 \cref{thm:eta-sigma} 的证明。
+
+\subsection{余积类型}
+
+\index{type!coproduct}%
+
+\begin{mathparpagebreakable}
+  \inferrule*[right=$+$-\rform]
+  {\oftp\Gamma{A}{\UU_i} \\ \oftp\Gamma{B}{\UU_i}}
+  {\oftp\Gamma{A+B}{\UU_i}}
+\\
+  \inferrule*[right=$+$-\rintro${}_1$]
+  {\oftp\Gamma{A}{\UU_i} \\ \oftp\Gamma{B}{\UU_i} \\\\ \oftp\Gamma{a}{A}}
+  {\oftp\Gamma{\inl(a)}{A+B}}
+\and
+  \inferrule*[right=$+$-\rintro${}_2$]
+  {\oftp\Gamma{A}{\UU_i} \\ \oftp\Gamma{B}{\UU_i} \\\\ \oftp\Gamma{b}{B}}
+  {\oftp\Gamma{\inr(b)}{A+B}}
+\\
+  \inferrule*[right=$+$-\relim]
+  {\oftp{\Gamma,\tmtp z{(A+B)}}{C}{\UU_i} \\\\
+   \oftp{\Gamma,\tmtp xA}{c}{C[\inl(x)/z]} \\
+   \oftp{\Gamma,\tmtp yB}{d}{C[\inr(y)/z]} \\\\
+   \oftp\Gamma{e}{A+B}}
+  {\oftp\Gamma{\ind{A+B}(z.C,x.c,y.d,e)}{C[e/z]}}
+\and
+  \inferrule*[right=$+$-\rcomp${}_1$]
+  {\oftp{\Gamma,\tmtp z{(A+B)}}{C}{\UU_i} \\
+   \oftp{\Gamma,\tmtp xA}{c}{C[\inl(x)/z]} \\
+   \oftp{\Gamma,\tmtp yB}{d}{C[\inr(y)/z]} \\\\
+   \oftp\Gamma{a}{A}}
+  {\jdeqtp\Gamma{\ind{A+B}(z.C,x.c,y.d,\inl(a))}{c[a/x]}{C[\inl(a)/z]}}
+\and
+  \inferrule*[right=$+$-\rcomp${}_2$]
+  {\oftp{\Gamma,\tmtp z{(A+B)}}{C}{\UU_i} \\
+   \oftp{\Gamma,\tmtp xA}{c}{C[\inl(x)/z]} \\
+   \oftp{\Gamma,\tmtp yB}{d}{C[\inr(y)/z]} \\\\
+   \oftp\Gamma{b}{B}}
+  {\jdeqtp\Gamma{\ind{A+B}(z.C,x.c,y.d,\inr(b))}{d[b/y]}{C[\inr(b)/z]}}
+\end{mathparpagebreakable}
+%
+在 $\ind{A+B}$ 中，$z$ 在 $C$ 中被绑定，$x$ 在 $c$ 中被绑定，$y$ 在
+$d$ 中被绑定。
+
+\subsection{空类型 \texorpdfstring{$\emptyt$}{0}}
+
+\index{type!empty|(}%
+
+\begin{mathparpagebreakable}
+  \inferrule*[right=$\emptyt$-\rform]
+  {\wfctx\Gamma}
+  {\oftp\Gamma\emptyt{\UU_i}}
+\and
+  \inferrule*[right=$\emptyt$-\relim]
+  {\oftp{\Gamma,\tmtp x\emptyt}{C}{\UU_i} \\ \oftp\Gamma{a}{\emptyt}}
+  {\oftp\Gamma{\ind{\emptyt}(x.C,a)}{C[a/x]}}
+\end{mathparpagebreakable}
+%
+在 $\ind{\emptyt}$ 中，$x$ 在 $C$ 中被绑定。空类型没有引入规则，也没有计算规则。
+
+\index{type!empty|)}%
+
+\subsection{单位类型 \texorpdfstring{$\unit$}{1}}
+\label{sec:more-formal-unit}
+
+\index{type!unit|(}%
+
+\begin{mathparpagebreakable}
+  \inferrule*[right=$\unit$-\rform]
+  {\wfctx\Gamma}
+  {\oftp\Gamma\unit{\UU_i}}
+\and
+  \inferrule*[right=$\unit$-\rintro]
+  {\wfctx\Gamma}
+  {\oftp\Gamma{\ttt}{\unit}}
+\and
+  \inferrule*[right=$\unit$-\relim]
+  {\oftp{\Gamma,\tmtp x\unit}{C}{\UU_i} \\
+   \oftp{\Gamma}{c}{C[\ttt/x]} \\
+   \oftp\Gamma{a}{\unit}}
+  {\oftp\Gamma{\ind{\unit}(x.C,c,a)}{C[a/x]}}
+\and
+  \inferrule*[right=$\unit$-\rcomp]
+  {\oftp{\Gamma,\tmtp x\unit}{C}{\UU_i} \\
+   \oftp{\Gamma}{c}{C[\ttt/x]}}
+  {\jdeqtp\Gamma{\ind{\unit}(x.C,c,\ttt)}{c}{C[\ttt/x]}}
+\end{mathparpagebreakable}
+%
+在 $\ind{\unit}$ 中，变量 $x$ 在 $C$ 中被绑定。
+
+注意，我们没有为单位类型设定判断性的唯一性原理；对应的命题性唯一性陈述见 \cref{sec:finite-product-types} 的证明。
+
+\index{type!unit|)}%
+
+\subsection{自然数类型}
+
+\index{natural numbers|(}%
+
+我们按照 \cref{sec:inductive-types} 给出自然数的规则。
+
+\begin{mathparpagebreakable}
+  \def\premise{
+     \oftp{\Gamma,\tmtp x{\N}}{C}{\UU_i} \\
+     \oftp\Gamma{c_0}{C[0/x]} \\
+     \oftp{\Gamma,\tmtp{x}\N,\tmtp y C}{c_s}{C[\suc(x)/x]}}
+  %
+  \inferrule*[right=$\N$-\rform]
+  {\wfctx\Gamma}
+  {\oftp\Gamma{\N}{\UU_i}}
+\and
+  \inferrule*[right=$\N$-\rintro${}_1$]
+  {\wfctx\Gamma}
+  {\oftp\Gamma{0}{\N}}
+\and
+  \inferrule*[right=$\N$-\rintro${}_2$]
+  {\oftp\Gamma{n}{\N}}
+  {\oftp\Gamma{\suc(n)}{\N}}
+\and
+  \inferrule*[right=$\N$-\relim]
+  {\premise \\ \oftp\Gamma{n}{\N}}
+  {\oftp\Gamma{\ind{\N}(x.C,c_0,x.y.c_s,n)}{C[n/x]}}
+\and
+  \inferrule*[right=$\N$-\rcomp${}_1$]
+  {\premise}
+  {\jdeqtp\Gamma{\ind{\N}(x.C,c_0,x.y.c_s,0)}{c_0}{C[0/x]}}
+\and
+  \inferrule*[right=$\N$-\rcomp${}_2$]
+  {\premise \\ \oftp\Gamma{n}{\N}}
+  {\Gamma\vdash
+    {\begin{aligned}[t]
+      &\ind{\N}(x.C,c_0,x.y.c_s,\suc(n)) \\
+      &\quad \jdeq c_s[n,\ind{\N}(x.C,c_0,x.y.c_s,n)/x,y] : C[\suc(n)/x]
+    \end{aligned}}}
+\end{mathparpagebreakable}
+%
+在 $\ind{\N}$ 中，$x$ 在 $C$ 中被绑定，而 $x$ 与 $y$ 在 $c_s$ 中被绑定。
+
+其他归纳定义的类型遵循同样的一般模式。
+
+\index{natural numbers|)}%
+
+\subsection{恒等类型}
+
+\label{sec:more-formal-identity}
+
+\index{type!identity|(}%
+
+这里的表述对应于 \cref{sec:identity-types} 中恒等类型的（无基点）路径归纳原理。
+
+\begin{mathparpagebreakable}
+  \inferrule*[right=$\idsym$-\rform]
+  {\oftp\Gamma{A}{\UU_i} \\ \oftp\Gamma{a}{A} \\ \oftp\Gamma{b}{A}}
+  {\oftp\Gamma{\id[A]{a}{b}}{\UU_i}}
+\and
+  \inferrule*[right=$\idsym$-\rintro]
+  {\oftp\Gamma{A}{\UU_i} \\ \oftp\Gamma{a}{A}}
+  {\oftp\Gamma{\refl a}{\id[A]aa}}
+\and
+  \inferrule*[right=$\idsym$-\relim]
+  {\oftp{\Gamma,\tmtp xA,\tmtp yA,\tmtp p{\id[A]xy}}{C}{\UU_i} \\
+   \oftp{\Gamma,\tmtp zA}{c}{C[z,z,\refl z/x,y,p]} \\
+   \oftp\Gamma{a}{A} \\ \oftp\Gamma{b}{A} \\ \oftp\Gamma{p'}{\id[A]ab}}
+  {\oftp\Gamma{\indid{A}(x.y.p.C,z.c,a,b,p')}{C[a,b,p'/x,y,p]}}
+\and
+  \inferrule*[right=$\idsym$-\rcomp]
+  {\oftp{\Gamma,\tmtp xA,\tmtp yA,\tmtp p{\id[A]xy}}{C}{\UU_i} \\
+   \oftp{\Gamma,\tmtp zA}{c}{C[z,z,\refl z/x,y,p]} \\
+   \oftp\Gamma{a}{A}}
+  {\jdeqtp\Gamma{\indid{A}(x.y.p.C,z.c,a,a,\refl a)}{c[a/z]}{C[a,a,\refl a/x,y,p]}}
+\end{mathparpagebreakable}
+%
+在 $\indid{A}$ 中，$x$、$y$ 与 $p$ 在 $C$ 中被绑定，而 $z$ 在
+$c$ 中被绑定。
+
+\index{type!identity|)}%
+
+\subsection{定义}
+
+\index{definition}%
+
+尽管到目前为止列出的规则已经足以直接构造我们所需的一切，
+但出于便利，我们仍希望能够使用有名字的常元，例如 $\isequiv$。非形式地看，这些常元可以被视作缩写；但在形式化中，情况会更微妙一些。
+
+例如考虑函数复合：它把 $f:A\to B$ 与
+$g:B\to C$ 送到 $g\circ f:A\to C$。略显出人意料的是，要在形式上让这件事成立，$\circ$ 的参数不仅必须包含 $f$ 和 $g$，还必须包含它们的类型 $A$、$B$、$C$：
+%
+\begin{narrowmultline*}
+  {\circ} \defeq \lam{A:\UU_i}{B:\UU_i}{C:\UU_i}
+  \narrowbreak
+  \lam{g:B\to C}{f:A\to B}{x:A} g(f(x)).
+\end{narrowmultline*}
+%
+从实践角度看，我们并不想在每次使用
+$\circ$ 时都标注 $A$、$B$、$C$，因为它们通常都能由周边信息轻易推断出来。我们希望只写 $g\circ f$。
+于是，严格地说，$g \circ f$ 并不是 $\lam{x : A} g(f(x))$ 的缩写，
+因为它还涉及我们希望省略的额外 \define{隐式参数}。
+\index{implicit argument}
+
+对隐式参数的推断、典型歧义\index{typical ambiguity}（\cref{sec:universes}）、
+确保符号只定义一次等工作，统称为
+\define{精化}。 \index{elaboration, in type theory}
+精化必须发生在检查推导之前，因此通常不作为核心类型论的一部分来呈现。然而，几乎不可能使用任何不执行精化的类型论实现；更多讨论见 \cite{Coq,norell2007towards}。
+\section{同伦类型论}
+\label{sec:hott-features}
+
+在本节中，我们陈述将同伦类型论与标准 Martin-L\"{o}f 类型论区分开的附加公理：函数外延性、
+泛等公理以及高阶归纳类型。我们按照第二种表述 \cref{sec:syntax-more-formally} 的风格来陈述它们，尽管同样也可以使用第一种表述 \cref{sec:syntax-informally}。
+
+\subsection{函数外延性与泛等}
+
+有两种基本方式可引入不产生新语法或判定相等的新公理（函数外延性和泛等都属于这种情形）：
+要么添加一个居留该公理的原始常元，要么在证明所有依赖该公理的定理时假设一个居留该公理的变量，参见 \cref{sec:axioms}。
+虽然这两种方式本质上等价，我们选择前一种做法，因为我们认为同伦类型论的公理是核心理论的重要组成部分。
+
+\index{function extensionality}%
+\cref{axiom:funext} 通过引入常元 $\funext$ 来形式化，它
+断言 $\happly$ 是一个等价：
+%
+\begin{mathparpagebreakable}
+  \inferrule*[right=$\Pi$-\textsc{ext}]
+  {\oftp\Gamma{f}{\tprd{x:A} B} \\
+   \oftp\Gamma{g}{\tprd{x:A} B}}
+  {\oftp\Gamma{\funext(f,g)}{\isequiv(\happly_{f,g})}}
+\end{mathparpagebreakable}
+%
+$\happly$ 和 $\isequiv$ 的定义分别见~\eqref{eq:happly} 与
+\cref{sec:concluding-remarks}。
+
+\index{univalence axiom}%
+\cref{axiom:univalence} 也以类似方式形式化：
+%
+\begin{mathparpagebreakable}
+  \inferrule*[right=$\UU_i$-\textsc{univ}]
+  {\oftp\Gamma{A}{\UU_i} \\
+   \oftp\Gamma{B}{\UU_i}}
+  {\oftp\Gamma{\univalence(A,B)}{\isequiv(\idtoeqv_{A,B})}}
+\end{mathparpagebreakable}
+%
+$\idtoeqv$ 的定义见~\eqref{eq:uidtoeqv}。
+
+\subsection{圆}
+
+\index{type!circle}%
+
+这里给出一个基础的高阶归纳类型示例；其他例子也遵循同样的
+一般图式，只是会有进一步细化。
+
+注意，下面这些规则并不严格遵循
+\cref{sec:syntax-more-formally} 中普通归纳类型的模式：这些规则涉及
+传送以及映射函子性的概念（\cref{sec:functors}），并且第二条计算规则是命题相等而非判定相等。
+这些差异在 \cref{sec:dependent-paths} 中讨论。
+
+\begin{mathparpagebreakable}
+  \inferrule*[right=$\Sn^1$-\rform]
+  {\wfctx\Gamma}
+  {\oftp\Gamma{\Sn^1}{\UU_i}}
+\and
+  \inferrule*[right=$\Sn^1$-\rintro${}_1$]
+  {\wfctx\Gamma}
+  {\oftp\Gamma{\base}{\Sn^1}}
+\and
+  \inferrule*[right=$\Sn^1$-\rintro${}_2$]
+  {\wfctx\Gamma}
+  {\oftp\Gamma{\lloop}{\id[\Sn^1]{\base}{\base}}}
+\and
+  \inferrule*[right=$\Sn^1$-\relim]
+  {\oftp{\Gamma,\tmtp x{\Sn^1}}{C}{\UU_i} \\
+   \oftp{\Gamma}{b}{C[\base/x]} \\
+   \oftp{\Gamma}{\ell}{\dpath C \lloop b b} \\
+   \oftp\Gamma{p}{\Sn^1}}
+  {\oftp\Gamma{\ind{\Sn^1}(x.C,b,\ell,p)}{C[p/x]}}
+\and
+  \inferrule*[right=$\Sn^1$-\rcomp${}_1$]
+  {\oftp{\Gamma,\tmtp x{\Sn^1}}{C}{\UU_i} \\
+   \oftp{\Gamma}{b}{C[\base/x]} \\
+   \oftp{\Gamma}{\ell}{\dpath C \lloop b b}}
+  {\jdeqtp\Gamma{\ind{\Sn^1}(x.C,b,\ell,\base)}{b}{C[\base/x]}}
+\and
+  \inferrule*[right=$\Sn^1$-\rcomp${}_2$]
+  {\oftp{\Gamma,\tmtp x{\Sn^1}}{C}{\UU_i} \\
+   \oftp{\Gamma}{b}{C[\base/x]} \\
+   \oftp{\Gamma}{\ell}{\dpath C \lloop b b}}
+  {\oftp\Gamma{\Sn^1\text{-}\mathsf{loopcomp}}
+    {\id {\apd{(\lamu{y:\Sn^1} \ind{\Sn^1}(x.C,b,\ell,y))}{\lloop}} {\ell}}}
+\end{mathparpagebreakable}
+%
+在 $\ind{\Sn^1}$ 中，$x$ 在 $C$ 中被约束。用于表示依值路径的记号 ${\dpath C \lloop b b}$ 已在 \cref{sec:dependent-paths} 中引入。
+\index{rules of type theory|)}%
+\section{基本元理论}
+\index{metatheory|(}%
+
+本节讨论 \cref{sec:syntax-informally} 中给出的类型论的元理论性质，而类似结果也适用于 \cref{sec:syntax-more-formally}。当加入 \cref{sec:hott-features} 的特性后，哪些性质仍成立，会很快导向开放问题\index{open!problem}，本节末尾将对此讨论。
+
+回忆 \cref{sec:syntax-informally} 将类型论中的项定义为
+无类型 $\lambda$-演算的扩展。$\lambda$-演算
+有其自身的计算概念，即计算规则\index{computation rule!for function types}：
+\[
+  (\lam{x} t)(u) \defeq t[u/x].
+\]
+该规则与定义常元的定义方程一起构成
+\emph{重写规则}\index{rewriting rule}\index{rule!rewriting}，从而确定重写系统中的约化步。
+这些步骤给出了计算意义上的概念，因为每条规则
+都有自然方向：通过在参数上求值，把 $(\lam{x} t)(u)$ 简化。
+
+此外，该系统是\emph{合流的}\index{confluence}：也就是说，若 $a$ 经若干步简化既可到达 $a'$ 又可到达 $a''$，则存在某个 $b$，使得 $a'$ 与
+$a''$ 最终都能简化到 $b$。因此我们可定义 $t\conv u$
+表示 $t$ 与 $u$ 都可简化到同一项。
+
+（在 \cref{sec:syntax-more-formally} 中情形类似：尽管那里
+我们将计算规则表述为无向相等 $\jdeq$，仍可给出
+操作语义，即规定消去子的应用于某个引入形式时
+向其相等式右侧简化，而不是反向。）
+
+使用类型论中的标准技术，可以证明 \cref{sec:syntax-informally} 中的系统
+具有如下性质：
+
+\begin{thm}\label{thm:conversion-preserves-typing}
+若 $A : \UU$ 且 $A \conv A'$，则 $A' : \UU$。
+若 $t:A$ 且 $t \conv t'$，则 $t':A$。
+\end{thm}
+
+我们称一个项是\define{可规范化的}
+\indexdef{term!normalizable}%
+\index{normalization}%
+\indexdef{normalizable term}%
+（分别地，\define{强可规范化的}）
+\indexdef{term!strongly normalizable}%
+\index{normalization!strong}%
+\index{strong!normalization}%
+如果从该项出发的某个（分别地，每个）重写步序列
+会终止。
+
+\begin{thm}\label{thm:strong-normalization}
+若 $A : \UU$，则 $A$ 是强可规范化的。
+若 $t:A$，则 $A$ 与 $t$ 都是强可规范化的。
+\end{thm}
+
+我们称一个项处于\define{范式}
+\index{normal form}%
+\index{term!normal form of}%
+当它不能再被进一步
+简化；称一个项是\define{封闭的}
+\index{closed!term}%
+\index{term!closed}%
+当其中没有变量自由出现。
+一个封闭的范式类型必须是原始类型，即
+形如某个原始常元 $c$ 的 $c(\vec{v})$（其中封闭范式项列表 $\vec{v}$
+若为空则可省略，如 $\N$ 的情形）。实际上，我们
+可以显式描述所有范式：
+
+\begin{lem}\label{lem:normal-forms}
+  范式项可由下列语法描述：
+  % 
+  \begin{align*}
+    v & \production  k \mid \lam{x} v \mid c(\vec{v}) \mid f(\vec{v}), \\
+    k &\production x \mid k(v) \mid f(\vec{v})(k),
+  \end{align*}
+  % 
+  其中 $f(\vec{v})$ 表示定义函数 $f$ 的一次部分应用。
+  特别地，处于范式的类型形如 $k$ 或 $c(\vec{v})$。
+\end{lem}
+
+\begin{thm}
+  若 $A$ 处于范式，则判断
+  $A : \UU$ 是可判定的。若 $A : \UU$ 且 $t$ 处于范式，则判断
+  $t:A$ 是可判定的。
+\end{thm}
+
+逻辑一致性\index{consistency}（针对 \cref{sec:syntax-informally} 中的系统）可立即推出：若在空上下文中有 $a:\emptyt$，则由
+\cref{thm:conversion-preserves-typing,thm:strong-normalization}，$a$
+可简化为一个范式项 $a':\emptyt$。但根据
+\cref{lem:normal-forms}，这样的项并不存在。
+
+\begin{cor}
+ \cref{sec:syntax-informally} 中的系统在逻辑上是一致的。
+\end{cor}
+
+类似地，我们还有\emph{典范性}\indexdef{canonicity}性质：若在空
+上下文中有 $a:\N$，则 $a$ 可简化为某个数字 $k$ 对应的范式项 $\suc^k(0)$。
+
+\begin{cor}
+ \cref{sec:syntax-informally} 中的系统具有典范性性质。
+\end{cor}
+
+最后，当 $a,A$ 都处于范式时，判定 $a:A$ 是\emph{可判定}的；换言之，由于类型检查等同于验证一个证明是否正确，这意味着我们总能“在见到一个正确证明时识别它”。
+
+\begin{cor}
+在 \cref{sec:syntax-informally} 中的系统里，“成为一个证明”这一性质是可判定的。
+\end{cor}
+
+\mentalpause
+
+上述结果不适用于同伦类型论的扩展系统
+（即在上述系统中加入 \cref{sec:hott-features} 的系统），因为
+泛等公理的出现以及高阶归纳类型构造子的出现
+永远不会被简化，从而破坏了 \cref{lem:normal-forms}。是否可以通过
+简化这些常元的应用来恢复典范性，仍是一个开放问题\index{open!problem}。
+我们也没有一个图式来描述所有允许的高阶
+归纳类型，也不确定其规则应如何被正确表述
+（例如，高阶构造子的计算规则是否应为判定
+相等）。
+
+含有泛等与高阶
+归纳类型扩展的 Martin-L\"{o}f 类型论的一致性\index{consistency}，可以通过发明一种合适的规范化过程来证明，但目前
+这些系统一致性的唯一证明仍来自语义模型 --- 就
+泛等而言，是 Voevodsky 给出的 Kan\index{Kan complex} 复形模型 \cite{klv:ssetmodel}；而就高阶归纳类型而言，是 Lumsdaine 与 Shulman 给出的模型 \cite{ls:hits}。
+
+其他元理论问题，以及当前结果的总结，在本书导言中的“Constructivity”和“Open problems”小节有更详细的讨论。
+
+\index{metatheory|)}%
+
+\sectionNotes\label{subsec:general-remarks}
+
+% This presentation is strongly inspired by two  Martin-L\"of 1972 and 1973.
+
+这种由引入规则（原始常元）以及消去与计算规则（定义常元）构成的规则系统，受到 Gentzen 自然演绎的启发。对存在量词消去规则可加强这一点，见 \cite{howard:pat}。析取公理的加强出现在 \cite{Martin-Lof-1972} 中，而荒谬消去与恒等类型的加强出现在 \cite{Martin-Lof-1973} 中。$W$-类型由 \cite{Martin-Lof-1979} 引入。它们推广了 \cite{Tait-1968} 引入的一种树的概念。
+\index{Martin-L\"of}%
+
+%inspired from unpublished work of Spector.
+
+自然数与序数的广义原始递归形式见于 \cite{Hilbert-1925}。这启发了 G\"odel 的系统 $T$，
+\cite{Goedel-T-1958}；该系统由 \cite{Tait-1966} 分析。后者沿用 \cite{Goedel-T-1958} 的术语，将可转换性称为“definitional equality”：若两个项通过一系列约化规则应用可约化到同一项，则它们\emph{判定相等}。
+这一术语也由 de Bruijn 在其对 \emph{AUTOMATH} 的表述中使用 \cite{deBruijn-1973}。\index{AUTOMATH}
+
+我们的第二种表述基本上是内涵 Martin-L\"{o}f 类型论的标准表述，外加一些同伦类型论所需的附加特性。与 \cite{hofmann:syntax-and-semantics} 的参考表述相比，本书的类型论有一些
+非关键差异：
+%
+\begin{itemize}
+\item Russell 风格的宇宙（\`{a} la Russell），按
+\cite{martin-lof:bibliopolis} 的意义；以及
+\item $\Pi$-类型的判定 $\eta$ 与函数外延性；
+\end{itemize}
+还有一些对同伦类型论至关重要的特性：
+\begin{itemize}
+\item 泛等公理；以及
+\item 高阶归纳类型。
+\end{itemize}
+%
+为方便起见，本书主要用归纳并通过\emph{模式匹配}定义函数。
+\index{pattern matching}%
+\index{definition!by pattern matching}%
+模式匹配这一概念是可以形式化的，如 \cref{sec:syntax-informally} 所示。然而，\cref{sec:syntax-more-formally} 采用的标准类型论表述是：为每个类型构造子引入一个单独的\emph{依值
+消去子}，并要求从该类型出发的函数都由此定义。这种做法在语法和语义上都更易形式化，因为它对应于该类型构造子的泛性质。
+两种做法是等价的；更长的讨论见 \cref{sec:pattern-matching}。
+
+\index{type theory!formal|)}%
+\index{formal!type theory|)}%
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "hott-online"
+%%% End: 

@@ -19,7 +19,8 @@ CNTEXFILES = preface-cn.tex \
 	homotopy-cn.tex \
 	categories-cn.tex \
 	setmath-cn.tex \
-	reals-cn.tex
+	reals-cn.tex \
+	formal-cn.tex
 
 # Top-level LaTeX files from which HoTT book can be generated
 TOPTEXFILES = $(DEFAULTTOPTEX) hott-ustrade.tex hott-letter.tex hott-letter-exercises.tex hott-a4.tex hott-a4-exercises.tex hott-ebook.tex hott-ebook-wide.tex hott-ebook-narrow.tex hott-arxiv.tex $(XELATEXTOPTEXFILES)
