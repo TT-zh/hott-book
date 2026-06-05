@@ -220,7 +220,8 @@ $\infty$-群胚的新方式。
 因此，引理或定理的陈述应当被翻译为一个类型，如 \cref{sec:pat} 所示；其证明应翻译为该类型的一个居民。
 按全称量词“对每个”的解释，\cref{lem:opp} 对应的类型是
 \[ \prd{A:\UU}{x,y:A} (x= y)\to(y= x). \]
-\cref{lem:opp} 的证明将构造该类型的一个元素，即对某个 $f$ 推导判断 $f:\prd{A:\UU}{x,y:A} (x= y)\to(y= x)$。
+\cref{lem:opp} 的证明将构造该类型的一个元素，即对某个 $f$ 推导判断
+\narrowequation{f:\prd{A:\UU}{x,y:A} (x= y)\to(y= x).}
 随后我们为该元素 $f$ 引入记号 $\opp{(\blank)}$，其中参数 $A$、$x$、$y$ 省略并由上下文推断。
 （如 \cref{sec:types-vs-sets} 所述，次要陈述“对每个 $x:A$，$\opp{\refl{x}}\jdeq\refl{x}$”应视为独立判断。）
 
@@ -232,9 +233,10 @@ $\infty$-群胚的新方式。
     d\defeq \lam{x} \refl{x}:\prd{x:A} D(x,x,\refl{x}).
   \end{equation*}
   因此，恒等类型的归纳原理给出元素
-  \narrowequation{ \indid{A}(D,d,x,y,p): (y= x)}
+  \narrowequation{\indid{A}(D,d,x,y,p): (y= x)}
   对每个 $p:(x= y)$ 成立。
-  现在可把所需函数 $\opp{(\blank)}$ 定义为 $\lam{p} \indid{A}(D,d,x,y,p)$，即设 $\opp{p} \defeq \indid{A}(D,d,x,y,p)$。
+  现在可把所需函数 $\opp{(\blank)}$ 定义为
+  \narrowequation{\opp{p} \defeq \indid{A}(D,d,x,y,p).}
   转换规则~\eqref{eq:Jconv} 给出 $\opp{\refl{x}}\jdeq \refl{x}$，如所要求。
 \end{proof}
 
@@ -860,12 +862,15 @@ $\Omega(A,a)$ 为类型 $\id[A]{a}{a}$。
   \begin{equation*}
     d\defeq\lam{x} \refl{f(x)}:\prd{x:A} D(x,x,\refl{x})
   \end{equation*}
-  现由路径归纳可得：对每个 $p:x= y$，有 $\apdfunc f(p):\trans p{f(x)}= f(y)$。
+  现由路径归纳可得：对每个 $p:x= y$，有
+  \narrowequation{\apdfunc f(p):\trans p{f(x)}= f(y).}
 \end{proof}
 
 \begin{proof}[第二种证明]
   由归纳法，只需考虑 $p$ 为 $\refl x$。
-  但此时所需等式为 $\trans{(\refl{x})}{f(x)}= f(x)$，它按判定相等成立。
+  但此时所需等式是
+  \narrowequation{\trans{(\refl{x})}{f(x)}= f(x),}
+  它按判定相等成立。
 \end{proof}
 
 在这个意义下，我们将一般地把“位于其他路径之上”的路径称为\emph{依值路径}。
@@ -897,7 +902,11 @@ $\Omega(A,a)$ 为类型 $\id[A]{a}{a}$。
   但 $\transfib P {\refl x} b \jdeq b$，所以此时我们需证明的是 $b=b$，而这由 $\refl{b}$ 给出。
 \end{proof}
 
-因此，对任意 $x,y:A$、$p:x=y$ 与 $f:A\to B$，分别与 $\transconst Bp{f(x)}$ 及其逆拼接，可得到函数
+因此，对任意
+\narrowequation{x,y:A,\qquad p:x=y,\qquad f:A\to B,}
+分别与
+\narrowequation{\transconst Bp{f(x)}}
+及其逆拼接，可得到函数
 \begin{align}
   \big(f(x) = f(y)\big) &\to \big(\trans{p}{f(x)} = f(y)\big)\label{eq:ap-to-apd}
   \qquad\text{以及} \\
@@ -2188,9 +2197,11 @@ $\mathsf{transport}$ 给出的作用：
 \[
 \transfibf{\semigroupstrsym}{(\ua(e))} : \semigroupstr{A} \to \semigroupstr{B}.
 \]
-而且这个映射是等价，因为
-$\transfibf{C}(\alpha)$ 总是一个等价，其逆为
-$\transfibf{C}{(\opp \alpha)}$，见 \cref{thm:transport-concat,thm:omg}。
+而且这个映射是等价。事实上，
+\narrowequation{\transfibf{C}(\alpha)}
+总是一个等价，而其逆为
+\narrowequation{\transfibf{C}{(\opp \alpha)},}
+见 \cref{thm:transport-concat,thm:omg}。
 
 虽然泛等公理\index{univalence axiom}保证该映射存在，但为了
 计算它具体做什么，我们需要使用前几节证明过的

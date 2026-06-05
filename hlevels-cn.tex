@@ -2077,7 +2077,12 @@ $n$-连通空间与函数的概念在经典同伦论中也很传统；不过如�
   \item 对每个 $x:\Gamma_0$，有函数 $\inc_x:F(x) \to \colim(F)$，
   \item 对每个 $x,y:\Gamma_0$、$\gamma:\Gamma_1(x,y)$、$a:F(x)$，有路径 $\glue_{x,y}(\gamma,a) : \inc_y(F_{x,y}(\gamma,a)) = \inc_x(a)$，以及
   \item 对每个 $x,y,z:\Gamma_0$、$\gamma:\Gamma_1(x,y)$、$\delta:\Gamma_1(y,z)$、$a:F(x)$，有路径
-    \[ \ap{\inc_z}{\cmp_{x,y,z}(\delta,\gamma,a)} \ct \glue_{x,z}(\delta\circ \gamma,a) = \glue_{y,z}(\delta,F_{x,y}(\gamma,a)) \ct \glue_{x,y}(\gamma,a). \]
+    \begin{narrowmultline*}
+      \ap{\inc_z}{\cmp_{x,y,z}(\delta,\gamma,a)} \ct
+      \glue_{x,z}(\delta\circ \gamma,a) \narrowbreak
+      = \glue_{y,z}(\delta,F_{x,y}(\gamma,a)) \ct
+      \glue_{x,y}(\gamma,a).
+    \end{narrowmultline*}
   \end{itemize}
   （这是对完全同伦论意义下图表与余极限概念的“二阶近似”；后者应在所有更高层级都包含这种“相干路径”。
   如何在类型论中定义这类对象仍是一个重要开放问题。）

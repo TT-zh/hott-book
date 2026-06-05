@@ -1208,7 +1208,8 @@ Hopf 纤维化将使我们能够计算若干球面的同伦群。
   \end{itemize}
   %
   再次使用扁平化引理，或直接计算，可容易看出
-  $\eqv{\sm{a:Y+Z}C(a)}{\sm{y:Y}E_Y(y)+\sm{z:Z}E_Z(z)}$，因此
+  \narrowequation{\eqv{\sm{a:Y+Z}C(a)}{\sm{y:Y}E_Y(y)+\sm{z:Z}E_Z(z)},}
+  因此
   ${E^{\mathrm{tot}}}'$ 等价于高阶归纳类型 $E^{\mathrm{tot}}$，其生成元如下：
   %
   \begin{itemize}
@@ -1337,7 +1338,7 @@ $\Sn^3$ 等价。
   $\mu(x,\base)=x$，我们对 $x:\Sn^1$ 做归纳：
   \begin{itemize}
   \item 若 $x$ 是 $\base$，则按定义 $\mu(\base,\base)=\base$，故有
-    $\refl\base:\mu(\base,\base)=\base$。
+    \narrowequation{\refl\base:\mu(\base,\base)=\base.}
   \item 当 $x$ 沿 $\lloop$ 变化时，需要证明
     \[\refl\base\ct\apfunc{\lam{x}x}({\lloop})=
     \apfunc{\lam{x}\mu(x,\base)}({\lloop})\ct\refl\base.\]
@@ -1638,11 +1639,24 @@ $A\vee B$ 定义为 $A\xleftarrow{a_0}
   首先需选取可缩中心，记为 $c(y,p):\code(y,p)$。
   这对应于我们先前证明中 $\encode$ 函数的定义，因此我们通过传送来定义它。
   注意在特例 $y$ 为 $\north$ 且 $p$ 为 $\refl{\north}$ 时，有
-  \[\code(\north,\refl{\north}) \jdeq \trunc{2n}{\tsm{x:X} (\merid(x) \ct \opp{\merid(x_0)} = \refl{\north})}.\]
-  因而可取 $c(\north,\refl{\north})\defeq \tproj{2n}{(x_0,\mathsf{rinv}_{\merid(x_0)})}$，其中 $\mathrm{rinv}_q$ 是任意 $q$ 的显然路径 $q\ct\opp q = \refl{}$。
-  现在可通过对 $p$ 做路径归纳得到 $c:\prd{y:\susp X}{p:\north=y} \code(y,p)$，但下文中我们还需要它的一个具体传送表达：
-  \[ c(y,p) \defeq \transfib{\hat{\code}}{\pairpath(p,\mathsf{tid}_p)}{c(\north,\refl{\north})}
-  \]
+  \begin{narrowmultline*}
+    \code(\north,\refl{\north}) \jdeq \narrowbreak
+    \trunc{2n}{\tsm{x:X} (\merid(x) \ct \opp{\merid(x_0)} = \refl{\north})}.
+  \end{narrowmultline*}
+  因而可取
+  \begin{narrowmultline*}
+    c(\north,\refl{\north}) \defeq \narrowbreak
+    \tproj{2n}{(x_0,\mathsf{rinv}_{\merid(x_0)})},
+  \end{narrowmultline*}
+  其中 $\mathrm{rinv}_q$ 是任意 $q$ 的显然路径
+  \narrowequation{q\ct\opp q = \refl{}.}
+  现在可通过对 $p$ 做路径归纳得到
+  \narrowequation{c:\prd{y:\susp X}{p:\north=y} \code(y,p),}
+  但下文中我们还需要它的一个具体传送表达：
+  \begin{narrowmultline*}
+    c(y,p) \defeq \narrowbreak
+    \transfib{\hat{\code}}{\pairpath(p,\mathsf{tid}_p)}{c(\north,\refl{\north})}
+  \end{narrowmultline*}
   其中 $\hat{\code}: \big(\sm{y:\susp X} (\north=y)\big) \to \type$ 是 \code 的去柯里化版本，$\mathsf{tid}_p:\trans{p}{\refl{}} = p$ 是一个标准引理。
 
   接着需证明 $\code(y,p)$ 的每个元素都等于 $c(y,p)$。

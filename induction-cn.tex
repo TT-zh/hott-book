@@ -496,9 +496,11 @@ C \ar[r]_{f}   & D }
 则 $f$ 是一个 $P$-同态（或\define{$\w$-同态}）。
 于是有 $\w$-同态的类型：
 \symlabel{whom}
-\begin{equation*}
-  \whom_{A,B}((C, s_C),(D,s_D)) \defeq \sm{f : C \to D} \prd{a:A}{h:B(a)\to C} \id{f(s_C(a,h))}{s_D(a, f\circ h)}
-\end{equation*}
+\begin{narrowmultline*}
+  \whom_{A,B}((C, s_C),(D,s_D)) \defeq \sm{f : C \to D}
+  \narrowbreak
+  \prd{a:A}{h:B(a)\to C} \id{f(s_C(a,h))}{s_D(a, f\circ h)}
+\end{narrowmultline*}
 
 \index{universal!property!of $\w$-type}%
 最后，称一个 $P$-代数 $(C, s_C)$ 为\define{同伦初始}

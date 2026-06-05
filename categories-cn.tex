@@ -1208,7 +1208,8 @@ Rezk 完备化也进一步阐明了范畴等价的概念。
 
 最简单的单排序结构就是一个不带附加结构的类型。单价公理以强形式表达了这种结构概念下的结构同一性原理：对类型 $A,B$，典范函数 $(A=B)\to (\eqv A B)$ 是等价。
 
-我们从一个预范畴 $X$ 出发。在应用到单排序一阶结构时，$X$ 将是 %\uset%
+我们从一个预范畴 $X$ 出发。
+在应用到单排序一阶结构时，我们令 $X$ 为
 $\bbU$-小集合范畴，其中 $\bbU$ 是一个单价类型宇宙。
 
 \begin{defn}\label{ct:sig}
@@ -1292,12 +1293,20 @@ $f:\hom_X(x,y)$ 与 $g:\hom_X(y,z)$，则有\label{item:sigcmp}
   其中第一箭头由函数外延性是等价，第二箭头因为它是依值乘积的等价（因 $B$ 是范畴），第三箭头如上所述。
   因而 $B^{A_0}$ 是范畴。
 
-  现在在 $B^{A_0}$ 上定义一种结构概念：其中 $P(F_0)$ 是操作 $F:\prd{a,a':A_0} \hom_A(a,a') \to \hom_B(F_0 a,F_0 a')$ 的类型，这些操作把 $F_0$ 扩展为函子（即保持复合与恒等）。
+  现在在 $B^{A_0}$ 上定义一种结构概念：其中 $P(F_0)$ 是如下操作 $F$ 的类型：
+  \begin{narrowmultline*}
+    F:\prd{a,a':A_0} \hom_A(a,a') \to \narrowbreak
+    \hom_B(F_0 a,F_0 a').
+  \end{narrowmultline*}
+  这些操作把 $F_0$ 扩展为函子（即保持复合与恒等）。
   由于每个 $\hom_B(\blank,\blank)$ 都是集合，该类型是集合。
   给定这类 $F$ 与 $G$，定义当且仅当 $\gamma:\hom_{B^{A_0}}(F_0, G_0)$ 构成自然变换\index{natural!transformation}时，它是一个同态。
   在 \cref{ct:functor-precat} 中我们本质上已验证这是一种结构概念。
   另外，若 $F,F'$ 都是 $F_0$ 上的结构，且恒等是从 $F$ 到 $F'$ 的自然变换，则对任意 $f:\hom_A(a,a')$，有
-  $F'f = F'f \circ 1_{F_0 a} = 1_{F_0 a}\circ F f = F f$。
+  \begin{narrowmultline*}
+    F'f = F'f \circ 1_{F_0 a} \narrowbreak
+    = 1_{F_0 a}\circ F f = F f.
+  \end{narrowmultline*}
   施加函数外延性可得 $F = F'$。
   因而得到一个\emph{标准}结构概念，再由 \cref{thm:sip} 可知预范畴 $B^A$ 是范畴。
 \end{eg}
@@ -1338,8 +1347,9 @@ $a$ 由一个集合 $|a|$ 以及如下赋值组成：对每个函数符号 $\ome
     P_0x &\defeq \prd{\omega:\Omega_0} x^{|\omega|}\to x, \mbox{ and } \\
     P_1x &\defeq \prd{\omega:\Omega_1} x^{|\omega|}\to \propU,
   \end{align*}
-\item 对 $\bbU$-小集合 $x,y$ 以及
-  $\alpha:P^\omega x,\;\beta:P^\omega y,\; f:x\to y$，定义
+\item 对 $\bbU$-小集合 $x,y$，以及
+  \narrowequation{\alpha:P^\omega x,\;\beta:P^\omega y,\; f:x\to y,}
+  定义
   \[ H_{\alpha\beta}(f) \defeq H_{0,\alpha\beta}(f)\wedge H_{1,\alpha\beta}(f).\]
   其中
   \begin{align*}
@@ -1640,7 +1650,10 @@ $a$ 由一个集合 $|a|$ 以及如下赋值组成：对每个函数符号 $\ome
   按 $\hom_{\widehat A}$ 对等式的定义，这由把 $1_{ia}$ 与等价 $g$ 复合给出，因此等于 $g$。
 
   \index{encode-decode method}%
-  注意这一步与 \cref{sec:compute-coprod,sec:compute-nat,cha:homotopy} 中的 encode-decode 方法非常相似。一次我们又是在刻画某个高阶归纳类型（这里是 $\widehat A_0$）的恒等类型：递归定义一族编码（这里是 $(x,y)\mapsto (x\cong y)$），并通过对 $\widehat A_0$ 及路径归纳定义编码与解码函数。
+  注意这一步与 \cref{sec:compute-coprod,sec:compute-nat,cha:homotopy} 中的 encode-decode 方法非常相似。这里我们再次刻画某个高阶归纳类型（这里是 $\widehat A_0$）的恒等类型。
+  具体地说，我们递归定义一族编码
+  \narrowequation{(x,y)\mapsto (x\cong y),}
+  再通过对 $\widehat A_0$ 及路径归纳定义编码与解码函数。
 
   \mentalpause
 

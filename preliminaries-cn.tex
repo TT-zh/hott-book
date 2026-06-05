@@ -749,9 +749,16 @@ $g : \prd{x:A} B(x) \to C$，并按定义方程
 \lamu{x:A} \fst(g(x)) &: A \to  B, \\
 \lamu{x:A} \snd(g(x)) &: \tprd{x:A} R(x,\fst(g(x))).
 \end{align*}
-此外，类型 $\prd{x:A} R(x,\fst(g(x)))$ 正是把 \ac 陪域中求和的类型族 $\lamu{f:A\to B} \tprd{x:A} R(x,f(x))$ 作用到函数 $\lamu{x:A} \fst(g(x))$ 的结果：
-\[ \tprd{x:A} R(x,\fst(g(x))) \jdeq
-\Parens{\lamu{f:A\to B} \tprd{x:A} R(x,f(x))}\big(\lamu{x:A} \fst(g(x))\big). \]
+此外，类型
+\narrowequation{\prd{x:A} R(x,\fst(g(x)))}
+正是把 \ac 陪域中求和的类型族
+\narrowequation{\lamu{f:A\to B} \tprd{x:A} R(x,f(x))}
+作用到函数 $\lamu{x:A} \fst(g(x))$ 的结果：
+\begin{narrowmultline*}
+  \tprd{x:A} R(x,\fst(g(x))) \jdeq \narrowbreak
+  \Parens{\lamu{f:A\to B} \tprd{x:A} R(x,f(x))}
+  \big(\lamu{x:A} \fst(g(x))\big).
+\end{narrowmultline*}
 因此有
 \[ \Parens{\lamu{x:A} \fst(g(x)),\, \lamu{x:A} \snd(g(x))} : \tsm{f:A\to B} \tprd{x:A} R(x,f(x))\]
 如所需。
@@ -1917,8 +1924,10 @@ Martin-L\"of 类型论语境下的基路径归纳规则由 Paulin-Mohring \cite{
 \end{ex}
 
 \begin{ex}\label{ex:without-K}
-  为什么恒等类型的归纳原理不允许我们构造函数 $f: \prd{x:A}{p:\id{x}{x}} (\id{p}{\refl{x}})$，并满足定义方程
-  \[ f(x,\refl{x}) \defeq \refl{\refl{x}} \quad ?\]
+  为什么恒等类型的归纳原理不允许我们构造函数
+  \narrowequation{f: \prd{x:A}{p:\id{x}{x}} (\id{p}{\refl{x}})}
+  并满足定义方程
+  \narrowequation{f(x,\refl{x}) \defeq \refl{\refl{x}} \quad ?}
 \end{ex}
 
 \begin{ex}\label{ex:subtFromPathInd}

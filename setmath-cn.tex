@@ -926,14 +926,19 @@ P(a,\acc_<(a,h)),
   通过对 $s_1$ 归纳来证，令
   \[P_1(a,s_1) \defeq \prd{s_2:\acc(a)} (s_1=s_2). \]
   因而，我们要证明：对任意 $a:A$、${h_1:\prd{b:A} (b<a) \to \acc(b)}$ 以及
-  \[ k_1:{\prd{b:A}{l:b<a}{t:\acc(b)} h_1(b,l) = t},\]
-  对任意 $s_2:\acc(a)$，有 $\acc_<(a,h) = s_2$。
-  把该命题视为 $\prd{a:A}{s_2:\acc(a)} P_2(a,s_2)$，其中
-  \[P_2(a,s_2) \defeq
-  \prd{h_1 : \cdots } %{h_1:\prd{b:A} (b<a) \to \acc(b)}
-  {k_1 : \cdots} % \Parens{\prd{b:A}{l:b<a}{t:\acc(b)} h_1(b,l) = t} \to
-  (\acc_<(a,h_1) = s_2);
+  \[
+    k_1:{\prd{b:A}{l:b<a}{t:\acc(b)} h_1(b,l) = t},
   \]
+  都有
+  \narrowequation{\prd{s_2:\acc(a)} (\acc_<(a,h) = s_2).}
+  把该命题视为
+  \narrowequation{\prd{a:A}{s_2:\acc(a)} P_2(a,s_2),}
+  其中
+  \begin{narrowmultline*}
+    P_2(a,s_2) \defeq \prd{h_1 : \cdots } %{h_1:\prd{b:A} (b<a) \to \acc(b)}
+    {k_1 : \cdots} % \Parens{\prd{b:A}{l:b<a}{t:\acc(b)} h_1(b,l) = t} \to
+    (\acc_<(a,h_1) = s_2).
+  \end{narrowmultline*}
   因此可对 $s_2$ 归纳来证。
   于是设 $h_2 : \prd{b:A} (b<a) \to \acc(b)$，以及一个类型庞杂但无关紧要的 $k_2$，
   % \begin{narrowmultline*}
