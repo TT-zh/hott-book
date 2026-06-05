@@ -7,7 +7,7 @@ DEFAULTTOPTEX = hott-online.tex
 XELATEXTOPTEXFILES = hott-book-cn.tex
 
 # Chinese-localized source files used by the XeLaTeX target(s)
-CNTEXFILES = preface-cn.tex introduction-cn.tex
+CNTEXFILES = preface-cn.tex introduction-cn.tex preliminaries-cn.tex
 
 # Top-level LaTeX files from which HoTT book can be generated
 TOPTEXFILES = $(DEFAULTTOPTEX) hott-ustrade.tex hott-letter.tex hott-letter-exercises.tex hott-a4.tex hott-a4-exercises.tex hott-ebook.tex hott-ebook-wide.tex hott-ebook-narrow.tex hott-arxiv.tex $(XELATEXTOPTEXFILES)

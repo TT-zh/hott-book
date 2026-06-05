@@ -123,7 +123,11 @@
 %%%% Header and footers
 \pagestyle{fancyplain}
 \setlength{\headheight}{15pt}
+\ifOPTchinese
+\renewcommand{\chaptermark}[1]{\markboth{\textsc{第\thechapter 章\ #1}}{}}
+\else
 \renewcommand{\chaptermark}[1]{\markboth{\textsc{Chapter \thechapter. #1}}{}}
+\fi
 \renewcommand{\sectionmark}[1]{\markright{\textsc{\thesection\ #1}}}
 
 \lhead[\fancyplain{}{{\thepage}}]%
@@ -137,7 +141,11 @@
 %%%% Chapter & part style
 \usepackage[raggedright]{titlesec}
 \titleformat{\part}[display]{\fontsize{\OPTpartfont}{\OPTpartfont}\fontseries{m}\fontshape{sc}\selectfont}{\hfil\partname\ \Roman{part}}{\OPTpartskip}{\fontsize{\OPTparttitlefont}{\OPTparttitlefont}\fontseries{b}\fontshape{sc}\selectfont\hfil}
+\ifOPTchinese
+\titleformat{\chapter}[display]{\fontsize{\OPTchapterfont}{\OPTchapterfont}\fontseries{m}\fontshape{it}\selectfont}{第\thechapter 章}{\OPTchapterskip}{\fontsize{\OPTchaptertitlefont}{\OPTchaptertitlefont}\fontseries{b}\fontshape{n}\selectfont}
+\else
 \titleformat{\chapter}[display]{\fontsize{\OPTchapterfont}{\OPTchapterfont}\fontseries{m}\fontshape{it}\selectfont}{\chaptertitlename\ \thechapter}{\OPTchapterskip}{\fontsize{\OPTchaptertitlefont}{\OPTchaptertitlefont}\fontseries{b}\fontshape{n}\selectfont}
+\fi
 
 % Patch bug in titlesec 2.10.1
 \makeatletter
@@ -232,7 +240,11 @@
 \part{Foundations}
 \label{part:foundations}
 
+\ifOPTchinese
+\include{preliminaries-cn}
+\else
 \include{preliminaries}
+\fi
 
 \include{basics}
 
@@ -268,7 +280,11 @@
 
 \appendix
 
+\ifOPTchinese
+\renewcommand{\chaptermark}[1]{\markboth{\textsc{附录\thechapter. #1}}{}}
+\else
 \renewcommand{\chaptermark}[1]{\markboth{\textsc{Appendix. \thechapter. #1}}{}}
+\fi
 \renewcommand{\sectionmark}[1]{\markright{\textsc{\thesection\ #1}}}
 
 \include{formal}

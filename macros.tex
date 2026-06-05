@@ -1,10 +1,21 @@
 %%%% MACROS FOR NOTATION %%%%
 % Use these for any notation where there are multiple options.
 
+% Localization flag fallback (for targets that include macros.tex directly).
+\expandafter\ifx\csname ifOPTchinese\endcsname\relax
+\expandafter\newif\csname ifOPTchinese\endcsname
+\csname OPTchinesefalse\endcsname
+\fi
+
 %%% Notes and exercise sections
 \makeatletter
+\ifOPTchinese
+\newcommand{\sectionNotes}{\phantomsection\section*{附注}\addcontentsline{toc}{section}{附注}\markright{\textsc{第 \thechapter 章 附注}}}
+\newcommand{\sectionExercises}[1]{\ifdef{\OPTexerciseperpage}{\newpage}{}\phantomsection\section*{练习}\addcontentsline{toc}{section}{练习}\markright{\textsc{第 \thechapter 章 练习}}}
+\else
 \newcommand{\sectionNotes}{\phantomsection\section*{Notes}\addcontentsline{toc}{section}{Notes}\markright{\textsc{\@chapapp{} \thechapter{} Notes}}}
 \newcommand{\sectionExercises}[1]{\ifdef{\OPTexerciseperpage}{\newpage}{}\phantomsection\section*{Exercises}\addcontentsline{toc}{section}{Exercises}\markright{\textsc{\@chapapp{} \thechapter{} Exercises}}}
+\fi
 \makeatother
 
 %%% Definitional equality (used infix) %%%
@@ -712,8 +723,14 @@
 \defthm{egs}{Examples}{Examples}
 \defthm{notes}{Notes}{Notes}
 % Number exercises within chapters, with their own counter.
+\ifOPTchinese
+\newtheorem{ex}{练习}[chapter]
+\crefname{ex}{练习}{练习}
+\Crefname{ex}{练习}{练习}
+\else
 \newtheorem{ex}{Exercise}[chapter]
 \crefname{ex}{Exercise}{Exercises}
+\fi
 
 % Display format for sections
 \crefformat{section}{\S#2#1#3}
@@ -734,6 +751,18 @@
 \Crefmultiformat{appendix}{Appendices~#2#1#3}{ and~#2#1#3}{, #2#1#3}{ and~#2#1#3}
 \crefrangemultiformat{appendix}{Appendices~#3#1#4--#5#2#6}{ and~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ and~#3#1#4--#5#2#6}
 \Crefrangemultiformat{appendix}{Appendices~#3#1#4--#5#2#6}{ and~#3#1#4--#5#2#6}{, #3#1#4--#5#2#6}{ and~#3#1#4--#5#2#6}
+
+\ifOPTchinese
+% Display format for chapters in Chinese mode.
+\crefformat{chapter}{第#2#1#3章}
+\Crefformat{chapter}{第#2#1#3章}
+\crefrangeformat{chapter}{第#3#1#4章至第#5#2#6章}
+\Crefrangeformat{chapter}{第#3#1#4章至第#5#2#6章}
+\crefmultiformat{chapter}{第#2#1#3章}{、第#2#1#3章}{、第#2#1#3章}{、第#2#1#3章}
+\Crefmultiformat{chapter}{第#2#1#3章}{、第#2#1#3章}{、第#2#1#3章}{、第#2#1#3章}
+\crefrangemultiformat{chapter}{第#3#1#4章至第#5#2#6章}{、第#3#1#4章至第#5#2#6章}{、第#3#1#4章至第#5#2#6章}{、第#3#1#4章至第#5#2#6章}
+\Crefrangemultiformat{chapter}{第#3#1#4章至第#5#2#6章}{、第#3#1#4章至第#5#2#6章}{、第#3#1#4章至第#5#2#6章}{、第#3#1#4章至第#5#2#6章}
+\fi
 
 \crefname{part}{Part}{Parts}
 
