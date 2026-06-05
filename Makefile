@@ -3,8 +3,14 @@
 # Default top-level LaTeX to generate
 DEFAULTTOPTEX = hott-online.tex
 
+# Top-level LaTeX files that should be built with XeLaTeX
+XELATEXTOPTEXFILES = hott-book-cn.tex
+
+# Chinese-localized source files used by the XeLaTeX target(s)
+CNTEXFILES = preface-cn.tex introduction-cn.tex
+
 # Top-level LaTeX files from which HoTT book can be generated
-TOPTEXFILES = $(DEFAULTTOPTEX) hott-ustrade.tex hott-letter.tex hott-letter-exercises.tex hott-a4.tex hott-a4-exercises.tex hott-ebook.tex hott-ebook-wide.tex hott-ebook-narrow.tex hott-arxiv.tex
+TOPTEXFILES = $(DEFAULTTOPTEX) hott-ustrade.tex hott-letter.tex hott-letter-exercises.tex hott-a4.tex hott-a4-exercises.tex hott-ebook.tex hott-ebook-wide.tex hott-ebook-narrow.tex hott-arxiv.tex $(XELATEXTOPTEXFILES)
 
 # LaTeX files that actually comprise the book
 # (that is, all of them except configuration)
@@ -69,7 +75,8 @@ BOOKAUXFILES := $(BOOKTEXFILES:.tex=.aux)
 
 # PDF and DVI files corresponding to HoTT book files
 TOPPDFFILES:=$(TOPTEXFILES:.tex=.pdf)
-TOPDVIFILES:=$(TOPTEXFILES:.tex=.dvi)
+PDFLATEXTOPPDFFILES:=$(filter-out $(XELATEXTOPTEXFILES:.tex=.pdf),$(TOPPDFFILES))
+TOPDVIFILES:=$(filter-out $(XELATEXTOPTEXFILES:.tex=.dvi),$(TOPTEXFILES:.tex=.dvi))
 
 # Default PDF file to make
 DEFAULTPDF:=$(DEFAULTTOPTEX:.tex=.pdf)
@@ -81,7 +88,7 @@ all: $(TOPPDFFILES) exercise_solutions.pdf errata.pdf cover-lulu-hardcover.pdf c
 dvi: $(TOPDVIFILES) exercise_solutions.dvi errata.dvi cover-lulu-hardcover.dvi cover-lulu-paperback.dvi cover-letter.dvi cover-a4.dvi
 
 # Main targets
-$(TOPPDFFILES) : %.pdf : %.tex $(TEXFILES) references.bib cover-lores-front.png cover-lores-back.png
+$(PDFLATEXTOPPDFFILES) : %.pdf : %.tex $(TEXFILES) references.bib cover-lores-front.png cover-lores-back.png
 	if which latexmk > /dev/null 2>&1 ;\
 	then latexmk -interaction=batchmode -g -pdf $< ;\
 	else (echo "run 1: pdflatex $<"; pdflatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null) && \
@@ -89,6 +96,17 @@ $(TOPPDFFILES) : %.pdf : %.tex $(TEXFILES) references.bib cover-lores-front.png 
 	     makeindex $(patsubst %.tex,%,$<) && \
 	     (echo "run 2: pdflatex $<"; pdflatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null) ;\
 	     pdflatex -halt-on-error $< ;\
+	     echo "HINT: If you think this took a long time you should install latexmk." ;\
+	fi
+
+$(XELATEXTOPTEXFILES:.tex=.pdf) : %.pdf : %.tex $(TEXFILES) $(CNTEXFILES) references.bib cover-lores-front.png cover-lores-back.png
+	if which latexmk > /dev/null 2>&1 ;\
+	then latexmk -interaction=batchmode -g -pdfxe $< ;\
+	else (echo "run 1: xelatex $<"; xelatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null) && \
+	     bibtex $(patsubst %.tex,%,$<) && \
+	     makeindex $(patsubst %.tex,%,$<) && \
+	     (echo "run 2: xelatex $<"; xelatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null) ;\
+	     xelatex -halt-on-error $< ;\
 	     echo "HINT: If you think this took a long time you should install latexmk." ;\
 	fi
 

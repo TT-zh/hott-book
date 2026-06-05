@@ -5,6 +5,12 @@
 % DOCUMENT CLASS
 \documentclass[\OPTfontsize]{book}
 
+% Localization flag (enabled in hott-book-cn.tex).
+\expandafter\ifx\csname ifOPTchinese\endcsname\relax
+\expandafter\newif\csname ifOPTchinese\endcsname
+\csname OPTchinesefalse\endcsname
+\fi
+
 \PassOptionsToPackage{table}{xcolor}
 
 \usepackage{etex} % We're running out of registers and dimensions, or some such
@@ -49,6 +55,13 @@
 %%% Because Germans have umlauts and Slavs have even stranger ways of mangling letters
 \usepackage[utf8]{inputenc}
 
+% Chinese support for the XeLaTeX-based Chinese target.
+\ifOPTchinese
+\ifdefined\XeTeXrevision
+\usepackage{xeCJK}
+\fi
+\fi
+
 %%% For table {tab:theorems}
 \usepackage{pifont}
 
@@ -65,7 +78,10 @@
 
 \usepackage{graphicx}
 \DeclareGraphicsExtensions{.png}
+% bmpsize-hack relies on pdfTeX internals and breaks under XeTeX.
+\ifdefined\XeTeXrevision\else
 \input{bmpsize-hack} % for bounding boxes in dvi mode
+\fi
 \usepackage{comment}
 
 \usepackage{fancyhdr} % To set headers and footers
@@ -175,12 +191,20 @@
 
 % Add Preface to PDF Metadata but not printed TOC
 \hypertarget{preface}{}
+\ifOPTchinese
+\bookmark[dest=preface]{前言}
+\else
 \bookmark[dest=preface]{Preface}
+\fi
 
 % Preface and TOC have arabic numbers
 \pagestyle{fancyplain}
 
+\ifOPTchinese
+\include{preface-cn}
+\else
 \include{preface}
+\fi
 
 \cleartooddpage[\thispagestyle{empty}]
 
@@ -199,7 +223,11 @@
 % Turn on headers and footers for mainmatter (must appear after \cleartooddpage)
 \pagestyle{fancyplain}
 
+\ifOPTchinese
+\include{introduction-cn}
+\else
 \include{introduction}
+\fi
 
 \part{Foundations}
 \label{part:foundations}

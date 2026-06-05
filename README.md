@@ -39,6 +39,7 @@ code. Also, the file `version.tex` is generated on the fly, so you will need the
 `make` utility with which you can compile the main files, as follows:
 
 * `make hott-online.pdf` -- the book appropriate for online reading, with colors and green links
+* `make hott-book-cn.pdf` -- the Chinese target, built with XeLaTeX
 * `make hott-ebook.pdf` -- the book with small margins, suitable for ebook readers
 * `make hott-ebook-wide.pdf` -- the book with small margins, suitable for ebook readers, wider page
 * `make hott-ebook-narrow.pdf` -- the book with small margins, suitable for ebook readers, narrower page
@@ -69,4 +70,3 @@ replaced with your name):
 
 Then use whatever tools you normally do to compile LaTeX. The main LaTeX files are called 
 `hott-XXX.tex`. But you really should have `make`, you know.
-
