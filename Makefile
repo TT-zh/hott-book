@@ -4,7 +4,7 @@
 DEFAULTTOPTEX = hott-online.tex
 
 # Top-level LaTeX files that should be built with XeLaTeX
-XELATEXTOPTEXFILES = hott-book-cn.tex
+XELATEXTOPTEXFILES = hott-book-cn.tex hott-ebook-cn.tex
 
 # Chinese-localized source files used by the XeLaTeX target(s)
 CNTEXFILES = front-cn.tex \
@@ -126,7 +126,7 @@ $(XELATEXTOPTEXFILES:.tex=.pdf) : %.pdf : %.tex $(TEXFILES) $(CNTEXFILES) refere
 	     xelatex -halt-on-error $< ;\
 	     echo "HINT: If you think this took a long time you should install latexmk." ;\
 	fi
-	if [ "$<" = "hott-book-cn.tex" ];\
+	if [ "$<" = "hott-book-cn.tex" ] || [ "$<" = "hott-ebook-cn.tex" ];\
 	then python3 scripts/translate_index_cn.py \
 		$(patsubst %.tex,%.ind,$<) TERMINOLOGY_CN.md $(patsubst %.tex,%.ind,$<) && \
 	     xelatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null ;\

@@ -68,13 +68,23 @@
 %%% Multi-Columns for long lists of names
 \usepackage{multicol}
 
+% Default line spacing factor; individual top-level targets may override.
+\expandafter\ifx\csname OPTlinespread\endcsname\relax
+\def\OPTlinespread{1.05}
+\fi
+
+% Default paragraph indent; individual top-level targets may override.
+\expandafter\ifx\csname OPTparindent\endcsname\relax
+\def\OPTparindent{17pt}
+\fi
+
 %%% Set the fonts
 \ifOPTchinese
 \ifdefined\XeTeXrevision
 \usepackage{mathpazo}
 \usepackage[scaled=0.95]{helvet}
 \usepackage{courier}
-\linespread{1.05} % Palatino looks better with this
+\linespread{\OPTlinespread}
 \setCJKmainfont{FandolSong-Regular}[
   Extension=.otf,
   BoldFont=FandolSong-Bold,
@@ -85,14 +95,16 @@
 \usepackage{mathpazo}
 \usepackage[scaled=0.95]{helvet}
 \usepackage{courier}
-\linespread{1.05} % Palatino looks better with this
+\linespread{\OPTlinespread}
 \fi
 \else
 \usepackage{mathpazo}
 \usepackage[scaled=0.95]{helvet}
 \usepackage{courier}
-\linespread{1.05} % Palatino looks better with this
+\linespread{\OPTlinespread}
 \fi
+
+\setlength{\parindent}{\OPTparindent}
 
 \usepackage{ifpdf}
 
