@@ -252,27 +252,63 @@
 \include{basics}
 \fi
 
+\ifOPTchinese
+\include{logic-cn}
+\else
 \include{logic}
+\fi
 
+\ifOPTchinese
+\include{equivalences-cn}
+\else
 \include{equivalences}
+\fi
 
+\ifOPTchinese
+\include{induction-cn}
+\else
 \include{induction}
+\fi
 
+\ifOPTchinese
+\include{hits-cn}
+\else
 \include{hits}
+\fi
 
+\ifOPTchinese
+\include{hlevels-cn}
+\else
 \include{hlevels}
+\fi
 
 \cleartooddpage[\thispagestyle{empty}] % Needed for correct TOC
 \part{Mathematics}
 \label{part:mathematics}
 
+\ifOPTchinese
+\include{homotopy-cn}
+\else
 \include{homotopy}
+\fi
 
+\ifOPTchinese
+\include{categories-cn}
+\else
 \include{categories}
+\fi
 
+\ifOPTchinese
+\include{setmath-cn}
+\else
 \include{setmath}
+\fi
 
+\ifOPTchinese
+\include{reals-cn}
+\else
 \include{reals}
+\fi
 
 %%%% Appendix
 

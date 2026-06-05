@@ -1,0 +1,2761 @@
+\chapter{同伦理论}
+\label{cha:homotopy}
+
+\index{acceptance|(}
+
+在本章中，我们在类型论内部发展一些同伦理论。我们采用
+\cref{cha:basics} 引入的同伦理论\emph{综合方法}：空间、点、路径与同伦是基本概念，
+它们由类型及其元素来表示，尤其是恒等类型。路径与同伦的代数结构由类型上的自然
+$\infty$-原群
+\index{.infinity-groupoid@$\infty$-groupoid}%
+结构来表示，而该结构由恒等类型的规则生成。借助
+\cref{cha:hits} 引入的高阶归纳类型，我们可以直接通过其泛性质来描述空间。
+
+\index{synthetic mathematics}%
+这种综合方法有若干值得关注的方面。
+首先，它把具体模型（如拓扑
+空间\index{topological!space}
+或单纯集合）\index{simplicial!sets}
+的优点，与同伦理论抽象范畴框架
+（如 Quillen 模型范畴）的优点结合起来。\index{Quillen model category}
+一方面，
+我们的证明具有初等风格，并具体地讨论类型中的
+点、路径与同伦。另一方面，这种方法仍然抽离了
+这些对象的任何具体呈现方式。例如，路径拼接的结合性是通过路径归纳证明的，
+而不是通过对映射 $[0,1] \to X$ 进行重参数化，或通过 horn-filling 条件来证明。
+类型论似乎是一种研究 $\infty$-原群抽象同伦理论的便捷方式：利用恒等类型的规则，
+我们可以避免许多 $\infty$-原群定义中涉及的复杂组合学，
+并且只在具体证明需要时才展开相应结构。
+
+类型论的抽象性意味着我们的证明会自动适用于多种语境。
+特别地，如前所述，同伦类型论在
+Kan\index{Kan complex} 单纯集合\index{simplicial!sets}
+中有一种解释，而这正是 $\infty$-原群同伦理论的一个模型。因此，
+我们的证明适用于该模型；再经由从单纯集合到拓扑空间的几何实现\index{geometric realization}
+函子传递过去，就得到经典同伦理论中对应定理的证明。
+然而，尽管细节仍在推进中，我们也可以在大量其他“看起来像 $\infty$-原群范畴”的范畴里
+解释类型论，例如
+$(\infty,1)$-拓扑斯\index{.infinity1-topos@$(\infty,1)$-topos}。
+因此，在类型论中证明的结果也会在这些语境下成立。
+这种额外的一般性是普通范畴逻辑中众所周知的性质：
+泛等基础把它也扩展到了同伦理论。
+
+其次，我们的综合方法催生了新的类型论式方法与证明。
+其中一些证明相当于对经典证明的直接转写；
+另一些则更具类型论风格，主要由
+$\infty$-原群运算的计算构成，其风格与计算机科学家使用类型论推理程序非常相似。
+这些新证明之所以出现，一个原因似乎在于类型论强调了同伦理论中与其他方法不同的侧面：
+尽管路径归纳与高阶归纳类型的泛性质这类工具在 Kan\index{Kan complex} 单纯集合等语境中也可用，类型
+论却提升了它们的重要性，因为它们是处理这些类型时\emph{唯一}可用的原始工具。
+围绕这些工具展开，促成了对一些熟悉构造（如圆的通用覆盖与 Hopf 纤维化）的新描述，
+这些描述只使用高阶归纳类型的递归原理。
+这种描述非常直接，而本章许多证明都涉及对这类纤维化的计算性推导。
+\index{mathematics!constructive}%
+我们证明的另一个新方面是其构造性（假设泛等与高阶归纳类型本身是构造性的）；
+在 \cref{sec:moreresults} 中我们会给出它在球面同伦群上的一个应用。
+
+\index{mathematics!formalized}%
+\indexsee{formalization of mathematics}{mathematics, formalized}%
+第三，这种综合方法非常适合在 \Coq 与 \Agda 等证明助手\index{proof!assistant} 中
+进行机器校验。
+本章所述证明几乎全部都已经过机器校验，其中很多
+最初就是在证明助手中给出的，随后才为本书“去形式化”。
+这些机器校验证明在长度与工作量上与本书给出的非形式化证明相当，
+在某些情形下甚至更短、也更容易完成。
+
+\mentalpause
+
+在正式陈述我们的结果之前，我们先简要回顾一些
+同伦理论的基本概念与定理，供不熟悉该主题的读者参考。
+我们也会概述本章将要证明的结果。
+
+\index{classical!homotopy theory|(}%
+同伦理论是代数拓扑的一个分支，它使用群论等抽象代数工具来研究空间的性质。
+同伦论研究者关心的一个问题是如何判断两个空间是否相同，
+其中“相同”指的是\emph{同伦等价}
+\index{homotopy!equivalence!topological}%
+（存在来回的连续映射，且它们的复合在同伦意义下等于恒等——这使我们可以“修正”那些
+不能严格复合为恒等的映射）。判断两个空间是否相同的一种常见方法
+是计算与空间关联的\emph{代数不变量}，
+其中包括它的\emph{同伦群}、\emph{同调群}与
+\emph{上同调群}。
+\index{homology}%
+\index{cohomology}%
+同伦等价空间的同伦/（上）同调群同构，因此若两个空间的这些群不同，
+它们就不等价。因此，这些代数不变量提供了空间的全局信息，
+可用于区分空间，并与连续性等概念提供的局部信息形成互补。
+例如，环面在局部上看起来像 $2$-球面，
+但它有一个“洞”这一全局差异，
+该差异可在这两个空间的同伦群中体现出来。
+
+同伦群最简单的例子是\emph{基本群}
+\index{fundamental!group}%
+，记作 $\pi_1(X,x_0$)：给定空间 $X$ 及其中一点 $x_0$，
+可以构造一个群，其元素是在 $x_0$ 处的回路
+（从 $x_0$ 到 $x_0$ 的连续路径），按同伦等价类计；
+其群运算由恒等路径（原地不动）、路径拼接与路径反向给出。
+例如，$2$-球面的基本群是平凡的，但环面的基本群不是，
+这说明球面与环面并不同伦等价。
+直观上，球面上的每条回路都与恒等回路同伦，
+因为它所围成的内部可以填充；
+相比之下，穿过环面“甜甜圈孔”的回路并不同伦于恒等回路，
+所以基本群中存在非平凡元素。
+
+\index{homotopy!group}
+\emph{高阶同伦群}提供了关于空间的额外信息。
+固定 $X$ 中一点 $x_0$，并考虑常值路径
+$\refl{x_0}$。则 $\refl{x_0}$ 到自身之间同伦的同伦类形成一个群
+$\pi_2(X,x_0)$，它反映该空间的二维结构。接着 $\pi_3(X,x_0$)
+是“同伦之间的同伦”的同伦类所成之群，依此类推。
+代数拓扑的基本问题之一是
+\emph{计算空间 $X$ 的同伦群}，也就是给出
+$\pi_k(X,x_0)$ 与某个更直接给出的群（如由乘法表或表示给出）之间的群同构。
+有些出人意料的是，即使对像球面这样简单的空间，这个问题也非常困难。
+从 \cref{tab:homotopy-groups-of-spheres} 可以看到，
+球面的高阶同伦群中呈现出某些模式，但不存在普遍公式，
+而且许多球面同伦群目前仍未知。
+
+\bgroup
+% Colors for the table of homotopy groups of spheres
+\definecolor{xA}{\OPTcolormodel}{\OPTcolxA}
+\definecolor{xB}{\OPTcolormodel}{\OPTcolxB}
+\definecolor{xC}{\OPTcolormodel}{\OPTcolxC}
+\definecolor{xD}{\OPTcolormodel}{\OPTcolxD}
+\definecolor{xE}{\OPTcolormodel}{\OPTcolxE}
+\definecolor{xF}{\OPTcolormodel}{\OPTcolxF}
+\definecolor{xG}{\OPTcolormodel}{\OPTcolxG}
+\definecolor{xH}{\OPTcolormodel}{\OPTcolxH}
+\definecolor{xI}{\OPTcolormodel}{\OPTcolxI}
+\definecolor{xJ}{\OPTcolormodel}{\OPTcolxJ}
+\definecolor{xK}{\OPTcolormodel}{\OPTcolxK}
+\definecolor{xL}{\OPTcolormodel}{\OPTcolxL}
+\definecolor{xM}{\OPTcolormodel}{\OPTcolxM}
+
+\newcommand{\cA}{\colorbox{xG}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cB}{\colorbox{xH}{\hbox to 20pt {\hfil$\Z$\hfil}}}
+\newcommand{\cC}{\colorbox{xI}{\hbox to 20pt {\hfil$\Z_{2}$\hfil}}}
+\newcommand{\cD}{\colorbox{xJ}{\hbox to 20pt {\hfil$\Z_{2}$\hfil}}}
+\newcommand{\cE}{\colorbox{xK}{\hbox to 20pt {\hfil$\Z_{24}$\hfil}}}
+\newcommand{\cF}{\colorbox{xL}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cG}{\colorbox{xM}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cH}{\colorbox{xF}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cI}{\colorbox{xE}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cJ}{\colorbox{xD}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cK}{\colorbox{xC}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cL}{\colorbox{xB}{\hbox to 20pt {\hfil$0$\hfil}}}
+\newcommand{\cM}{\colorbox{xA}{\hbox to 20pt {\hfil$0$\hfil}}}
+
+\begin{table}[htb]
+\centering\small
+\begin{tabular}{p{15pt}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}>{\centering\arraybackslash}p{\OPTspherescolwidth}}
+\toprule
+           & $\Sn^0$ & $\Sn^1$ & $\Sn^{2}$ & $\Sn^{3}$ & $\Sn^{4}$ & $\Sn^{5}$ & $\Sn^{6}$ & $\Sn^{7}$ & $\Sn^{8}$ \\ \addlinespace[3pt] \midrule
+$\pi_{1}$  & $0$     & $\Z$    & \cA       & \cH       & \cI       & \cJ       & \cK       & \cL       & \cM       \\ \addlinespace[3pt]
+$\pi_{2}$  & $0$     & $0$     & \cB       & \cA       & \cH       & \cI       & \cJ       & \cK       & \cL       \\ \addlinespace[3pt]
+$\pi_{3}$  & $0$     & $0$     & $\Z$      & \cB       & \cA       & \cH       & \cI       & \cJ       & \cK       \\ \addlinespace[3pt]
+$\pi_{4}$  & $0$     & $0$     & $\Z_{2}$  & \cC       & \cB       & \cA       & \cH       & \cI       & \cJ       \\ \addlinespace[3pt]
+$\pi_{5}$  & $0$     & $0$     & $\Z_{2}$  & $\Z_{2}$  & \cC       & \cB       & \cA       & \cH       & \cI       \\ \addlinespace[3pt]
+$\pi_{6}$  & $0$     & $0$     & $\Z_{12}$ & $\Z_{12}$ & \cD       & \cC       & \cB       & \cA       & \cH       \\ \addlinespace[3pt]
+$\pi_{7}$  & $0$     & $0$     & $\Z_{2}$  & $\Z_{2}$  & {\footnotesize $\Z {\times} \Z_{12}$} & \cD & \cC & \cB     & \cA    \\ \addlinespace[3pt]
+$\pi_{8}$  & $0$     & $0$     & $\Z_{2}$  & $\Z_{2}$  & $\Z_{2}^{2}$ & \cE & \cD & \cC & \cB \\ \addlinespace[3pt]
+$\pi_{9}$  & $0$     & $0$     & $\Z_{3}$  & $\Z_{3}$  & $\Z_{2}^{2}$ & $\Z_{2}$ & \cE & \cD & \cC \\ \addlinespace[3pt]
+$\pi_{10}$ & $0$     & $0$     & $\Z_{15}$ & $\Z_{15}$ & \footnotesize{$\Z_{24} {\times} \Z_{3}$} & $\Z_{2}$ & \cF & \cE & \cD \\ \addlinespace[3pt]
+$\pi_{11}$ & $0$     & $0$     & $\Z_{2}$  & $\Z_{2}$  & $\Z_{15}$ & $\Z_{2}$ & $\Z$ & \cF & \cE \\ \addlinespace[3pt]
+$\pi_{12}$ & $0$     & $0$     & $\Z_{2}^{2}$ & $\Z_{2}^{2}$ & $\Z_{2}$ & $\Z_{30}$ & $\Z_{2}$ & \cG & \cF \\ \addlinespace[3pt]
+$\pi_{13}$ & $0$     & $0$     & {\footnotesize $\Z_{12} {\times} \Z_{2}$} & {\footnotesize $\Z_{12} {\times} \Z_{2}$} & $\Z_{2}^{3}$ & $\Z_{2}$ & $\Z_{60}$ & $\Z_{2}$ & \cG \\ \addlinespace[3pt]
+%$\pi_{14}$ & $0$     & $0$     & $\Z_{84} {\times} \Z_{2}^{2}$ & $\Z_{84} {\times} \Z_{2}^{2}$ & {\footnotesize $\Z_{120} {\times} \Z_{12} {\times} \Z_{2}$} & $\Z_{2}^{3}$ & $\Z_{24} {\times} \Z_{2}$ & $\Z_{120}$ & $\Z_{2}$ \\ \addlinespace[3pt]
+%$\pi_{15}$ & $0$     & $0$     & $\Z_{2}^{2}$ & $\Z_{2}^{2}$ & $\Z_{84} {\times} \Z_{2}^{5}$ & $\Z_{72} {\times} \Z_{2}$ & $\Z_{2}^{3}$ & $\Z_{2}^{3}$ & $\Z {\times} \Z_{120}$ \\ \addlinespace[3pt]
+\bottomrule
+\end{tabular}
+
+\caption{球面的同伦群~\cite{wikipedia-groups}。\index{homotopy!group!of sphere}
+$n$ 维球面 $\Sn^n$ 的第 $k$ 个同伦群 $\pi_k$ 与各单元中所列群同构，其中
+$\Z$ 是整数加法群\index{integers}，$\Z_{m}$ 是阶为 $m$ 的循环群\index{group!cyclic}\index{cyclic group}。
+}
+\label{tab:homotopy-groups-of-spheres}
+\end{table}
+\egroup
+
+
+理解这种复杂性的一种方式，是通过
+\cref{cha:basics} 引入的空间与 $\infty$-原群之间的对应。
+\index{.infinity-groupoid@$\infty$-groupoid}%
+正如 \cref{sec:circle} 所述，2-球面由一个带一个点和一条二维回路的高阶归纳类型给出。
+因此，人们可能会疑惑：当类型 $\Sn ^2$ 并没有生成三维胞腔的构造子时，
+为何 $\pi_3(\Sn ^2)$ 却是 $\Z$？事实是，$\pi_3(\Sn ^2)$ 的生成元
+是利用 \cref{thm:EckmannHilton} 证明中描述的交换律构造出来的：
+$\infty$-原群的代数结构包含层级之间的非平凡相互作用，
+而这些相互作用会产生高阶同伦群的元素。
+
+\index{classical!homotopy theory|)}%
+
+类型论为研究这种结构提供了自然语境，因为我们可以容易地定义高阶同伦群。
+回忆 \cref{def:loopspace}：对 $n:\N$，带点类型 $(A,a)$ 的
+$n$ 重迭代回路空间\index{loop space!iterated} 递归定义为：
+\begin{align*}
+  \Omega^0(A,a)&=(A,a)\\
+  \Omega^{n+1}(A,a)&=\Omega^n(\Omega(A,a)).
+\end{align*}
+%
+这给出了一个由 $n$ 维回路\index{loop!n-@$n$-} 组成的\emph{空间}（即一个类型），它自身仍有更高同伦。
+对其做截断即可得到 $n$ 维回路构成的集合（这也曾在
+\cref{sec:free-algebras} 中作为例子出现）：
+
+\begin{defn}[同伦群]\label{def-of-homotopy-groups}
+  给定 $n\ge 1$ 与带点类型 $(A,a)$，我们将 $A$ 在点 $a$ 处的\define{同伦群}
+  \indexdef{homotopy!group}%
+  定义为
+  \[\pi_n(A,a)\defeq \Trunc0{\Omega^n(A,a)}\]
+\end{defn}
+
+\noindent
+由于 $n\ge 1$，$\Omega^n(A)$ 上的路径拼接与取逆运算会以直接方式
+在 $\pi_n(A)$ 上诱导群运算，使其成为一个群。若 $n\ge 2$，
+则由 Eckmann--Hilton 论证\index{Eckmann--Hilton argument}（\cref{thm:EckmannHilton}）可知
+$\pi_n(A)$ 为阿贝尔群\index{group!abelian}。
+同时记 $\pi_0(A) \defeq \trunc0 A$ 也很方便，
+但这一情形行为略有不同：它不仅不是群，
+而且其定义不依赖于 $A$ 中任何基点。
+
+\index{presentation!of an infinity-groupoid@of an $\infty$-groupoid}%
+这个定义之所以适于研究同伦群，是因为类型 $X$ 的（高阶）归纳定义把 $X$ 呈现为
+一个自由类型，类似于自由 $\infty$-原群，
+\index{.infinity-groupoid@$\infty$-groupoid}%
+而这种呈现会\emph{决定}但不会\emph{显式描述}
+$X$ 的高阶恒等类型。恒等类型中的元素既包括生成元（对圆而言是 $\lloop$），
+也包括对其施加原群全部运算所得结果
+（恒等、复合、逆元、结合、交换，\ldots）。
+因此，空间的高阶归纳呈现使我们可以提出“$X$ 的恒等类型究竟是什么？”这一问题，
+尽管回答它往往需要相当多的数学工作。
+这是类型论中熟悉事实的高维推广：即使 $X$ 是普通归纳类型（如自然数或布尔值），
+刻画其恒等类型也可能并不轻松。
+例如，$\bfalse$ 与 $\btrue$ 不同这一结论并不从定义立即得到；
+见 \cref{sec:compute-coprod}。
+
+\index{univalence axiom}%
+泛等公理在计算同伦群时起着关键作用
+（没有泛等时，类型论仍与一种解释相容，在该解释下所有路径——包括圆上的回路——都只是自反路径）。
+我们在下文计算圆的基本群时会看到这一点：从 $\Omega(\Sn^1)$ 到 $\Z$ 的映射
+把圆上的一个回路映到集合 $\Z$ 的一个自同构
+\index{automorphism!of Z, successor@of $\Z$, successor}，例如把 $\lloop \ct \opp
+\lloop$ 送到 $\mathsf{successor} \ct \mathsf{predecessor}$（其中
+$\mathsf{successor}$ 与 $\mathsf{predecessor}$ 是 $\Z$ 的自同构，并经由泛等被视作宇宙中的路径），
+然后把该自同构作用在 $0$ 上。泛等在宇宙中产生非平凡路径，
+这使我们能够从高阶归纳类型中的路径提取信息。
+
+在本章中，我们首先计算若干球面的同伦群，
+包括 $\pi_k(\Sn ^1)$（\cref{sec:pi1-s1-intro}）、$k<n$ 时的 $\pi_{k}(\Sn
+^n)$（\cref{sec:conn-susp,sec:pik-le-n}）、通过 Hopf 纤维化（\cref{sec:hopf}）及长正合列
+论证（\cref{sec:long-exact-sequence-homotopy-groups}）得到的 $\pi_2(\Sn ^2)$ 与 $\pi_3(\Sn ^2)$，
+以及通过 Freudenthal 悬挂定理（\cref{sec:freudenthal}）得到的 $\pi_n(\Sn ^n)$。
+接着我们讨论 van Kampen 定理（\cref{sec:van-kampen}），它刻画了余推出的基本群，
+以及 Whitehead 原理的现状（一个在所有同伦群上诱导等价的映射何时本身就是等价？）
+（\cref{sec:whitehead}）。最后，我们简要概述若干未收录于本书正文的结果，
+如 $n\ge 3$ 时的 $\pi_{n+1}(\Sn ^n)$、Blakers--Massey 定理，以及
+Eilenberg--Mac Lane 空间的一种构造（\cref{sec:moreresults}）。
+本章的先修内容包括 \cref{cha:typetheory,cha:basics,cha:hits,cha:hlevels}，
+以及 \cref{cha:logic} 的部分内容。
+
+\index{fundamental!group!of circle|(}
+\section{\texorpdfstring{$\pi_1(S^1)$}{π₁(S¹)}}
+\label{sec:pi1-s1-intro}
+
+在本节中，我们的目标是证明 $\id {\pi_1(\Sn ^1)} {\Z}$。
+事实上，我们将证明回路空间\index{loop space} ${\Omega(\Sn ^1)}$ 与 $\Z$ 等价。
+这是一个更强的陈述，因为按定义有 $\id{\pi_1(\Sn ^1)} {\trunc 0 {\Omega(\Sn ^1)}}$；
+因此若 $\id {\Omega(\Sn ^1)} {\Z}$，则由合同性可得 $\id {\trunc
+  0 {\Omega(\Sn ^1)}} {\trunc 0 {\Z}}$，而且
+$\Z$ 按定义是集合（它是一个集合商；见 \cref{defn-Z,Z-quotient-by-canonical-representatives}），故 $\id {\trunc 0 {\Z}} {\Z}$。
+此外，一旦知道 ${\Omega(\Sn ^1)}$ 是集合，就推出对 $n>1$ 有 $\pi_n(\Sn^1)$ 平凡，因此我们实际上会计算出 $\Sn^1$ 的\emph{全部}同伦群。
+
+\subsection{起步}
+\label{sec:pi1s1-initial-thoughts}
+
+在 $\Omega(\Sn^1)$ 与 \Z 之间双向定义函数并不太难。
+将 \cref{thm:looptothe} 专门化到 $\lloop:\base=\base$，可得函数 $\lloop^{\blank} : \Z \rightarrow (\id{\base}{\base})$，其定义（粗略地）为
+\[
+  \lloop^n =
+  \begin{cases}
+    \underbrace{\lloop \ct \lloop \ct \cdots \ct \lloop}_{n}  & \text{若 $n > 0$,} \\
+    \underbrace{\opp \lloop \ct \opp \lloop \ct \cdots \ct \opp \lloop}_{-n} & \text{若 $n < 0$,} \\
+    \refl{\base} & \text{若 $n = 0$.}
+\end{cases}
+\]
+%
+在反方向定义函数 $g:\Omega(\Sn^1)\to\Z$ 稍微更棘手。
+注意后继函数 $\Zsuc:\Z\to\Z$ 是一个等价，
+\index{successor!isomorphism on Z@isomorphism on $\Z$}%
+因而在宇宙 \type 中诱导出一条路径 $\ua(\Zsuc):\Z=\Z$。
+因此，$\Sn^1$ 的递归原理诱导映射 $c:\Sn^1\to\type$，其中 $c(\base)\defeq \Z$ 且 $\apfunc c (\lloop) \defid \ua(\Zsuc)$。
+于是我们有 $\apfunc{c} : (\base=\base) \to (\Z=\Z)$，并可定义 $g(p)\defeq \transfib{X\mapsto X}{\apfunc{c}(p)}{0}$。
+
+有了这些定义，甚至可对任意 $n:\Z$ 证明 $g(\lloop^n)=n$，所用是 $n$ 的归纳原理 \cref{thm:sign-induction}。
+（稍后我们会证明一个更一般的命题。）
+然而，另一个等式 $\lloop^{g(p)}=p$ 就困难得多。
+最直接的尝试是路径归纳，但路径归纳不适用于这类回路 $p:(\base=\base)$，因为它的\emph{两个}端点都被固定了！
+我们需要一个新思路，它既可用经典同伦理论解释，也可用类型论解释。
+先从前者开始。
+
+
+\subsection{经典证明}
+\label{sec:pi1s1-classical-proof}
+
+\index{classical!homotopy theory|(}%
+在经典同伦理论中，利用通用覆盖空间可给出 $\pi_1(\Sn^1)=\Z$ 的标准证明。
+我们的证明可视作该证明的类型论版本，其中覆盖空间在这里表现为纤维为集合的纤维化。
+\index{fibration}%
+\index{total!space}%
+回忆：在同伦理论中，空间 $B$ 上的\emph{纤维化}对应于类型论中的类型族 $B\to\type$。
+\index{path!fibration}%
+\index{fibration!of paths}%
+特别地，对点 $x_0:B$，类型族 $(x\mapsto (x_0=x))$ 对应于\emph{路径纤维化} $P_{x_0} B \to B$：其中 $P_{x_0} B$ 的点是从 $x_0$ 出发到达 $B$ 中某点的路径，而到 $B$ 的映射取该路径的另一端点。
+这个总空间 $P_{x_0} B$ 是可缩的，因为我们可以把任意路径“缩回”到其起点 $x_0$——我们已在 \cref{thm:contr-paths} 见过其类型论版本。
+此外，$x_0$ 处的纤维就是回路空间\index{loop space} $\Omega(B,x_0)$——在类型论中，这由回路空间定义即可直接看出。
+
+\begin{figure}\centering
+  \begin{tikzpicture}[xscale=1.4,yscale=.6]
+    \node (R) at (2,1) {$\mathbb{R}$};
+    \node (S1) at (2,-2) {$S^1$};
+    \draw[->] (R) -- node[auto] {$w$} (S1);
+    \draw (0,-2) ellipse (1 and .4);
+    \draw[dotted] (1,0) arc (0:-30:1 and .8);
+    \draw (1,0) arc (0:90:1 and .8) arc (90:270:1 and .3) coordinate (t1);
+    \draw[white,line width=4pt] (t1) arc (-90:90:1 and .8);
+    \draw (t1) arc (-90:90:1 and .8) arc (90:270:1 and .3) coordinate (t2);
+    \draw[white,line width=4pt] (t2) arc (-90:90:1 and .8);
+    \draw (t2) arc (-90:90:1 and .8) arc (90:270:1 and .3) coordinate (t3);
+    \draw[white,line width=4pt] (t3) arc (-90:90:1 and .8);
+    \draw (t3) arc (-90:-30:1 and .8) coordinate (t4);
+    \draw[dotted] (t4) arc (-30:0:1 and .8);
+    \node[fill,circle,inner sep=1pt,label={below:\scriptsize \base}] at (0,-2.4) {};
+    \node[fill,circle,inner sep=1pt,label={above left:\scriptsize 0}] at (0,.2) {};
+    \node[fill,circle,inner sep=1pt,label={above left:\scriptsize 1}] at (0,1.2) {};
+    \node[fill,circle,inner sep=1pt,label={above left:\scriptsize 2}] at (0,2.2) {};
+  \end{tikzpicture}
+  \caption{经典拓扑中的缠绕映射}\label{fig:winding}
+\end{figure}
+
+现在在经典同伦理论中，把 $\Sn^1$ 视作拓扑空间，可如下进行。
+\index{winding!map}%
+考虑“缠绕”映射 $w:\mathbb{R}\to \Sn ^1$，它看起来像一条投影到圆上的螺旋线（见 \cref{fig:winding}）。
+该映射 $w$ 把螺旋线上的每个点\index{helix} 送到它“正上方”的圆上点。
+它是一个纤维化，并且每个点上的纤维都同构于整数。\index{integers}
+若把底部沿逆时针方向绕一圈的路径提升上去，就会在螺旋线上升一层，使纤维中的整数加一。
+同理，沿顺时针方向绕一圈对应于在螺旋线下降一层，使这个计数减一。
+这个纤维化称为圆的\emph{通用覆盖}。
+\index{universal!cover}%
+\index{cover!universal}%
+\index{covering space!universal}%
+
+经典同伦理论中的一个基本事实是：在 $B$ 上两个纤维化之间的映射 $E_1\to E_2$，若在 $E_1$ 与 $E_2$ 间是同伦等价，则会在所有纤维上诱导同伦等价。
+（其类型论版本我们也已在 \cref{thm:total-fiber-equiv} 中见过。）
+由于 $\mathbb{R}$ 与 $P_{\base} S^1$ 都是可缩拓扑空间，它们同伦等价，因此其在基点上的纤维 $\Z$ 与 $\Omega(\Sn ^1)$ 也同伦等价。
+
+\index{classical!homotopy theory|)}%
+
+\subsection{类型论中的通用覆盖}
+\label{sec:pi1s1-universal-cover}
+
+\index{universal!cover|(}%
+\index{cover!universal|(}%
+\index{covering space!universal|(}%
+
+现在考虑如何在类型论中表达上述证明。
+我们已经提到，$\Sn^1$ 的路径纤维化由类型族 $(x\mapsto (\base=x))$ 表示。
+我们也已经见过 $\Sn^1$ 通用覆盖的一个良好候选：正是我们在 \cref{sec:pi1s1-initial-thoughts} 中定义的类型族 $c:\Sn^1\to\type$！
+按定义，该类型族在 $\base$ 上的纤维是 $\Z$，而沿 $\lloop$ 传送的效应是加一——因此它的行为正如 \cref{fig:winding} 所示。
+
+不过，由于我们尚未证明这个类型族确实具有通用覆盖应有的性质（例如其总空间是单连通的），这里我们用另一个名字称呼它。
+为便于引用，先重复其定义。
+\index{integers}
+
+\begin{defn}[$\Sn^1$ 的通用覆盖] \label{S1-universal-cover}
+  通过圆递归定义 $\code : \Sn ^1 \to \type$，其中
+  \begin{align*}
+    \code(\base) &\defeq \Z \\
+    \apfunc{\code}({\lloop}) &\defid \ua(\Zsuc).
+  \end{align*}
+\end{defn}
+
+我们简要强调这个类型族的定义，因为它与经典同伦理论中通常定义覆盖空间的方式非常不同。
+要用圆递归定义函数，我们需要在陪域中给出一个点和一条回路。
+在此处陪域是 $\type$，我们选取的点是 $\Z$，对应于我们对通用覆盖纤维应为整数的预期。
+我们选取的回路是 $\Z$ 上的后继/前驱
+\index{successor!isomorphism on Z@isomorphism on $\Z$}%
+\index{predecessor!isomorphism on Z@isomorphism on $\Z$}%
+同构，这对应于在底空间中绕回路一圈会在螺旋线上升一层这一事实。
+这一部分证明需要泛等，因为我们需要把 $\Z$ 上一个\emph{非平凡}等价转化为恒等。
+
+我们称其为“编码”纤维化，因为其元素是组合数据，充当圆上路径的编码：整数 $n$ 编码绕圆 $n$ 圈的路径。
+
+由此定义，可直接计算出：沿 $\code$ 传送时，$\lloop$ 对应后继函数，而
+$\opp{\lloop}$ 对应前驱函数：
+\begin{lem} \label{lem:transport-s1-code}
+\id{\transfib \code \lloop x} {x + 1} 且
+\id{\transfib \code {\opp \lloop} x} {x - 1}.
+\end{lem}
+\begin{proof}
+对第一个等式，计算如下：
+\begin{align}
+{\transfib \code \lloop x}
+&= \transfib {A \mapsto A} {(\ap{\code}{\lloop})} x \tag{由 \cref{thm:transport-compose}}\\
+&= \transfib {A \mapsto A} {\ua (\Zsuc)} x \tag{由 $\rec{\Sn^1}$ 的计算规则}\\
+&= x + 1 \tag{由 \ua 的计算规则}.
+\end{align}
+第二个等式由第一个推出，因为 $\transfib{B}{p}{\blank}$ 与 $\transfib{B}{\opp p}{\blank}$ 总互为逆，因此 $\transfib\code {\opp \lloop}{\blank}$ 必为 $\Zsuc$ 的逆。
+\end{proof}
+
+现在可以看出我们最初方法的问题：我们只在纤维 $\Omega(\Sn^1)$ 与 \Z 上定义了 $f$ 与 $g$，而实际上应在 $\Sn^1$ 上定义整个\emph{纤维化态射}。
+在类型论中，这意味着我们应定义如下类型的函数
+\begin{align}
+  \prd{x:\Sn^1} &((\base=x) \to \code(x)) \qquad\text{和/或} \label{eq:pi1s1-encode}\\
+  \prd{x:\Sn^1} &(\code(x) \to (\base=x))\label{eq:pi1s1-decode}
+\end{align}
+而不只是 $x$ 取 \base 时的特例。
+这也是类型论中的一个常见观察：当试图证明某个归纳类型中特定元素的性质时，通常把陈述推广到该类型的\emph{全部}元素，反而更容易，再通过归纳来证明。
+从这个角度看，证明 $\Omega(\Sn^1)=\Z$ 与 \cref{sec:compute-coprod,sec:compute-nat} 中对余积和自然数恒等类型的刻画遵循同一模式。
+
+到这里，完成证明有两条路径。
+我们可以继续模仿经典论证，构造~\eqref{eq:pi1s1-encode} 或~\eqref{eq:pi1s1-decode}（选哪一个都可以），证明总空间之间的同伦等价会在纤维上诱导等价，然后再证明通用覆盖的总空间可缩。
+最早的 $\Omega(\Sn^1)=\Z$ 类型论证明走的就是这条路；我们称之为\emph{同伦论式}证明。
+
+但后来我们发现还有另一种证明，它更具类型论风格，也更贴近 \cref{sec:compute-coprod,sec:compute-nat} 中的证明。
+在该证明中，我们直接构造~\eqref{eq:pi1s1-encode} 和~\eqref{eq:pi1s1-decode} 两个函数，并通过计算证明它们互为逆。
+我们称其为\emph{编码-解码}证明，因为我们把~\eqref{eq:pi1s1-encode} 与~\eqref{eq:pi1s1-decode} 分别称作 \emph{encode} 与 \emph{decode}。
+这两种证明都使用了上面相同的覆盖构造。
+经典证明是由总空间等价推出纤维等价，而编码-解码证明则把逆映射（\emph{decode}）显式构造为纤维间映射。
+经典证明使用可缩性，而编码-解码证明使用路径归纳、圆归纳与整数归纳。
+这些本质上仍是证明可缩性所用工具——实际上，路径归纳\emph{本质上就是}路径纤维化与 $\mathsf{transport}$ 复合后的可缩性——但其使用方式不同。
+
+由于本书是同伦类型论的著作，我们先呈现编码-解码证明。
+若同伦论读者在此迷失，可直接跳到同伦论式证明（\cref{subsec:pi1s1-homotopy-theory}）。
+
+\index{universal!cover|)}%
+\index{cover!universal|)}%
+\index{covering space!universal|)}%
+
+\subsection{编码-解码证明}
+\label{subsec:pi1s1-encode-decode}
+
+\index{encode-decode method|(}%
+\indexsee{encode}{encode-decode method}%
+\indexsee{decode}{encode-decode method}%
+我们先看把路径映到编码的函数~\eqref{eq:pi1s1-encode}：
+\begin{defn}
+定义 $\encode : \prd{x : \Sn ^1} (\base=x) \rightarrow  \code(x)$ 为
+\[
+\encode \: p \defeq \transfib{\code} p 0
+\]
+（参数 $x$ 省略不写）。
+\end{defn}
+Encode 的定义是把路径提升到通用覆盖中，
+从而确定一个等价，再把该等价作用于 $0$。
+这个函数的有趣之处在于：当圆上的回路以同伦类型论抽象的原群框架表示时，它能从中计算出一个具体整数。
+要形成直觉，注意由上面的引理可知，
+$\transfib \code \lloop x$ 是后继映射，而 $\transfib \code {\opp
+  \lloop} x$ 是前驱映射。
+此外，$\mathsf{transport}$ 具有函子性（\cref{cha:basics}），因此
+$\transfib{\code} {\lloop \ct \lloop}{\blank}$ 是
+\[(\transfib \code \lloop-) \circ (\transfib \code \lloop-)\]
+依此类推。
+所以当 $p$ 是如下复合
+\[
+\lloop \ct \opp \lloop \ct \lloop \ct \cdots
+\]
+时，$\transfib{\code}{p}{\blank}$ 会计算为如下函数复合
+\[
+\Zsuc \circ \Zpred \circ \Zsuc \circ \cdots
+\]
+把这串函数复合作用于 0，就会得到路径的
+\index{winding!number}%
+\emph{绕数}——即在消去逆元后，它绕圆的次数，以及其正负方向。
+因此，$\encode$ 的计算行为来自高阶归纳类型与泛等的化简规则，
+以及 $\mathsf{transport}$ 对复合与逆元的作用。
+
+注意特例 $\encode' \defeq \encode_{\base}$ 的类型是
+$(\id \base \base) \rightarrow \Z$。
+这是我们所需等价的一半；事实上它正是 \cref{sec:pi1s1-initial-thoughts} 中定义的函数 $g$。
+
+同样，函数~\eqref{eq:pi1s1-decode} 是 \cref{sec:pi1s1-initial-thoughts} 中函数 $\lloop^{\blank}$ 的推广。
+
+\begin{defn}\label{thm:pi1s1-decode}
+通过对 $x$ 做圆归纳定义 $\decode : \prd{x : \Sn ^1}\code(x) \rightarrow (\base=x)$。
+只需给出一个函数
+${\code(\base) \rightarrow (\base=\base)}$，我们取 $\lloop^{\blank}$，并
+证明 $\lloop^{\blank}$ 与该回路相容。
+\end{defn}
+
+\begin{proof}
+要证明 $\lloop^{\blank}$ 与回路相容，只需给出一条位于 $\lloop$ 之上的、从 $\lloop^{\blank}$ 到自身的路径。
+按依值路径的定义，这意味着给出从
+\[\transfib {(x' \mapsto \code(x') \rightarrow (\base=x'))} {\lloop} {\lloop^{\blank}}\]
+到 $\lloop^{\blank}$ 的路径。我们按如下方式定义这条
+路径：
+\begin{align*}
+  \MoveEqLeft \transfib {(x' \mapsto \code(x') \rightarrow (\base=x'))} \lloop {\lloop^{\blank}}\\
+&= \transfibf {x'\mapsto (\base=x')}(\lloop) \circ {\lloop^{\blank}} \circ \transfibf \code ({\opp \lloop}) \\
+&= (- \ct \lloop) \circ (\lloop^{\blank}) \circ \transfibf \code ({\opp \lloop}) \\
+&= (- \ct \lloop) \circ (\lloop^{\blank}) \circ \Zpred \\
+&= (n \mapsto \lloop^{n - 1} \ct \lloop).
+\end{align*}
+第一行中，我们应用了当纤维化最外层联结词是 $\rightarrow$ 时 $\mathsf{transport}$ 的刻画，
+从而把该 $\mathsf{transport}$ 约化为在定义域与陪域上的 $\mathsf{transport}$ 的前后复合。
+第二行中，我们应用了类型族为 $x\mapsto \id{\base}{x}$ 时 $\mathsf{transport}$ 的刻画，即路径的后复合。
+第三行中，我们使用 \cref{lem:transport-s1-code} 给出的 $\code$ 对 $\opp \lloop$ 的作用。
+第四行中，我们只是做了函数复合的化简。
+因此，只需对所有 $n$ 证明 $\id{\lloop^{n - 1} \ct \lloop}{\lloop^{n}}$。
+这可由 \cref{thm:sign-induction} 和原群律轻松得到。
+\end{proof}
+
+现在我们可以证明 $\encode$ 与 $\decode$ 互为拟逆。
+先前困难的方向现在变得简单了！
+
+\begin{lem} \label{lem:s1-decode-encode}
+对任意 $x: \Sn ^1$ 与 $p : \id \base x$，有 $\id
+{\decode_x({{\encode_x(p)}})} p$。
+\end{lem}
+
+\begin{proof}
+由路径归纳，只需证明
+\narrowequation{\id {\decode_{\base}({{\encode_{\base}(\refl{\base})}})} {\refl{\base}}.}
+但
+\narrowequation{\encode_{\base}(\refl{\base}) \jdeq \transfib{\code}{\refl{\base}} 0 \jdeq 0,}
+且 $\decode_{\base}(0) \jdeq \lloop^ 0 \jdeq \refl{\base}$。
+\end{proof}
+
+反方向也并不更难。
+
+\begin{lem} \label{lem:s1-encode-decode} 对任意
+$x: \Sn ^1$ 与 $c : \code(x)$，有 $\id
+{\encode_x({{\decode_x(c)}})} c$.
+\end{lem}
+
+\begin{proof}
+该证明使用圆归纳。
+只需证明 \base 的情形，因为 \lloop 的情形是在
+$\Z$ 中路径之间的一条路径，而由于 $\Z$ 是集合，这一点是直接的。
+
+因此，只需对所有 $n : \Z$ 证明
+\[
+\id {\encode'(\lloop^n)} {n}.
+\]
+证明通过归纳进行，使用 \cref{thm:sign-induction}。
+%
+\begin{itemize}
+
+\item 在 $0$ 的情形，结论由定义成立。
+
+\item 在 $n+1$ 的情形，
+\begin{align}
+ {\encode'(\lloop^{n+1})}
+&= {\encode'(\lloop^{n} \ct \lloop)} \tag{由 $\lloop^{\blank}$ 的定义} \\
+&= \transfib{\code}{(\lloop^{n} \ct \lloop)}{0} \tag{由 $\encode$ 的定义}\\
+&= \transfib{\code}{\lloop}{(\transfib{\code}{\lloop^n}{0})} \tag{由函子性}\\
+&= {(\transfib{\code}{\lloop^n}{0})} + 1 \tag{由 \cref{lem:transport-s1-code}}\\
+&= n + 1. \tag{由归纳假设}
+\end{align}
+
+\item 负数情形类似。 \qedhere
+\end{itemize}
+\end{proof}
+
+最后得到定理。
+
+\begin{thm}
+存在一族等价 $\prd{x : \Sn ^1} (\eqv {(\base=x)} {\code(x)})$。
+\end{thm}
+\begin{proof}
+由 \cref{lem:s1-decode-encode,lem:s1-encode-decode}，映射 $\encode$ 与 $\decode$ 互为拟逆。
+\end{proof}
+
+在 {\base} 处取实例可得
+\begin{cor}\label{cor:omega-s1}
+$\eqv {\Omega(\Sn^1,\base)} {\Z}$.
+\end{cor}
+
+一个简单归纳可证该等价把加法送到复合，因此作为群有 $\Omega(\Sn ^1) = \Z$。
+
+\begin{cor} \label{cor:pi1s1}
+$\id{\pi_1(\Sn ^1)} {\Z}$，而当 $n>1$ 时 $\id{\pi_n(\Sn ^1)}0$。
+\end{cor}
+\begin{proof}
+当 $n=1$ 时，上面已从 \cref{cor:omega-s1} 概述了证明。
+当 $n > 1$ 时，
+$\trunc 0 {\Omega^{n}(\Sn ^1)} = \trunc 0 {\Omega^{n-1}(\Omega{\Sn ^1})} = \trunc 0 {\Omega^{n-1}(\Z)}$。
+且因 $\Z$ 是集合，$\Omega^{n-1}(\Z)$ 可缩，故该群平凡。
+\end{proof}
+
+\index{encode-decode method|)}%
+
+
+\subsection{同伦论式证明}
+\label{subsec:pi1s1-homotopy-theory}
+
+在 \cref{sec:pi1s1-universal-cover} 中，我们在类型论里定义了候选通用覆盖 $\code:\Sn^1\to\type$；在 \cref{subsec:pi1s1-encode-decode} 中，我们定义了从路径纤维化到通用覆盖的映射 $\encode : \prd{x:\Sn^1} (\base=x) \to \code(x)$。
+经典证明剩下的部分是：证明该映射在总空间上诱导等价（因为两者都可缩），并由此推出它在每条纤维上都是等价。
+
+\index{total!space}%
+在 \cref{thm:contr-paths} 中我们已看到总空间 $\sm{x:\Sn^1} (\base=x)$ 可缩。
+对另一个总空间，我们有：
+
+\begin{lem}\label{thm:iscontr-s1cover}
+  类型 $\sm{x:\Sn^1}\code(x)$ 是可缩的。
+\end{lem}
+\begin{proof}
+  将展平引理（\cref{thm:flattening}）应用于以下取值：
+  \begin{itemize}
+  \item $A\defeq\unit$ 与 $B\defeq\unit$，$f$ 与 $g$ 为显然函数。
+    因而展平引理中的基高阶归纳类型 $W$ 等价于 $\Sn^1$。
+  \item $C:A\to\type$ 是常值 \Z。
+  \item $D:\prd{b:B} (\eqv{\Z}{\Z})$ 是常值 $\Zsuc$。
+  \end{itemize}
+  于是展平引理中定义的类型族 $P:\Sn^1\to\type$ 与 $\code:\Sn^1\to\type$ 等价。
+  因而展平引理告诉我们，$\sm{x:\Sn^1}\code(x)$ 等价于一个具有下列生成元的高阶归纳类型，记作 $R$：
+  \begin{itemize}
+  \item 函数 $\mathsf{c}: \Z \to R$。
+  \item 对每个 $z:\Z$，路径 $\mathsf{p}_z:\mathsf{c}(z) = \mathsf{c}(\Zsuc(z))$。
+  \end{itemize}
+  我们可把此类型称为\define{同伦实数}；
+  \indexdef{real numbers!homotopical}%
+  它在该证明中扮演的角色与经典证明里的拓扑空间 $\mathbb{R}$ 相同。
+
+  因此只需证明 $R$ 可缩。
+  取收缩中心为 $\mathsf{c}(0)$；我们需对所有 $x:R$ 证明 $x=\mathsf{c}(0)$。
+  对 $R$ 做归纳。
+  首先，当 $x$ 为 $\mathsf{c}(z)$ 时，我们需给出路径 $q_z:\mathsf{c}(0) = \mathsf{c}(z)$，
+  可通过对 $z:\Z$ 归纳得到，使用 \cref{thm:sign-induction}：
+  \begin{align*}
+    q_0 &\defid \refl{\mathsf{c}(0)}\\
+    q_{n+1} &\defid q_n \ct \mathsf{p}_n & &\text{对 $n\ge 0$}\\
+    q_{n-1} &\defid q_n \ct \opp{\mathsf{p}_{n-1}} & &\text{对 $n\le 0$.}
+  \end{align*}
+  其次，我们需证明对任意 $z:\Z$，路径 $q_z$ 沿 $\mathsf{p}_z$ 传送后变为 $q_{z+1}$。
+  由路径传送的刻画，这等价于证明 $q_z \ct \mathsf{p}_z = q_{z+1}$。
+  用 $z$ 归纳并利用 $q_z$ 的定义即可轻松完成。
+  从而 $R$ 可缩，因此 $\sm{x:\Sn^1}\code(x)$ 也可缩。
+\end{proof}
+
+\begin{cor}\label{thm:encode-total-equiv}
+  由 \encode 诱导的映射：
+  \[ \tsm{x:\Sn^1} (\base=x) \to \tsm{x:\Sn^1}\code(x) \]
+  是一个等价。
+\end{cor}
+\begin{proof}
+  两边类型都可缩。
+\end{proof}
+
+\begin{thm}
+  $\eqv {\Omega(\Sn^1,\base)} {\Z}$.
+\end{thm}
+\begin{proof}
+  将 \cref{thm:total-fiber-equiv} 应用于 $\encode$，并使用 \cref{thm:encode-total-equiv}。
+\end{proof}
+
+本质上，这两种证明并无太大差异：编码-解码证明可被看作同伦论式证明的一种“约化”或“拆包”。
+二者各有优势；这两种视角之间的互动正是该主题的趣味之一。
+\index{fundamental!group!of circle|)}
+
+
+\subsection{作为恒等系统的通用覆盖}
+\label{sec:pi1s1-idsys}
+
+注意纤维化 $\code:\Sn^1\to\type$ 连同 $0:\code(\base)$，按 \cref{defn:identity-systems} 的意义构成一个\emph{带点谓词}。
+从这个观点看，\cref{subsec:pi1s1-encode-decode} 的编码-解码证明是在证明 \code 满足 \cref{thm:identity-systems}\ref{item:identity-systems3}，而 \cref{subsec:pi1s1-homotopy-theory} 的同伦论式证明是在证明它满足 \cref{thm:identity-systems}\ref{item:identity-systems4}。
+这提示了第三种做法。
+
+\begin{thm}
+  序对 $(\code,0)$ 在 $\base:\Sn^1$ 处按 \cref{defn:identity-systems} 的意义是一个恒等系统。
+\end{thm}
+\begin{proof}
+  给定 $D:\prd{x:\Sn^1} \code(x) \to \type$ 与 $d:D(\base,0)$；我们希望定义函数 $f:\prd{x:\Sn^1}{c:\code(x)} D(x,c)$。
+  由圆归纳，只需给出 $f(\base):\prd{c:\code(\base)} D(\base,c)$，并验证 $\trans{\lloop}{f(\base)} = f(\base)$。
+
+  当然，$\code(\base)\jdeq \Z$。
+  由 \cref{lem:transport-s1-code} 与对 $n$ 的归纳，对任意整数 $n$ 可得路径 $p_n : \transfib{\code}{\lloop^n}{0} = n$。
+  因此，由 $\Sigma$-类型中的路径，我们在 $\sm{x:\Sn^1} \code(x)$ 中得到路径 $\pairpath(\lloop^n,p_n) : (\base,0) = (\base,n)$。
+  沿与 $D$ 关联的纤维化 $\widehat{D}:(\sm{x:\Sn^1} \code(x)) \to\type$ 对该路径传送 $d$，可得到任意 $n:\Z$ 的元素 $D(\base,n)$。
+  我们把该元素定义为 $f(\base)(n)$：
+  \[ f(\base)(n) \defeq \transfib{\widehat{D}}{\pairpath(\lloop^n,p_n)}{d}. \]
+  %
+  现在需要 $\transfib{\lam{x} \prd{c:\code(x)} D(x,c)}{\lloop}{f(\base)} = f(\base)$。
+  由 \cref{thm:dpath-forall}，这意味着我们需对任意 $n:\Z$ 证明
+  %
+  \begin{narrowmultline*}
+    \transfib{\widehat D}{\pairpath(\lloop,\refl{\trans\lloop n})}{f(\base)(n)}
+    =_{D(\base,\trans\lloop n)} \narrowbreak
+    f(\base)(\trans\lloop n).
+  \end{narrowmultline*}
+  %
+  现有路径 $q:\trans\lloop n = n+1$，沿其传送后，只需证明
+  \begin{multline*}
+    \transfib{D(\base)}{q}{\transfib{\widehat D}{\pairpath(\lloop,\refl{\trans\lloop n})}{f(\base)(n)}}\\
+    =_{D(\base,n+1)} \transfib{D(\base)}{q}{f(\base)(\trans\lloop n)}.
+  \end{multline*}
+  借助若干关于传送与依值应用的引理，这等价于
+  \[ \transfib{\widehat D}{\pairpath(\lloop,q)}{f(\base)(n)} =_{D(\base,n+1)} f(\base)(n+1). \]
+  但展开 $f(\base)$ 的定义可得
+  \begin{narrowmultline*}
+    \transfib{\widehat D}{\pairpath(\lloop,q)}{f(\base)(n)}
+    \narrowbreak
+    \begin{aligned}[t]
+      &= \transfib{\widehat D}{\pairpath(\lloop,q)}{\transfib{\widehat{D}}{\pairpath(\lloop^n,p_n)}{d}}\\
+      &= \transfib{\widehat D}{\pairpath(\lloop^n,p_n) \ct \pairpath(\lloop,q)}{d}\\
+      &= \transfib{\widehat D}{\pairpath(\lloop^{n+1},p_{n+1})}{d}\\
+      &= f(\base)(n+1).
+    \end{aligned}
+  \end{narrowmultline*}
+  这里我们使用了传送的函子性、$\Sigma$-类型中复合的刻画（其证明曾留作习题），以及一个把 $p_n$ 与 $q$ 关联到 $p_{n+1}$ 的引理（其陈述与证明留给读者）。
+
+  由此完成了 $f:\prd{x:\Sn^1}{c:\code(x)} D(x,c)$ 的构造。
+  由于
+  \[f(\base,0) \jdeq \trans{\pairpath(\lloop^0,p_0)}{d} = \trans{\refl{\base}}{d} = d,\]
+  我们证明了 $(\code,0)$ 是一个恒等系统。
+\end{proof}
+
+\begin{cor}
+  对任意 $x:\Sn^1$，有 $\eqv{(\base=x)}{\code(x)}$。
+\end{cor}
+\begin{proof}
+  由 \cref{thm:identity-systems}。
+\end{proof}
+
+当然，这个证明本质上也包含了前两种证明的同样要素。
+粗略地说，它把 \cref{thm:pi1s1-decode,lem:s1-encode-decode} 的证明统一起来，只在一个泛化情形中进行一次所需的归纳论证。
+
+\begin{rmk}
+  注意，上述关于 $\eqv{\pi_1(\Sn^1)}{\Z}$ 的所有证明都本质地使用了泛等公理。
+  这是不可避免的：要证明 $\eqv{\pi_1(\Sn^1)}{\Z}$，泛等或类似原理是\emph{必要}的。
+  在缺少泛等时，命题“所有类型都是集合”（又称“恒等证明唯一性”或 “Axiom K”，见 \cref{sec:hedberg}）是相容的，而它将推出 $\eqv{\pi_1(\Sn^1)}{\unit}$。
+  事实上，$\pi_1(\Sn^1)$ 的（非）平凡性恰好检测了“所有类型是否都是集合”：\cref{thm:loop-nontrivial} 的证明反向说明，若 $\lloop=\refl{\base}$，则所有类型都是集合。
+\end{rmk}
+\section{悬挂的连通性}
+\label{sec:conn-susp}
+
+回忆 \cref{sec:connectivity}：若 $\trunc nA$ 可缩，则称类型 $A$ 为\define{$n$-连通}。
+本节目标是证明：\cref{sec:suspension} 中的悬挂操作会提升连通性。
+
+\begin{thm} \label{thm:suspension-increases-connectedness}
+  若 $A$ 是 $n$-连通，则 $A$ 的悬挂是 $(n+1)$-连通。
+\end{thm}
+
+\begin{proof}
+  我们在 \cref{sec:colimits} 中提到，$A$ 的悬挂是余推出 $\unit\sqcup^A\unit$，因此需要
+  证明下列类型可缩：
+  %
+  \[\trunc{n+1}{\unit\sqcup^A\unit}.\]
+  %
+  由 \cref{reflectcommutespushout} 可知，
+  $\trunc{n+1}{\unit\sqcup^A\unit}$ 是 $\typelep{n+1}$ 中下图的余推出
+  \[\xymatrix{\trunc{n+1}A \ar[d] \ar[r] & \trunc{n+1}{\unit} \\
+    \trunc{n+1}{\unit} & }.\]
+  %
+  由于 $\trunc{n+1}{\unit}=\unit$，类型
+  $\trunc{n+1}{\unit\sqcup^A\unit}$ 也等于 $\typelep{n+1}$ 中下图的余推出
+  （因为两张图相等）
+  %
+  \[\Ddiag=\vcenter{\xymatrix{\trunc{n+1}A \ar[d] \ar[r] & \unit \\
+    \unit & }}.\]
+  %
+  下面我们证明 $\unit$ 也是 $\typelep{n+1}$ 中 $\Ddiag$ 的余推出。
+  %
+  设 $E$ 是一个 $(n+1)$-截断类型；我们需要证明下列映射
+  是一个等价：
+  %
+  \[\function{(\unit \to E)}{\cocone{\Ddiag}{E}}{y}
+  {(y,y,\lamu{u:{\trunc{n+1}A}} \refl{y(\ttt)})}.\]
+  %
+  其中回忆 $\cocone{\Ddiag}{E}$ 是类型
+  \[\sm{f:\unit \to E}{g:\unit \to E}(\trunc{n+1}A\to
+  (f(\ttt)=_E{}g(\ttt))).\]
+  %
+  映射 $\function{(\unit\to E)}{E}{f}{f(\ttt)}$ 是等价，因此
+  也有
+  \[\cocone{\Ddiag}{E}=\sm{x:E}{y:E}(\trunc{n+1}A\to(x=_Ey)).\]
+  %
+  现在 $A$ 是 $n$-连通，因此 $\trunc{n+1}A$ 也 $n$-连通，因为
+  $\trunc n{\trunc{n+1}A}=\trunc nA=\unit$；并且 $(x=_Ey)$ 是 $n$-截断，因为
+  $E$ 是 $(n+1)$-截断。故由 \cref{connectedtotruncated}，下列映射
+  是等价：
+  %
+  \[\function{(x=_Ey)}{(\trunc{n+1}A\to(x=_Ey))}{p}{\lam{z} p}\]
+  %
+  因而有
+  %
+  \[\cocone{\Ddiag}{E}=\sm{x:E}{y:E}(x=_Ey).\]
+  %
+  但下列映射是等价：
+  %
+  \[\function{E}{\sm{x:E}{y:E}(x=_Ey)}{x}{(x,x,\refl{x})}.\]
+  %
+  因而
+  %
+  \[\cocone{\Ddiag}{E}=E.\]
+  %
+  最后得到等价
+  %
+  \[(\unit \to E)\eqvsym\cocone{\Ddiag}{E}\]
+  %
+  现在把定义展开可得到该映射的显式表达，并且容易看出，这正是我们在
+  开头写下的那个映射。
+
+  因此我们证明了：$\unit$ 是 $\typelep{n+1}$ 中 $\Ddiag$ 的一个余推出。利用
+  余推出的唯一性可得 $\trunc{n+1}{\unit\sqcup^A\unit}=\unit$，
+  从而证明 $A$ 的悬挂是 $(n+1)$-连通。
+\end{proof}
+
+\begin{cor} \label{cor:sn-connected}
+  对所有 $n:\N$，球面 $\Sn^n$ 是 $(n-1)$-连通。
+\end{cor}
+
+\begin{proof}
+  对 $n$ 做归纳。
+  %
+  当 $n=0$ 时，需证明 $\Sn^0$ 仅仅可居留，这显然成立。
+  %
+  设 $n:\N$，且 $\Sn^n$ 是 $(n-1)$-连通。按定义 $\Sn^{n+1}$
+  是 $\Sn^n$ 的悬挂，因此由前一引理，$\Sn^{n+1}$ 是
+  $n$-连通。
+\end{proof}
+\section{\texorpdfstring{$\pi_{k \le n}$}{π\_(k≤n)} 在 \texorpdfstring{$n$}{n}-连通空间中的情形与 \texorpdfstring{$\pi_{k < n}(\Sn ^n)$}{π\_(k<n)(Sⁿ)}}
+\label{sec:pik-le-n}
+
+设 $(A,a)$ 是一个带基点类型，且 $n:\N$。由
+\cref{thm:homotopy-groups} 回忆可知：若 $n>0$，则集合 $\pi_n(A,a)$ 带有群结构；若 $n>1$，该群还是阿贝尔的\index{group!abelian}。
+
+现在我们可以说明 $n$-截断类型与 $n$-连通类型的同伦群性质。
+
+\begin{lem}
+  若 $A$ 是 $n$-截断的且 $a:A$，则对所有 $k>n$，都有 $\pi_k(A,a)=\unit$。
+\end{lem}
+
+\begin{proof}
+  一个 $n$-类型的环路空间是
+  $(n-1)$-类型，因此 $\Omega^k(A,a)$ 是一个 $(n-k)$-类型，而此时
+  $(n-k)\le-1$，故 $\Omega^k(A,a)$ 是纯命题。但 $\Omega^k(A,a)$ 有元素，
+  因而它实际上是可缩的，并且
+  $\pi_k(A,a)=\trunc0{\Omega^k(A,a)}=\trunc0{\unit}=\unit$。
+\end{proof}
+
+\begin{lem} \label{lem:pik-nconnected}
+  若 $A$ 是 $n$-连通的且 $a:A$，则对所有 $k\le{}n$，都有 $\pi_k(A,a)=\unit$。
+\end{lem}
+
+\begin{proof}
+  我们有如下等式链：
+  %
+  \begin{narrowmultline*}
+    \pi_k(A,a) = \trunc0{\Omega^k(A,a)}
+    = \Omega^k(\trunc k{(A,a)})
+    = \Omega^k(\trunc k{\trunc n{(A,a)}})
+    = \narrowbreak
+      \Omega^k(\trunc k{\unit})
+    = \Omega^k(\unit)
+    = \unit.
+  \end{narrowmultline*}
+  %
+  第三个等式用到了 $k\le{}n$，从而可用
+  $\truncf k\circ\truncf n=\truncf k$；第四个等式用到了 $A$
+  是 $n$-连通的。
+\end{proof}
+
+\begin{cor}
+  当 $k < n$ 时，$\pi_k(\Sn ^n) = \unit$。
+\end{cor}
+\begin{proof}
+  由 \cref{cor:sn-connected}，球面 $\Sn^n$ 是 $(n-1)$-连通的，因此
+  可应用 \cref{lem:pik-nconnected}。
+\end{proof}
+\section{纤维序列与长正合序列}
+\label{sec:long-exact-sequence-homotopy-groups}
+
+\index{fiber sequence|(}%
+\index{sequence!fiber|(}%
+
+若函数 $f:X\to Y$ 的陪域配备了基点 $y_0:Y$，则我们把 $f$ 在 $y_0$ 上的纤维 $F\defeq \hfib f {y_0}$ 称为\define{$f$ 的纤维}\index{fiber}。
+（若 $Y$ 连通，则 $F$ 在纯等价意义下是唯一确定的；见 \cref{ex:unique-fiber}。）
+现在我们说明：若 $X$ 也是带基点的且 $f$ 保持基点，则 $F$、$X$ 与 $Y$ 的同伦群之间存在一个关系，其形式是一个\emph{长正合序列}。
+我们将通过与此类 $f$ 相关的\emph{纤维序列}导出该结果。
+
+\begin{defn}\label{def:pointedmap}
+  带基点类型 $(X,x_0)$ 与 $(Y,y_0)$ 之间的\define{带基点映射}
+  \indexdef{pointed!map}%
+  \indexsee{function!pointed}{pointed map}%
+  是指一个映射 $f:X\to Y$，连同一条路径 $f_0:f(x_0)=y_0$。
+\end{defn}
+
+对任意带基点类型 $(X,x_0)$ 与 $(Y,y_0)$，都有带基点映射 $(\lam{x} y_0) : X\to Y$，它在基点处恒定。
+我们称其为\define{零映射}\indexdef{zero!map}\indexdef{function!zero}，有时记作 $0:X\to Y$。
+
+回忆每个带基点类型 $(X,x_0)$ 都有环路空间\index{loop space} $\Omega (X,x_0)$。
+现在注意该操作对带基点映射是函子性的。\index{loop space!functoriality of}\index{functor!loop space}
+
+\begin{defn}\label{def:loopfunctor}
+  给定带基点类型之间的带基点映射 $f:X \to Y$，定义带基点
+  映射 $\Omega f:\Omega X
+  \to \Omega Y$ 为
+  \[(\Omega f)(p) \defeq \rev{f_0}\ct\ap{f}{p}\ct f_0.\]
+  路径 $(\Omega f)_0 : (\Omega f) (\refl{x_0}) = \refl{y_0}$ 给出 $\Omega f$ 的带基点结构，它是如下类型中的显然路径：
+  \[\rev{f_0}\ct\ap{f}{\refl{x_0}}\ct f_0=\refl{y_0}.\]
+\end{defn}
+
+带基点映射上还有另一个函子，它把 $f:X\to Y$ 送到 $\proj1 : \hfib f {y_0} \to X$。
+当 $f$ 是带基点映射时，我们总把 $\hfib f {y_0}$ 的基点取为 $(x_0,f_0)$，此时 $\proj1$ 也是带基点映射，见证为 $(\proj1)_0 \defeq \refl{x_0}$。
+因此，这个操作可以迭代。
+
+\begin{defn}
+  带基点映射 $f:X\to Y$ 的\define{纤维序列}
+  \indexdef{fiber sequence}%
+  \indexdef{sequence!fiber}%
+  是如下带基点类型与带基点映射组成的无穷序列
+  \[\xymatrix{\dots \ar[r]^{f^{(n+1)}} & X^{(n+1)} \ar[r]^{f^{(n)}} & X^{(n)} \ar^-{f^{(n-1)}}[r] & \dots \ar[r] & X^{(2)} \ar^-{f^{(1)}}[r] & X^{(1)} \ar[r]^{f^{(0)}} & X^{(0)}}\]
+  递归定义为
+  \[ X^{(0)} \defeq Y\qquad
+    X^{(1)} \defeq X\qquad
+    f^{(0)} \defeq f\qquad
+    \]
+  以及
+  \begin{alignat*}{2}
+    X^{(n+1)} &\defeq \hfib {f^{(n-1)}}{x^{(n-1)}_0}\\
+    f^{(n)} &\defeq \proj1 &: X^{(n+1)} \to X^{(n)}.
+  \end{alignat*}
+  其中 $x^{(n)}_0$ 表示 $X^{(n)}$ 的基点，按上面的方式递归选取。
+\end{defn}
+
+因此，该纤维序列中任意相邻两张映射都具有如下形式
+\[ \xymatrix{ X^{(n+1)} \jdeq \hfib{f^{(n-1)}}{x^{(n-1)}_0} \ar[rr]^-{f^{(n)}\jdeq \proj1} && X^{(n)} \ar[r]^{f^{(n-1)}} & X^{(n-1)}. } \]
+特别地，$f^{(n-1)} \circ f^{(n)} = 0$。
+现在我们观察到，该序列中出现的类型是基
+空间 $Y$、总空间\index{total!space} $X$ 以及纤维 $F\defeq \hfib f {y_0}$ 的迭代环路空间\index{loop space!iterated}，映射也是如此。
+
+\begin{lem}\label{thm:fiber-of-the-fiber}
+  设 $f:X\to Y$ 是带基点空间之间的带基点映射。则：
+  \begin{enumerate}
+  \item $f^{(1)}\defeq \proj1 : \hfib f {y_0} \to X$ 的纤维等价于 $\Omega Y$。\label{item:fibseq1}
+  \item 类似地，$f^{(2)} : \Omega Y \to \hfib f {y_0}$ 的纤维等价于 $\Omega X$。\label{item:fibseq2}
+  \item 在这些等价下，带基点映射 $f^{(3)} : \Omega X\to \Omega Y$ 可识别为带基点映射 $\Omega f\circ\rev{(\blank)}$。\label{item:fibseq3}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  对于~\ref{item:fibseq1}，我们有
+  \begin{align*}
+    \hfib{f^{(1)}}{x_0}
+    &\defeq \sm{z:\hfib{f}{y_0}} (\proj{1}(z) = x_0)\\
+    &\eqvsym \sm{x:X}{p:f(x)=y_0} (x = x_0) &\text{（由 \cref{ex:sigma-assoc}）}\\
+    &\eqvsym (f(x_0) = y_0) &\text{（因为 $\tsm{x:X} (x=x_0)$ 可缩）}\\
+    &\eqvsym (y_0 = y_0) &\text{（由 $(f_0 \ct \blank)$）}\\
+    &\jdeq \Omega Y.
+  \end{align*}
+  追踪该等价可见，它把 $((x,p),q)$ 送到 $\opp{f_0} \ct \ap{f}{\opp q} \ct p$，而其逆把 $r:y_0=y_0$ 送到 $((x_0, f_0 \ct r), \refl{x_0})$。
+  特别地，$\hfib{f^{(1)}}{x_0}$ 的基点 $((x_0,f_0),\refl{x_0})$ 被送到 $\opp{f_0} \ct \ap{f}{\opp {\refl{x_0}}} \ct f_0$，它等于 $\refl{y_0}$。
+  因而该等价是带基点映射（见 \cref{ex:pointed-equivalences}）。
+  另外，在此等价下，$f^{(2)}$ 可识别为 $\lam{r} (x_0, f_0 \ct r): \Omega Y \to \hfib f {y_0}$。
+
+  对 $f^{(1)}$ 应用~\ref{item:fibseq1}（把它替代原来的 $f$）即可立得 \cref{item:fibseq2}。
+  % The resulting equivalence sends $(((x,p),p'),q') : \hfib{f^{(2)}}{(x_0,f_0)}$ to $\ap{f}{\opp {q'}} \ct p'$, while its inverse sends $s:x_0=x_0$ to $(((x_0,f_0), s), \refl{(x_0,f_0)})$.
+  由于 $(f^{(1)})_0 \defeq \refl{x_0}$，在这个等价下 $f^{(3)}$ 被识别为映射 $\Omega X \to \hfib {f^{(1)}}{x_0}$，其定义是 $s \mapsto ((x_0,f_0),s)$。
+  因此与前一个等价 $\hfib {f^{(1)}}{x_0} \eqvsym \Omega Y$ 复合后，可见 $s$ 被送到 $\opp{f_0} \ct \ap{f}{\opp s} \ct f_0$，这按定义正是 $(\Omega f)(\opp s)$。关于这是一条带基点映射的等式而非仅函数等式，我们从略其证明。
+\end{proof}
+
+因此，$f:X\to Y$ 的纤维序列可画为：
+\[\xymatrix@C=1.5pc{
+  \dots \ar[r] &
+  \Omega^2 X \ar[r]^-{\Omega^2 f} &
+  \Omega^2 Y \ar[r]^-{-\Omega \partial} &
+  \Omega F \ar[r]^-{-\Omega i} &
+  \Omega X \ar[r]^-{-\Omega f} &
+  \Omega Y \ar[r]^-{\partial} &
+  F \ar[r]^-{i} &
+  X \ar[r]^{f} & Y.}\]
+其中负号表示与路径反演 $\rev{(\blank)}$ 复合。
+注意由 \cref{ex:ap-path-inversion} 有
+\[ \Omega\left(\Omega f\circ \opp{(\blank)}\right) \circ \opp{(\blank)}
+= \Omega^2 f \circ \opp{(\blank)} \circ \opp{(\blank)}
+= \Omega^2 f.
+\]
+因此，当 $k$ 为奇数时，$k$ 重环路映射上会出现负号。
+
+由该纤维序列我们将推出一个\emph{带基点集合的正合序列}。
+\index{image}%
+设 $A$ 和 $B$ 是集合，$f:A\to B$ 是函数。由 \cref{defn:modal-image} 回忆\emph{像}的定义：$\im(f)$ 可视为 $B$ 的子集：
+\[\im(f) \defeq \setof{b:B | \exis{a:A} f(a)=b}. \]
+若进一步 $A$ 与 $B$ 都是带基点集合，基点分别为 $a_0$ 与 $b_0$，且 $f$ 是带基点映射，则定义 $f$ 的\define{核}
+\indexdef{kernel}%
+\indexdef{pointed!map!kernel of}%
+为 $A$ 的如下子集：
+\symlabel{kernel}
+\[\ker(f) \defeq \setof{x:A | f(x) = b_0}. \]
+当然，这正是 $f$ 在基点 $b_0$ 上的纤维；由于 $B$ 是集合，它确实是 $A$ 的一个子集。
+
+注意任何群都可看作带基点集合，其基点是单位元，且任何群同态都是带基点映射。
+在这种情形下，核与像与群论中的通常概念一致。
+
+\begin{defn}
+  一个\define{带基点集合的正合序列}
+  \indexdef{exact sequence}%
+  \indexdef{sequence!exact}%
+  是一个（可有界的）带基点集合与带基点映射序列：
+  \[\xymatrix{\dots \ar[r] & A^{(n+1)} \ar[r]^-{f^{(n)}} & A^{(n)} \ar[r]^{f^{(n-1)}} & A^{(n-1)} \ar[r] &
+    \dots}\]
+  使得对每个 $n$，$f^{(n)}$ 的像作为 $A^{(n)}$ 的子集，恰等于 $f^{(n-1)}$ 的核。
+  换言之，对所有 $a:A^{(n)}$ 都有
+  \[ (f^{(n-1)}(a) = a^{(n-1)}_0) \iff \exis{b:A^{(n+1)}} (f^{(n)}(b)=a). \]
+  其中 $a^{(n)}_0$ 表示 $A^{(n)}$ 的基点。
+\end{defn}
+
+通常，正合序列中的大多数（或全部）带基点集合都是群，并且常常是阿贝尔群。
+当我们说\define{群的正合序列}时，还默认这些映射是群同态，而不仅是带基点映射。
+
+\index{exact sequence}
+\begin{thm}\label{thm:les}
+  设 $f:X \to Y$ 是带基点空间之间的带基点映射，其纤维为 $F\defeq \hfib f {y_0}$。
+  则有如下长正合序列：除最后三项外其余皆为群，除最后六项外其余皆为阿贝尔群。
+
+  \[
+  \xymatrix@R=1.2pc@C=3pc{
+    \vdots & \vdots & \vdots \ar[lld] \\
+    \pi_k(F) \ar[r] & \pi_k(X) \ar[r] & \pi_k(Y) \ar[lld] \\
+    \vdots & \vdots & \vdots \ar[lld] \\
+    \pi_2(F) \ar[r] & \pi_2(X) \ar[r] & \pi_2(Y) \ar[lld] \\
+    \pi_1(F) \ar[r] & \pi_1(X) \ar[r] & \pi_1(Y) \ar[lld]\\
+    \pi_0(F) \ar[r] & \pi_0(X) \ar[r] & \pi_0(Y)}
+  \]
+\end{thm}
+
+% In US trade we might want a page break here, and extra stretch, otherwise the
+% whole page looks ugly.
+\vspace*{0pt plus 10ex}
+\goodbreak
+
+\begin{proof}
+  我们先证明：纤维序列做 0-截断后得到带基点集合的正合序列。
+  因而我们需要证明，对纤维序列中任意相邻的两张映射：
+  %
+  \[\xymatrix{\hfib{f}{z_0} \ar^-g[r] & W \ar^-f[r] & Z}\]
+  %
+  其中 $g\defeq \proj1$，序列
+  %
+  \[\xymatrix{\trunc{0}{\hfib{f}{z_0}} \ar^-{\trunc0g}[r] & \trunc0{W}
+    \ar^-{\trunc0{f}}[r] & \trunc0{Z}}\]
+  %
+  是正合的，即 $\im(\trunc0g)\subseteq\ker(\trunc0f)$ 且 $\ker(\trunc0f)\subseteq\im(\trunc0g)$。
+
+  第一个包含关系等价于 $\trunc0f\circ\trunc0g=0$，这由 $\truncf0$ 的函子性及 $f\circ g=0$ 立得。
+  对第二个包含关系，设 $w':\trunc0W$ 且 $p':\trunc0f(w')=\tproj0{z_0}$，我们要证明仅存在 ${t:\hfib{f}{z_0}}$ 使得 $\tproj0{g(t)}=w'$。
+  由于目标是纯命题，我们可假设 $w'$ 形如 $\tproj0w$，其中 $w:W$。
+  由 \cref{thm:path-truncation}，$p' : \tproj0{f(w)}=\tproj0{z_0}$ 给出 $p'': \trunc{-1}{f(w)=z_0}$，再做一次截断归纳后可假设有某个 $p:f(w)=z_0$。
+  于是有 $\tproj0{(w,p)}:\trunc{0}{\hfib{f}{z_0}}$，其在 $\trunc0g$ 下的像是 $\tproj0w\jdeq w'$，得证。
+
+  因而，对 $f$ 的纤维序列施加 $\truncf0$，可得到按所需顺序由带基点集合 $\pi_k(F)$、$\pi_k(X)$ 与 $\pi_k(Y)$ 构成的长正合序列。
+  当然，$\pi_k$ 在 $k\ge1$ 时是群，因为它是环路空间的 0-截断；在 $k\ge 2$ 时由 Eckmann--Hilton 论证
+  \index{Eckmann--Hilton argument}（\cref{thm:EckmannHilton}）可知是阿贝尔群。
+  此外，\cref{thm:fiber-of-the-fiber} 允许我们把该正合序列中的映射 $\pi_k(F) \to \pi_k(X)$ 与 $\pi_k(X) \to \pi_k(Y)$ 分别识别为 $(-1)^k \pi_k(i)$ 与 $(-1)^k \pi_k(f)$。
+
+  更一般地，除最后三项外，该长正合序列中的每个映射都形如某个 $h$ 的 $\trunc0{\Omega h}$ 或 $\trunc0{-\Omega h}$。
+  前者是群同态；后者在群阿贝尔时也是同态，否则是“反同态”。
+  但把群同态换成其负映射并不改变其核与像，因此也不改变涉及它的任意序列的正合性。
+  因而我们可修改长正合序列，使其直接涉及 $\pi_k(i)$ 与 $\pi_k(f)$，并且其中所有映射（最后三项除外）都是群同态。
+\end{proof}
+
+阿贝尔群正合序列\index{group!abelian!exact sequence of}的通常性质可按常规证明。特别地有：
+\begin{lem}\label{thm:ses}
+  设有阿贝尔群的正合序列：
+  %
+  \[\xymatrix{K \ar[r]& G \ar^f[r] & H \ar[r] & Q.}\]
+  %
+  \begin{enumerate}
+  \item 若 $K=0$，则 $f$ 为单射。\label{item:sesinj}
+  \item 若 $Q=0$，则 $f$ 为满射。\label{item:sessurj}
+  \item 若 $K=Q=0$，则 $f$ 为同构。\label{item:sesiso}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  由于 $f$ 的核是 $K\to G$ 的像，若 $K=0$，则 $f$ 的核是 $\{0\}$；
+  因而 $f$ 是单射，因为它是群同态。
+  同理，由于 $f$ 的像是 $H\to Q$ 的核，若 $Q=0$，则 $f$ 的像就是整个 $H$，故 $f$ 为满射。
+  最后，~\ref{item:sesiso} 由~\ref{item:sesinj} 与~\ref{item:sessurj} 结合 \cref{thm:mono-surj-equiv} 得到。
+\end{proof}
+
+作为直接应用，现在我们可以量化地说明：映射的 $n$-连通性比在 $n$-截断上诱导等价更强在哪些方面。
+
+\begin{cor}\label{thm:conn-pik}
+  设 $f:A\to B$ 是 $n$-连通映射，$a:A$，并记 $b\defeq f(a)$。则：
+  \begin{enumerate}
+  \item 若 $k\le n$，则 $\pi_k(f):\pi_k(A,a) \to \pi_k(B,b)$ 为同构。\label{item:conn-pik1}
+  \item 若 $k=n+1$，则 $\pi_k(f):\pi_k(A,a) \to \pi_k(B,b)$ 为满射。\label{item:conn-pik2}
+  \end{enumerate}
+\end{cor}
+\begin{proof}
+  当 $k=0$ 时，注意到 $\pi_0(f)\equiv\trunc 0f$，于是第~\ref{item:conn-pik1} 点由 \cref{lem:connected-map-equiv-truncation} 得到。
+  当 $k=0$ 时的第~\ref{item:conn-pik2} 点由 \cref{ex:is-conn-trunc-functor} 得到，并注意由 \cref{thm:minusoneconn-surjective}，函数满射当且仅当它是 $(-1)$-连通的。
+  当 $k>0$ 时，长正合序列中有一段正合序列
+  \[\xymatrix{\pi_k(\hfib f b) \ar[r]& \pi_k(A,a) \ar^f[r] & \pi_k(B,b) \ar[r] & \pi_{k-1}(\hfib f b).}\]
+  现因 $f$ 是 $n$-连通的，$\trunc n{\hfib f b}$ 可缩。
+  因此，若 $k\le n$，则 $\pi_k(\hfib f b) = \trunc0{\Omega^k(\hfib f b)} = \Omega^k(\trunc k{\hfib f b})$ 也可缩。
+  故当 $k\le n$ 时由 \cref{thm:ses}\ref{item:sesiso} 可知 $\pi_k(f)$ 是同构；当 $k=n+1$ 时由 \cref{thm:ses}\ref{item:sessurj} 可知它是满射。
+\end{proof}
+
+在 \cref{sec:whitehead} 中我们将看到 \cref{thm:conn-pik} 的逆命题也成立。
+
+\index{fiber sequence|)}%
+\index{sequence!fiber|)}%
+\section{Hopf 纤维化}
+\label{sec:hopf}
+
+在本节中我们将定义\define{Hopf 纤维化}。
+\indexdef{Hopf!fibration}%
+
+\begin{thm}[Hopf Fibration]\label{thm:hopf-fibration}
+存在一个定义在 $\Sn ^2$ 上的纤维化 $H$，其在基点上的纤维为 $\Sn ^1$，
+其总空间为 $\Sn ^3$。
+\end{thm}
+
+Hopf 纤维化将使我们能够计算若干球面的同伦群。
+确实，它给出如下同伦群长正合序列
+\index{homotopy!group!of sphere}
+\index{sequence!exact}
+（见
+\cref{sec:long-exact-sequence-homotopy-groups}）：
+%
+\[
+\xymatrix@R=1.2pc{
+  \pi_k(\Sn^1) \ar[r] & \pi_k(\Sn^3) \ar[r] & \pi_k(\Sn^2) \ar[lld] \\
+  \vdots & \vdots & \vdots \ar[lld] \\
+  \pi_2(\Sn^1) \ar[r] & \pi_2(\Sn^3) \ar[r] & \pi_2(\Sn^2) \ar[lld] \\
+  \pi_1(\Sn^1) \ar[r] & \pi_1(\Sn^3) \ar[r] & \pi_1(\Sn^2)}
+\]
+%
+我们已经算出了所有 $\pi_n(\Sn^1)$ 以及在 $k<n$ 时的 $\pi_k(\Sn^n)$，因此该序列化为：
+%
+\[
+\xymatrix@R=1.2pc{
+  0 \ar[r] & \pi_k(\Sn^3) \ar[r] & \pi_k(\Sn^2) \ar[lld] \\
+  \vdots & \vdots & \vdots \ar[lld] \\
+  0 \ar[r] & \pi_3(\Sn^3) \ar[r] & \pi_3(\Sn^2) \ar[lld] \\
+  0 \ar[r] & 0 \ar[r] & \pi_2(\Sn^2) \ar[lld] \\
+  \Z \ar[r] & 0 \ar[r] & 0}
+\]
+%
+特别地，我们得到如下结果：
+
+\begin{cor} \label{cor:pis2-hopf}
+  我们有 $\eqv{\pi_2(\Sn^2)}{\Z}$，并且对每个 $k\ge3$ 都有 $\eqv{\pi_k(\Sn^3)}{\pi_k(\Sn^2)}$（其中该映射由 Hopf 纤维化诱导，即把它看作从总空间 $\Sn^3$ 到底空间 $\Sn^2$ 的映射）。
+\end{cor}
+
+事实上我们还能说得更多：Hopf 纤维化的纤维序列将表明 $\Omega^3(\Sn^3)$ 是某个从 $\Omega^3(\Sn^2)$ 到 $\Omega^2(\Sn^1)$ 的映射的纤维。
+由于 $\Omega^2(\Sn^1)$ 可缩，便有 $\eqv{\Omega^3(\Sn^3)}{\Omega^3(\Sn^2)}$。
+在经典同伦论中，这一事实可由 \cref{cor:pis2-hopf} 与 Whitehead 定理推出，但 Whitehead 定理在同伦类型论中不一定成立（见 \cref{sec:whitehead}）。
+不过这里我们不会使用这一更精确的版本。
+
+\subsection{余推上方的纤维化}
+\label{sec:fib-over-pushout}
+
+我们先从一个引理开始，解释如何在余推上构造纤维化。
+\index{pushout}%
+
+\begin{lem}\label{lem:fibration-over-pushout}
+  设 $\Ddiag=(Y\xleftarrow{j}X\xrightarrow{k}Z)$ 是一个张图\index{span}，并假设我们有
+  \begin{itemize}
+  \item 两个纤维化 $E_Y:Y\to\type$ 与 $E_Z:Z\to\type$。
+  \item 一个 $E_Y\circ j:X\to\type$ 与 $E_Z\circ
+    k:X\to\type$ 之间的等价族 $e_X$，即
+    \[e_X:\prd{x:X}\eqv{E_Y(j(x))}{E_Z(k(x))}.\]
+  \end{itemize}
+
+  则我们可以构造一个纤维化 $E:Y\sqcup^XZ\to\type$，使得
+  \begin{itemize}
+  \item 对所有 $y:Y$，$E(\inl(y))\judgeq E_Y(y)$。
+  \item 对所有 $z:Z$，$E(\inr(z))\judgeq E_Z(z)$。
+  \item 对所有 $x:X$，$\map E{\glue(x)}=\ua(e_X(x))$（注意等式右侧由泛等给出，且两边都是从 $E_Y(j(x))$ 到 $E_Z(k(x))$ 的 $\type$ 中路径）。
+  \end{itemize}
+  此外，该纤维化的总空间可嵌入下列余推方块：
+  \[\xymatrix{ \sm{x:X}E_Y(j(x)) \ar[r]_\sim^{\idfunc\times e_X}
+    \ar[d]_{j\times\idfunc} &
+    \sm{x:X}E_Z(k(x)) \ar[r]^-{k\times\idfunc}
+    & \sm{z:Z}E_Z(z) \ar[d]^\inr \\
+    \sm{y:Y}E_Y(y) \ar[rr]_\inl & & \sm{t:Y\sqcup^XZ}E(t) }\]
+\end{lem}
+
+\begin{proof}
+  我们用余推 $Y\sqcup^XZ$ 的递归原理定义 $E$。为此，需要给出 $E$ 在形如 $\inl(y)$、$\inr(z)$ 的点上的取值，以及 $E$ 在路径 $\glue(x)$ 上的作用，因此直接取：
+  \begin{align*}
+    E(\inl(y)) & \defeq E_Y(y),\\
+    E(\inr(z)) & \defeq E_Z(z),\\
+    \map E{\glue(x)} & \defid \ua(e_X(x)).
+  \end{align*}
+  %
+  要看该纤维化的总空间是一个余推，我们将扁平化引理（\cref{thm:flattening}）应用在如下数据上：\index{flattening lemma}
+  \begin{itemize}
+  \item $A\defeq Y+Z$，$B\defeq X$，且 $f,g:B\to A$ 定义为
+    $f(x)\defeq\inl(j(x))$，$g(x)\defeq\inr(k(x))$，
+  \item 类型族 $C:A\to\type$ 定义为
+    \begin{equation*}
+      C(\inl(y)) \defeq E_Y(y)
+      \qquad\text{且}\qquad
+      C(\inr(z)) \defeq E_Z(z),
+    \end{equation*}
+  \item 等价族 $D:\prd{b:B}C(f(b))\eqvsym C(g(b))$ 定义为
+    $e_X$。
+  \end{itemize}
+  %
+  扁平化引理中的基础高阶归纳类型 $W$ 与余推 $Y\sqcup^XZ$ 等价，而类型族 $P:Y\sqcup^XZ\to\type$ 与上面定义的 $E$ 等价。
+
+  因而扁平化引理告诉我们，$\sm{t:Y\sqcup^XZ}E(t)$ 等价于高阶归纳类型 ${E^{\mathrm{tot}}}'$，其生成元如下：
+  %
+  \begin{itemize}
+  \item 一个函数 $\mathsf{z}:\sm{a:Y+Z}C(a)\to {E^{\mathrm{tot}}}'$，
+  \item 对每个 $x:X$ 与 $t:E_Y(j(x))$，一条路径
+    \narrowequation{\mathsf{z}(\inl(j(x)),t)=\mathsf{z}(\inr(k(x)),e_X(t)).}
+  \end{itemize}
+  %
+  再次使用扁平化引理，或直接计算，可容易看出
+  $\eqv{\sm{a:Y+Z}C(a)}{\sm{y:Y}E_Y(y)+\sm{z:Z}E_Z(z)}$，因此
+  ${E^{\mathrm{tot}}}'$ 等价于高阶归纳类型 $E^{\mathrm{tot}}$，其生成元如下：
+  %
+  \begin{itemize}
+  \item 一个函数 $\inl:\sm{y:Y}E_Y(y)\to E^{\mathrm{tot}}$，
+  \item 一个函数 $\inr:\sm{z:Z}E_Z(z)\to E^{\mathrm{tot}}$，
+  \item 对每个 $(x,t):\sm{x:X}E_Y(j(x))$，一条路径
+    \narrowequation{\glue(x,t):\inl(j(x),t) = \inr(k(x),e_X(t)).}
+  \end{itemize}
+  %
+  因而 $E$ 的总空间正是 $E_Y$ 与 $E_Z$ 总空间的余推，如所需。
+\end{proof}
+
+\subsection{Hopf 构造}
+
+\begin{defn}
+  一个\define{H-空间}
+  \indexdef{H-space}%
+  由以下数据组成：
+  \begin{itemize}
+  \item 一个类型 $A$，
+  \item 一个基点 $e:A$，
+  \item 一个二元运算 $\mu:A\times A\to A$，以及
+  \item 对每个 $a:A$，等式 $\mu(e,a)=a$ 与 $\mu(a,e)=a$。
+  \end{itemize}
+\end{defn}
+
+\begin{lem}
+  设 $A$ 是连通的 H-space。则对任意 $a:A$，映射 $\mu(a,\blank):A\to
+  A$ 与 $\mu(\blank,a):A\to A$ 都是等价。
+\end{lem}
+
+\begin{proof}
+  我们证明对每个 $a:A$，映射 $\mu(a,\blank)$ 是等价。另一个结论是对称的。
+  %
+  命题“$\mu(a,\blank)$ 是等价”对应于一个直谓（依值命题族）
+  $P:A\to\prop$，证明它即是在该类型族上构造一个截面。
+
+  类型 $\prop$ 是一个集合（\cref{thm:hleveln-of-hlevelSn}），因此可定义新类型族 $P':\trunc0A\to\prop$，满足 $P'(\tproj0a)\defeq
+  P(a)$。而按假设 $A$ 连通，所以 $\trunc0A$ 可缩。
+  这意味着要为 $P'$ 构造截面，只需在 $P'$ 于 $\tproj0e$ 上的纤维中给出一点。又有
+  $P'(\tproj0e)=P(e)$，它有元素，因为按 H-space 的定义 $\mu(e,\blank)$ 等于恒等映射，因此是等价。
+
+  我们已证明对每个 $x:\trunc0A$ 命题 $P'(x)$ 都成立，
+  从而特别地对每个 $a:A$，命题 $P(a)$ 也成立，因为
+  $P(a)$ 就是 $P'(\tproj0a)$。
+\end{proof}
+
+\begin{defn}
+  设 $A$ 是连通 H-space。我们用
+  \cref{lem:fibration-over-pushout} 在 $\susp A$ 上定义一个纤维化。
+
+  由 $\susp A$ 是余推 $\unit\sqcup^A\unit$，我们可通过给定以下数据来定义 $\susp A$ 上的纤维化：
+  \begin{itemize}
+  \item 两个定义在 $\unit$ 上的纤维化（即两个类型 $F_1$ 与 $F_2$），以及
+  \item 一个等价族 $e:A\to(\eqv{F_1}{F_2})$，
+    对每个 $A$ 的元素都给出 $F_1$ 与 $F_2$ 之间一个等价。
+  \end{itemize}
+  %
+  我们取 $F_1$ 与 $F_2$ 都为 $A$，并且对每个 $a:A$，取
+  $e(a)$ 为等价 $\mu(a,\blank)$。
+\end{defn}
+
+根据 \cref{lem:fibration-over-pushout}，我们有如下
+图表：
+%
+\[\xymatrix{A \ar@{->>}[d] & A \times A \ar[l]_-{\proj2} \ar@{->>}_{\proj1}[d]
+  \ar[r]^-{\mu} & A \ar@{->>}[d] \\
+  1 & A \ar[r] \ar[l] & 1}\]
+%
+而我们刚构造的纤维化是定义在 $\susp A$ 上的纤维化，其总
+空间是上面一行的余推。
+
+此外，令 $f(x,y)\defeq(\mu(x,y),y)$，则有如下图表：
+%
+\[\xymatrix{A \ar_\idfunc[d] & A \times A \ar[l]_-{\proj2} \ar^f[d]
+  \ar[r]^-{\mu} & A \ar^\idfunc[d] \\
+  A & A\times A \ar^-{\proj2}[l] \ar_-{\proj1}[r] & A}\]
+%
+该图交换，且三条竖直映射都是等价，其中
+$f$ 的逆是函数 $g$：
+\[g(u,v)\defeq(\opp{\mu(\blank,v)}(u),v).\]
+%
+这表明两行是等价（因此相等）的张图，所以我们构造的纤维化总
+空间等价于下面一行的余推。
+而按定义，后者就是 $A$ 与自身的\emph{join}（见 \cref{sec:colimits}）。
+%
+由此我们证明了：
+
+\begin{lem}\label{lem:hopf-construction}
+  给定连通 H-space $A$，存在一个纤维化，称为
+  \define{Hopf 构造}，
+  \indexdef{Hopf!construction}%
+  其底空间为 $\susp A$，纤维为 $A$，总空间为 $A*A$。
+\end{lem}
+
+\subsection{Hopf 纤维化}
+
+\index{Hopf fibration|(}
+\indexsee{fibration!Hopf}{Hopf fibration}
+我们先在圆周 $\Sn^1$ 上构造 H-space 结构，于是由
+\cref{lem:hopf-construction} 可得一个定义在 $\Sn^2$ 上的纤维化，其纤维为
+$\Sn^1$，总空间为 $\Sn^1*\Sn^1$。随后我们将证明该 join 与
+$\Sn^3$ 等价。
+
+\begin{lem}\label{lem:hspace-S1}
+  圆周 $\Sn^1$ 上存在一个 H-space 结构。
+\end{lem}
+\begin{proof}
+  该 H-space 结构的基点取为 $\base$。
+  %
+  现在需要定义乘法运算
+  $\mu:\Sn^1\times\Sn^1\to\Sn^1$。
+  我们将通过对 $\Sn^1$ 递归定义 $\mu$ 的柯里化形式 $\widetilde\mu:\Sn^1\to(\Sn^1\to\Sn^1)$：
+  \begin{equation*}
+    \widetilde\mu(\base) \defeq\idfunc[\Sn^1],
+    \qquad\text{且}\qquad
+    \ap{\widetilde\mu}{\lloop} \defid\funext(h).
+  \end{equation*}
+  其中 $h:\prd{x:\Sn^1}(x=x)$ 是 \cref{thm:S1-autohtpy} 中定义的函数，
+  满足 $h(\base) \defeq\lloop$。
+
+  现在只需证明对每个 $x:\Sn^1$ 都有 $\mu(x,\base)=\mu(\base,x)=x$。
+  %
+  按定义，若 $x:\Sn^1$，则
+  $\mu(\base,x)=\widetilde\mu(\base)(x)=\idfunc[\Sn^1](x)=x$。对等式
+  $\mu(x,\base)=x$，我们对 $x:\Sn^1$ 做归纳：
+  \begin{itemize}
+  \item 若 $x$ 是 $\base$，则按定义 $\mu(\base,\base)=\base$，故有
+    $\refl\base:\mu(\base,\base)=\base$。
+  \item 当 $x$ 沿 $\lloop$ 变化时，需要证明
+    \[\refl\base\ct\apfunc{\lam{x}x}({\lloop})=
+    \apfunc{\lam{x}\mu(x,\base)}({\lloop})\ct\refl\base.\]
+    左边等于 $\lloop$，右边则有：
+    \begin{align*}
+      \apfunc{\lam{x}\mu(x,\base)}({\lloop})\ct\refl\base &=
+      \apfunc{\lam{x}(\widetilde\mu(x))(\base)}({\lloop})\\
+      &=\happly(\apfunc{\lam{x}(\widetilde\mu(x))}({\lloop}),\base)\\
+      &=\happly(\funext(h),\base)\\
+      &=h(\base)\\
+      &=\lloop. \qedhere
+    \end{align*}
+  \end{itemize}
+\end{proof}
+
+现在回忆 \cref{sec:colimits}：类型 $A$ 与 $B$ 的\emph{join} $A*B$ 是如下图表的余推
+\index{join!of types}%
+\[A \xleftarrow{\proj1}A\times B \xrightarrow{\proj2} B. \]
+
+\begin{lem}
+  \index{associativity!of join}%
+  join 运算满足结合律：若 $A$、$B$、$C$ 是三个类型，
+  则有等价 $\eqv{(A*B)*C}{A*(B*C)}$。
+\end{lem}
+
+\begin{proof}
+  我们通过归纳定义映射 $f:(A*B)*C\to A*(B*C)$。首先要定义
+  $f\circ\inl:A*B\to A*(B*C)$（将通过归纳完成），再定义
+  $f\circ\inr:C\to A*(B*C)$，然后定义
+  $\apfunc{f}\circ\glue:\prd{t:(A*B)\times
+    C}f(\inl(\fst(t)))=f(\inr(\snd(t)))$，其将通过对 $t$ 的第一分量归纳得到：
+  \begin{align*}
+    (f\circ\inl)(\inl(a)) &\defeq \inl(a), \\
+    (f\circ\inl)(\inr(b)) &\defeq \inr(\inl(b)), \\
+    \apfunc{f\circ\inl}(\glue(a,b)) &\defid \glue(a,\inl(b)), \\
+    f(\inr(c)) &\defeq \inr(\inr(c)),\\
+    \apfunc{f}(\glue(\inl(a),c)) &\defid\glue(a,\inr(c)),\\
+    \apfunc{f}(\glue(\inr(b),c)) &\defid\apfunc{\inr}(\glue(b,c)),\\
+    \apdfunc{\lam{x}\apfunc{f}(\glue(x,c))}(\glue(a,b)) &\defid
+    ``\apdfunc{\lam{x}\glue(a,x)}(\glue(b,c))''.
+  \end{align*}
+  %
+  对最后一个等式，注意其右边的类型是
+  \[\transfib{\lam{x}\inl(a)=\inr(x)}{\glue(b,c)}{\glue(a,\inl(b))}=
+  \glue(a,\inr(c))\]
+  而所需类型是
+  %
+  \begin{narrowmultline*}
+    \transfib{\lam{x}f(\inl(x))=f(\inr(c))}{\glue(a,b)}{\apfunc{f}(\glue(\inl(a),c))}
+    = \narrowbreak
+    \apfunc{f}(\glue(\inr(b),c)).
+  \end{narrowmultline*}
+  %
+  但由定义中的前几条子句，这两种类型都等价于下述类型：
+  \[\glue(a,\inr(c))=\glue(a,\inl(b))\ct\apfunc\inr(\glue(b,c)),\]
+  因而我们可沿该等价进行传送，得到所需元素。
+  %
+  类似地可定义映射 $g:A*(B*C)\to(A*B)*C$；验证 $f$ 与
+  $g$ 互为逆是一个冗长但本质上直接的计算。
+\end{proof}
+
+一个更具概念性的证明梗概如下。
+
+\begin{proof}
+  考虑下图，其中映射都是显然的投影：
+  \[\xymatrix{
+    A & A\times C \ar[l] \ar[r] & A\times C\\
+    A\times B \ar[u] \ar[d] & A\times B\times C \ar[l]\ar[u]\ar[r]\ar[d] &
+    A\times C \ar[u] \ar[d] \\
+    B & B\times C \ar[l] \ar[r] & C}\]
+  %
+  对每一列取余极限可得下图，其余极限是 $(A*B)*C$：
+  \[\xymatrix{A*B & (A*B)\times C \ar[l]\ar[r] & C}\]
+  %
+  另一方面，对每一行取余极限可得一个图，其余极限是 $A*(B*C)$。
+
+  因而若使用余极限的 Fubini 型定理（我们尚未证明），便有等价 $\eqv{(A*B)*C}{A*(B*C)}$。不过该余极限 Fubini 定理
+  \index{Fubini theorem for colimits}
+  的证明仍需要那种冗长的计算。
+\end{proof}
+
+\begin{lem}
+  对任意类型 $A$，存在等价 $\eqv{\susp A}{\bool*A}$。
+\end{lem}
+
+\begin{proof}
+  双向映射的定义以及互逆性的证明都很容易。细节留作练习。
+\end{proof}
+
+现在我们可以构造 Hopf 纤维化：
+
+\begin{thm}
+  存在一个定义在 $\Sn^2$ 上的纤维化，其纤维为 $\Sn^1$，总空间为 $\Sn^3$。
+  \index{total!space}%
+\end{thm}
+\begin{proof}
+  我们已证明 $\Sn^1$ 具有 H-space 结构（参见 \cref{lem:hspace-S1}），
+  因而由 \cref{lem:hopf-construction}，存在一个定义在 $\Sn^2$ 上的纤维化，其纤维为 $\Sn^1$，总空间为 $\Sn^1*\Sn^1$。再由前两个结果及 \cref{thm:suspbool}，有：
+  \begin{equation*}
+    \Sn^1*\Sn^1 = (\susp\bool)*\Sn^1
+    =(\bool*\bool)*\Sn^1
+    =\bool*(\bool*\Sn^1)
+    =\susp(\susp\Sn^1)
+    =\Sn^3. \qedhere
+  \end{equation*}
+\end{proof}
+\index{Hopf fibration|)}
+\section{Freudenthal 悬垂定理}
+\label{sec:freudenthal}
+
+\index{Freudenthal suspension theorem|(}%
+\index{theorem!Freudenthal suspension|(}%
+
+在证明 Freudenthal 悬垂定理之前，我们需要一些关于连通性的辅助引理。
+在 \cref{cha:hlevels} 中，我们对固定 $n$ 的 $n$-连通映射与 $n$-类型证明了若干事实；这里我们关心的是当 $n$ 变化时会发生什么。
+例如，在 \cref{prop:nconnected_tested_by_lv_n_dependent types} 中，我们说明了 $n$-连通映射可由相对于 $n$-类型族的“归纳原理”刻画。
+如果我们想沿一个 $n$-连通映射对某个 $k$-类型族（$k> n$）进行“归纳”，我们并不能立刻知道这种归纳原理会给出函数；但下面这个引理表明，至少这种未知性是可以量化的。
+
+\begin{lem}\label{thm:conn-trunc-variable-ind}
+  若 $f:A\to B$ 是 $n$-连通的，且 $P:B\to \ntype{k}$ 是一个 $k$-类型族并满足 $k\ge n$，则诱导函数
+  \[ (\blank\circ f) : \Parens{\prd{b:B} P(b)} \to \Parens{\prd{a:A} P(f(a)) } \]
+  是 $(k-n-2)$-截断的。
+\end{lem}
+\begin{proof}
+  我们对自然数 $k-n$ 归纳。
+  当 $k=n$ 时，这就是 \cref{prop:nconnected_tested_by_lv_n_dependent types}。
+  %
+  对归纳步，设 $f$ 是 $n$-连通的，且 $P$ 是一个 $(k+1)$-类型族。
+  要证明 $(\blank\circ f)$ 是 $(k-n-1)$-截断的，取 $\ell:\prd{a:A} P(f(a))$；则有
+  \[ \hfib{(\blank\circ f)}{\ell} \eqvsym \sm{g:\prd{b:B} P(b)} \prd{a:A} g(f(a)) = \ell(a).\]
+  设 $(g,p)$ 与 $(h,q)$ 属于该类型，其中 $p:g\circ f \htpy \ell$ 且 $q:h\circ f \htpy \ell$；则还有
+  \[ \big((g,p) = (h,q)\big) \eqvsym
+  \Parens{\sm{r:g\htpy h} r\circ f = p \ct \opp{q}}.
+  \]
+  然而此处右侧是映射
+  \[ (\blank\circ f) : \Parens{\prd{b:B} Q(b)} \to \Parens{\prd{a:A} Q(f(a)) } \]
+  的一个纤维，其中 $Q(b) \defeq (g(b)=h(b))$。
+  由于 $P$ 是一个 $(k+1)$-类型族，$Q$ 是一个 $k$-类型族，因此归纳假设蕴含该纤维是一个 $(k-n-2)$-类型。
+  于是，$\hfib{(\blank\circ f)}{\ell}$ 的所有路径空间都是 $(k-n-2)$-类型，故其本身是 $(k-n-1)$-类型。
+\end{proof}
+
+回忆：若 $\pairr{A,a_0}$ 与 $\pairr{B,b_0}$ 是带基点类型，则它们的\define{楔和}
+\index{wedge}%
+$A\vee B$ 定义为 $A\xleftarrow{a_0}
+\unit\xrightarrow{b_0} B$ 的余推。
+存在一个典范映射 $i:A\vee B \to A\times B$，由两张映射 $\lam{a} (a,b_0)$ 与 $\lam{b} (a_0,b)$ 定义；下面引理本质上说明：若 $A$ 与 $B$ 高度连通，则该映射也高度连通。
+不过，无论在证明还是使用时，若采用 \cref{prop:nconnected_tested_by_lv_n_dependent types} 给出的连通性刻画，并代入楔和（推广到类型族后的）泛性质，会更方便。
+
+\begin{lem}[楔和连通性引理]\label{thm:wedge-connectivity}
+  设 $\pairr{A,a_0}$ 与 $\pairr{B,b_0}$ 分别是 $n$-连通和 $m$-连通的带基点类型，且 $n,m\geq0$，并令
+%
+\narrowequation{P:A\to B\to \ntype{(n+m)}.}
+%
+则对任意 ${f:\prd{a:A} P(a,b_0)}$ 与 ${g:\prd{b:B} P(a_0,b)}$，若有 $p:f(a_0) = g(b_0)$，则存在 $h:\prd{a:A}{b:B} P(a,b)$ 及同伦
+%
+\begin{equation*}
+  q:\prd{a:A} h(a,b_0)=f(a)
+  \qquad\text{和}\qquad
+  r:\prd{b:B} h(a_0,b)=g(b)
+ \end{equation*}
+%
+使得 $p = \opp{q(a_0)} \ct r(b_0)$。
+\end{lem}
+\begin{proof}
+  定义 $Q:A\to\type$ 为
+  \[ Q(a) \defeq \sm{k:\prd{b:B} P(a,b)} (f(a) = k(b_0)). \]
+  则有 $(g,p):Q(a_0)$。
+  由于 $a_0:\unit\to A$ 是 $(n-1)$-连通的，若 $Q$ 是一个 $(n-1)$-类型族，则可得 $\ell:\prd{a:A} Q(a)$ 满足 $\ell(a_0) = (g,p)$，此时可定义 $h(a,b) \defeq \proj1(\ell(a))(b)$。
+  但固定 $a$ 后，$Q(a)$ 是以下映射在 $f(a)$ 处的纤维：
+  \[ \Parens{\prd{b:B} P(a,b) } \to P(a,b_0) \]
+  该映射由与 $b_0:\unit\to B$ 预复合给出。
+  由于 $b_0:\unit\to B$ 是 $(m-1)$-连通的，根据 \cref{thm:conn-trunc-variable-ind}，要使该纤维是 $(n-1)$-截断的，只需每个 $P(a,b)$ 都是 $(n+m)$-类型，而这正是我们的假设。
+\end{proof}
+
+设 $(X,x_0)$ 是带基点类型。回忆 \cref{sec:suspension} 中悬垂 $\susp X$ 的定义，其构造子为 $\north,\south:\susp X$ 以及 $\merid:X \to (\north=\south)$。
+我们把 $\susp X$ 看作带基点空间，基点取 $\north$，于是有 $\Omega\susp X \defeq (\id[\susp X]\north\north)$。
+这时存在一个典范映射
+\begin{align*}
+  \sigma &: X \to \Omega\susp X\\
+  \sigma(x) &\defeq \merid(x) \ct \opp{\merid(x_0)}.
+\end{align*}
+
+\begin{rmk}
+  在经典代数拓扑中，通常考虑\emph{约化悬垂}，即把路径 $\merid(x_0)$ 收缩到一点，从而将 $\north$ 与 $\south$ 识别。
+  约化与非约化悬垂同伦等价，因此在纯同伦论视角下二者无差别；而高阶归纳类型本来也只允许我们在高路径意义下“识别”点，因此在同伦类型论中考虑约化悬垂并无特别必要。
+  不过，我们这里的悬垂是“非约化”的，这也是在 $\sigma$ 定义中出现（可能出乎意料的）$\opp{\merid(x_0)}$ 的原因。
+\end{rmk}
+
+我们现在的目标是证明下述定理。
+
+\begin{thm}[Freudenthal 悬垂定理]\label{thm:freudenthal}
+  设 $X$ 是 $n$-连通的带基点类型，且 $n\geq 0$。
+  则映射 $\sigma:X\to \Omega\susp(X)$ 是 $2n$-连通的。
+\end{thm}
+
+\index{encode-decode method|(}%
+
+我们将使用 encode-decode 方法，不过应用方式略有不同。
+到目前为止，大多数场合中我们用它把某个类型的环路空间 $\Omega (A,a_0)$ 刻画为与另一类型 $B$ 等价：构造类型族 $\code:A\to \type$，使得 $\code(a_0)\defeq B$，并给出等价族 $\decode:\prd{x:A}\code(x) \eqvsym (a_0=x)$。
+% We have also generalized it to characterize truncations of loop spaces by way of a family of equivalences $\prd{x:A}\code(x) \eqvsym \trunc n{a_0=x}$.
+
+但在这里，我们想证明的是 $\sigma:X\to \Omega \susp X$ 是 $2n$-连通的。
+我们可以用前述方法的一个截断版本（如 \cref{sec:van-kampen} 中将会看到的）证明 $\trunc{2n}X\to \trunc{2n}{\Omega \susp X}$ 是等价；但这比映射本身 $2n$-连通稍弱（见 \cref{thm:conn-pik,thm:pik-conn}）。
+不过请注意：在一般情形下，要证明 $\decode(x)$ 是等价，也可等价地去证明其纤维可缩，而且仍可对底类型做归纳。
+这可以推广到证明一个映入环路空间的映射是连通的，也即其纤维的\emph{截断}可缩。
+进一步地，我们无需分别构造 $\code$ 与 $\decode$，而可以直接构造一个\emph{纤维截断之编码}族。
+
+\begin{defn}\label{thm:freudcode}
+  若 $X$ 是 $n$-连通的带基点类型且 $n\geq 0$，则存在类型族
+  \begin{equation}
+    \code:\prd{y:\susp X} (\north=y) \to \type\label{eq:freudcode}
+  \end{equation}
+  满足
+  \begin{align}
+    \code(\north,p) &\defeq \trunc{2n}{\hfib{\sigma}{p}}
+    \jdeq \trunc{2n}{\tsm{x:X} (\merid(x) \ct \opp{\merid(x_0)} = p)}\label{eq:freudcodeN}\\
+    \code(\south,q) &\defeq \trunc{2n}{\hfib{\merid}{q}}
+    \jdeq \trunc{2n}{\tsm{x:X} (\merid(x) = q)}.\label{eq:freudcodeS}
+  \end{align}
+\end{defn}
+
+我们最终的目标是证明对所有 $y:\susp X$ 与 $p:\north=y$，$\code(y,p)$ 都可缩。
+将其应用于 $y\defeq \north$ 可得：$\sigma$ 的所有纤维都是 $2n$-连通的，因此 $\sigma$ 是 $2n$-连通的。
+
+\begin{proof}[\cref{thm:freudcode} 的证明]
+  我们对 $y:\susp X$ 归纳定义 $\code(y,p)$，其中前两个分支分别由~\eqref{eq:freudcodeN} 与~\eqref{eq:freudcodeS} 给出。
+  余下需对每个 $x_1:X$ 构造一条依值路径
+  \[ \dpath{\lam{y}(\north=y)\to\type}{\merid(x_1)}{\code(\north)}{\code(\south)}. \]
+  由 \cref{thm:dpath-arrow}，这等价于给出一族路径
+  \[ \prd{q:\north=\south} \code(\north)(\transfib{\lam{y}(\north=y)}{\opp{\merid(x_1)}}{q}) = \code(\south)(q). \]
+  再由泛等与路径类型中的传送，这等价于一族等价
+  \[ \prd{q:\north=\south} \code(\north,q \ct \opp{\merid(x_1)}) \eqvsym \code(\south,q). \]
+  我们将先定义一族映射
+  \begin{equation}\label{eq:freudmap}
+    \prd{q:\north=\south} \code(\north,q \ct \opp{\merid(x_1)}) \to \code(\south,q).
+  \end{equation}
+  再证明它们都是等价。
+  于是取 $q:\north=\south$；由截断的泛性质以及 $\code(\north,\blank)$ 与 $\code(\south,\blank)$ 的定义，只需对每个 $x_2:X$ 定义映射
+  \begin{equation*}
+    \big(\merid(x_2)\ct \opp{\merid(x_0)} = q \ct \opp{\merid(x_1)}\big)
+    \to \trunc{2n}{\tsm{x:X} (\merid(x) = q)}.
+  \end{equation*}
+  对每个 $x_1,x_2:X$，该类型是 $2n$-截断的，而 $X$ 是 $n$-连通的。
+  因此由 \cref{thm:wedge-connectivity}，只需在 $x_1$ 取 $x_0$、$x_2$ 取 $x_0$ 的情况下定义该映射，并在两者都为 $x_0$ 时验证一致性。
+
+  当 $x_1$ 为 $x_0$ 时，假设为 $r:\merid(x_2)\ct \opp{\merid(x_0)} = q \ct \opp{\merid(x_0)}$。
+  于是可从 $r$ 消去末尾的 $\opp{\merid(x_0)}$ 得 $r':\merid(x_2)=q$，从而把像定义为 $\tproj{2n}{(x_2,r')}$。
+
+  当 $x_2$ 为 $x_0$ 时，假设为 $r:\merid(x_0)\ct \opp{\merid(x_0)} = q \ct \opp{\merid(x_1)}$。
+  重新整理可得 $r'':\merid(x_1)=q$，于是把像定义为 $\tproj{2n}{(x_1,r'')}$。
+
+  最后，当 $x_1$ 与 $x_2$ 都是 $x_0$ 时，只需证明得到的 $r'$ 与 $r''$ 相同；这是一个关于路径复合的简单引理。
+  这就完成了~\eqref{eq:freudmap} 的定义。
+  要证明它是一族等价，由于“是等价”是纯命题，且 $x_0:\unit\to X$（至少）是 $(-1)$-连通的，只需假设 $x_1$ 为 $x_0$。
+  在此情形下，检查上述构造可见：它本质上是“消去 $\opp{\merid(x_0)}$”这一函数的 $2n$-截断，而该函数本身是等价。
+\end{proof}
+
+除~\eqref{eq:freudcodeN} 与~\eqref{eq:freudcodeS} 外，我们还需从 $\code$ 的构造中提取其在路径上的作用信息。
+为此使用下述引理。
+
+\begin{lem}\label{thm:freudlemma}
+  设 $A:\UU$、$B:A\to \UU$、$C:\prd{a:A} B(a)\to\UU$，并有 $a_1,a_2:A$、$m:a_1=a_2$ 以及 $b:B(a_2)$。
+  则函数
+  \[\transfib{\widehat{C}}{\pairpath(m,t)}{\blank} : C(a_1,\transfib{B}{\opp m}{b}) \to C(a_2,b),\]
+  其中 $t:\transfib{B}{m}{\transfib{B}{\opp m}{b}} = b$ 是显然的一致性路径，$\widehat{C}:(\sm{a:A} B(a)) \to\type$ 是 $C$ 的去柯里化形式；该函数等于由泛等从下列复合得到的等价：
+  \begin{align}
+    C(a_1,\transfib{B}{\opp m}{b})
+    &= \transfib{\lam{a} B(a)\to \UU}{m}{C(a_1)}(b)
+    \tag{由~\eqref{eq:transport-arrow}}\\
+    &= C(a_2,b). \tag{由 $\happly(\apd{C}{m},b)$}
+  \end{align}
+\end{lem}
+\begin{proof}
+  由路径归纳可设 $a_2$ 就是 $a_1$ 且 $m$ 是 $\refl{a_1}$；此时两个函数都恒等。
+\end{proof}
+
+我们将此引理应用于 $A\defeq\susp X$、$B\defeq \lam{y}(\north=y)$、$C\defeq\code$，并取 $a_1\defeq\north$、$a_2\defeq\south$、$m\defeq \merid(x_1)$（某个 $x_1:X$），最后令 $b\defeq q$ 为某条路径 $\north=\south$。
+对 $\susp X$ 归纳的计算规则把 $\apd{C}{m}$ 识别为一条由泛等与函数外延性按某种方式构造的路径。
+\cref{thm:freudlemma} 中描述的第二个函数，本质上是在“撤销”这些泛等与函数外延性的应用，从而回到我们用 \cref{thm:wedge-connectivity} 定义的特定函数~\eqref{eq:freudmap}。
+因此，\cref{thm:freudlemma} 说明沿 $\pairpath(q,t)$ 传送，本质上会恢复这些函数。
+
+最后，按构造可知：当 $x_1$ 或 $x_2$ 与 $x_0$ 重合且输入来自 $\tproj{2n}{\blank}$ 的像时，我们对这些函数有更显式的描述。
+因此，对任意 $x_2:X$，有
+\begin{equation}
+  \transfib{\hat{\code}}{\pairpath(\merid(x_0),t)}{\tproj{2n}{(x_2,r)}}
+  =\tproj{2n}{(x_1,r')}\label{eq:freudcompute1}
+\end{equation}
+其中 $r:\merid(x_2) \ct \opp{\merid(x_0)} = \transfib{B}{\opp{\merid(x_0)}}{q}$ 如前任意，且 $r':\merid(x_2)=q$ 由 $r$ 经过端点识别为 $q \ct \opp{\merid(x_0)}$ 并消去 $\opp{\merid(x_0)}$ 得到。
+类似地，对任意 $x_1:X$，有
+\begin{equation}
+  \transfib{\hat{\code}}{\pairpath(\merid(x_1),t)}{\tproj{2n}{(x_0,r)}}
+  = \tproj{2n}{(x_1,r'')}\label{eq:freudcompute2}
+\end{equation}
+其中 $r:\merid(x_0) \ct \opp{\merid(x_0)} = \transfib{B}{\opp{\merid(x_1)}}{q}$，而 $r'':\merid(x_1)=q$ 由端点识别并整理路径得到。
+
+\begin{proof}[\cref{thm:freudenthal} 的证明]
+  余下只需证明：对每个 $y:\susp X$ 与 $p:\north=y$，$\code(y,p)$ 可缩。
+  首先需选取可缩中心，记为 $c(y,p):\code(y,p)$。
+  这对应于我们先前证明中 $\encode$ 函数的定义，因此我们通过传送来定义它。
+  注意在特例 $y$ 为 $\north$ 且 $p$ 为 $\refl{\north}$ 时，有
+  \[\code(\north,\refl{\north}) \jdeq \trunc{2n}{\tsm{x:X} (\merid(x) \ct \opp{\merid(x_0)} = \refl{\north})}.\]
+  因而可取 $c(\north,\refl{\north})\defeq \tproj{2n}{(x_0,\mathsf{rinv}_{\merid(x_0)})}$，其中 $\mathrm{rinv}_q$ 是任意 $q$ 的显然路径 $q\ct\opp q = \refl{}$。
+  现在可通过对 $p$ 做路径归纳得到 $c:\prd{y:\susp X}{p:\north=y} \code(y,p)$，但下文中我们还需要它的一个具体传送表达：
+  \[ c(y,p) \defeq \transfib{\hat{\code}}{\pairpath(p,\mathsf{tid}_p)}{c(\north,\refl{\north})}
+  \]
+  其中 $\hat{\code}: \big(\sm{y:\susp X} (\north=y)\big) \to \type$ 是 \code 的去柯里化版本，$\mathsf{tid}_p:\trans{p}{\refl{}} = p$ 是一个标准引理。
+
+  接着需证明 $\code(y,p)$ 的每个元素都等于 $c(y,p)$。
+  同样由路径归纳，只需设 $y$ 为 $\north$ 且 $p$ 为 $\refl{\north}$。
+  实际上，我们证明更强结论：当 $y$ 为 $\north$ 且 $p$ 任意时也成立。
+  即证明：对任意 $p:\north=\north$ 与 $d:\code(\north,p)$，有 $d = c(\north,p)$。
+  由于该等式是 $(2n-1)$-类型，可设 $d$ 形如 $\tproj{2n}{(x_1,r)}$，其中 $x_1:X$ 且 $r:\merid(x_1) \ct \opp{\merid(x_0)} = p$。
+
+  再做一次路径归纳，可设 $r$ 为反身性，且 $p$ 为 $\merid(x_1) \ct \opp{\merid(x_0)}$。
+  （这就是上面推广到任意 $p$ 的原因。）
+  因而我们需要证明
+  \begin{equation}
+    \tproj{2n}{(x_1, \refl{\merid(x_1) \ct \opp{\merid(x_0)}})}
+    \;=\;
+    c\left(\north,\refl{\merid(x_1) \ct \opp{\merid(x_0)}}\right).\label{eq:freudgoal}
+  \end{equation}
+  按定义，上式右边等于
+  \begin{multline*}
+    \Transfib{\hat{\code}}{\pairpath(\merid(x_1) \ct \opp{\merid(x_0)}, \nameless)}{\tproj{2n}{(x_0,\nameless)}} \\
+    = \transfibf{\hat{\code}}
+    \begin{aligned}[t]
+      \Big(
+      &{\pairpath(\opp{\merid(x_0)}, \nameless)},\\
+      &{\Transfib{\hat{\code}}{\pairpath(\merid(x_1), \nameless)}{\tproj{2n}{(x_0,\nameless)}}}
+      \Big)
+    \end{aligned}
+    \\
+    = \Transfib{\hat{\code}}{\pairpath(\opp{\merid(x_0)}, \nameless)}{\tproj{2n}{(x_1,\nameless)}}
+    = \tproj{2n}{(x_1,\nameless)}
+  \end{multline*}
+  其中下划线 $\nameless$ 应由适当的一致性路径填充。
+  这里第一步是传送的函子性，第二步调用~\eqref{eq:freudcompute2}，第三步调用~\eqref{eq:freudcompute1}（并把传送移到另一侧）。
+  因而它与~\eqref{eq:freudgoal} 左边具有同一第一分量。
+  余下留给读者验证：所有一致性路径都会相互抵消，从而第二分量得到反身性。
+\end{proof}
+
+% As a corollary, we have the following equivalence.
+
+\begin{cor}[Freudenthal 等价] \label{cor:freudenthal-equiv}
+设 $X$ 是 $n$-连通的带基点类型，且 $n\geq 0$。
+则 $\eqv{\trunc{2n}{X}}{\trunc{2n}{\Omega\susp(X)}}$。
+\end{cor}
+\begin{proof}
+由 \cref{thm:freudenthal}，$\sigma$ 是 $2n$-连通的。再由
+\cref{lem:connected-map-equiv-truncation}，它在 $2n$-截断上
+是一个等价。
+\end{proof}
+
+\index{encode-decode method|)}%
+
+\index{Freudenthal suspension theorem|)}%
+\index{theorem!Freudenthal suspension|)}%
+
+\index{homotopy!group!of sphere}%
+\index{stability!of homotopy groups of spheres}%
+\index{type!n-sphere@$n$-sphere}%
+Freudenthal 悬垂定理的一个重要推论是：在某个范围内，球面的同伦群是稳定的（即 \cref{tab:homotopy-groups-of-spheres} 中从东北到西南的对角线）：
+
+\begin{cor}[球面的稳定性] \label{cor:stability-spheres}
+若 $k \le 2n-2$，则 $\pi_{k+1}(S^{n+1}) = \pi_{k}(S^{n})$。
+\end{cor}
+\begin{proof}
+设 $k \le 2n-2$。
+%
+由 \cref{cor:sn-connected}，$\Sn ^{n}$ 是 $\nminusone$-连通的。故
+由 \cref{cor:freudenthal-equiv}，
+\[
+\trunc{2(n-1)}{\Omega(\susp(\Sn^{n}))} = \trunc{2(n-1)}{\Sn^{n}}.
+\]
+由 \cref{lem:truncation-le}，因为 $k \le 2(n-1)$，对两边施加 $\trunc{k}{\blank}$，
+可得该等式在 $k$ 阶同样成立：
+\begin{equation}\label{eq:freudenthal-for-spheres}
+\trunc{k}{\Omega(\susp(\Sn^{n}))} = \trunc{k}{\Sn^{n}}.
+\end{equation}
+%
+接下来证明主思路如下；我们略去核查这些等价在这些空间的基点上作用是否恰当，以及当
+$k > 0$ 时这些等价是否保持乘法：
+%
+\begin{align*}
+\pi_{k+1}(\Sn^{n+1}) &\jdeq \trunc{0}{\Omega^{k+1}(\Sn^{n+1})} \\
+                     &\jdeq \trunc{0}{\Omega^k(\Omega(\Sn^{n+1}))} \\
+                     &\jdeq \trunc{0}{\Omega^k(\Omega(\susp(\Sn^{n})))} \\
+                     &= \Omega^k(\trunc{k}{(\Omega(\susp(\Sn^{n})))})
+                     \tag{由 \cref{thm:path-truncation}}\\
+                     &= \Omega^k(\trunc{k}{\Sn^{n}})
+                     \tag{由 \eqref{eq:freudenthal-for-spheres}}\\
+                     &= \trunc{0}{\Omega^k(\Sn^{n})}
+                     \tag{由 \cref{thm:path-truncation}}\\
+                     &\jdeq \pi_k(\Sn^{n}). \qedhere
+\end{align*}
+%
+\end{proof}
+
+这意味着：一旦算出这些稳定对角线中的某个条目，我们就知道整条对角线。例子如下：
+\begin{thm}\label{thm:pinsn}
+对每个 $n\geq 1$，有 $\pi_n(\Sn^n)=\Z$。
+\end{thm}
+
+\begin{proof}
+该证明对 $n$ 归纳。我们已知 $\pi_1(\Sn ^1) = \Z$
+（\cref{cor:pi1s1}）且 $\pi_2(\Sn ^2) = \Z$（\cref{cor:pis2-hopf}）。
+当 $n \ge 2$ 时有 $n \le (2n - 2)$。因此由
+\cref{cor:stability-spheres}，$\pi_{n+1}(S^{n+1}) = \pi_{n}(S^{n})$，
+该等价结合归纳假设即得结论。
+\end{proof}
+
+\begin{cor}
+  对任意 $n\ge -1$，$\Sn^{n+1}$ 都不是 $n$-类型。
+\end{cor}
+
+\begin{cor}\label{thm:pi3s2}
+  $\pi_3(\Sn^2)=\Z$。
+\end{cor}
+\begin{proof}
+  由 \cref{cor:pis2-hopf}，$\pi_3(\Sn^2) = \pi_3(\Sn^3)$。
+  再由 \cref{thm:pinsn}，$\pi_3(\Sn^3) = \Z$。
+\end{proof}
+\section{van Kampen 定理}
+\label{sec:van-kampen}
+
+\index{van Kampen theorem|(}%
+\index{theorem!van Kampen|(}%
+
+\index{fundamental!group}%
+van Kampen 定理用于计算（同伦）余推空间的基本群 $\pi_1$。
+传统表述是：拓扑空间 $X$ 由两个开子空间 $U$ 与 $V$ 的并给出；但从同伦论角度看，这只是方便地保证 $X$ 是 $U$ 与 $V$ 在其交上的余推。
+因此，我们将给出适用于任意余推的 van Kampen 定理版本。
+
+本节将描述一种 van Kampen 定理的证明，它使用与 \cref{sec:pi1-s1-intro} 中计算 $\pi_1(\Sn^1)$ 相同的 encode-decode 方法。
+也有更偏同伦论的处理方式；见 \cref{ex:rezk-vankampen}。
+
+我们需要 encode-decode 方法的更精细版本。
+在 \cref{sec:pi1-s1-intro}（以及 \cref{sec:compute-coprod,sec:compute-nat}）中，我们用它刻画了某个（高阶）归纳类型 $W$ 的路径空间，从而作为推论得到环路空间 $\Omega(W)$ 的刻画，并进一步得到其 0-截断 $\pi_1(W)$ 的刻画。
+而在 van Kampen 定理中，我们的目标只是刻画基本群 $\pi_1(W)$，并没有可直接利用的环路空间或路径空间的显式描述。
+
+事实证明，我们可以直接将同一技巧用于路径纤维化的截断版本，于是不仅能刻画基本\emph{群} $\pi_1(W)$，还能刻画整个基本\emph{群胚}。
+\index{fundamental!pregroupoid}%
+更具体地，对类型 $X$，记 $\Pi_1 X: X\to X\to \type$ 为其恒等类型的 $0$-截断，即 $\Pi_1 X(x,y) \defeq \trunc0{x=y}$。
+注意这诱导出原群（pregroupoid）运算
+\begin{align*}
+  (\blank\ct\blank) &\;:\; \Pi_1X(x,y) \to \Pi_1X(y,z) \to \Pi_1X(x,z)\\
+  \opp{(\blank)} &\;:\; \Pi_1X(x,y) \to \Pi_1X(y,x)\\
+  \refl{x} &\;:\; \Pi_1X(x,x)\\
+  \apfunc{f} &\;:\; \Pi_1X(x,y) \to \Pi_1Y(fx,fy)
+\end{align*}
+我们对它们沿用与路径对应运算相同的记号。
+
+\subsection{朴素的 van Kampen}
+\label{sec:naive-vankampen}
+
+我们先给出 van Kampen 定理的一个“朴素”版本：它有用，但不如经典版本那样有用。
+在 \cref{sec:better-vankampen} 中，我们会把它改进为更实用的版本。
+
+\index{encode-decode method|(}%
+
+给定类型 $A,B,C$ 与函数 $f:A\to B$、$g:A\to C$，令 $P$ 是它们的余推 $B\sqcup^A C$。
+正如 \cref{sec:colimits} 所见，$P$ 是由以下生成元给出的高阶归纳类型：
+\begin{itemize}
+\item $i:B\to P$,
+\item $j:C\to P$,
+\item 对所有 $x:A$，一条路径 $k x:ifx = jgx$。
+\end{itemize}
+用关于 $P$ 的双重归纳按如下方式定义 $\code:P\to P\to \type$。
+\begin{itemize}
+\item $\code(ib,ib')$ 是一个集合商（见 \cref{sec:set-quotients}），其基类型是如下序列的类型 %pairs $(\vec a, \vec a', \vec p, \vec q)$
+  \[ (b, p_0, x_1, q_1, y_1, p_1, x_2, q_2, y_2, p_2, \dots, y_n, p_n, b') \]
+  其中
+  \begin{itemize}
+  \item $n:\mathbb{N}$
+  \item 对 $0<k \le n$，$x_k:A$ 与 $y_k:A$
+  \item 当 $n>0$ 时，$p_0:\Pi_1B(b,f x_1)$ 与 $p_n:\Pi_1B(f y_n, b')$；当 $n=0$ 时，$p_0:\Pi_1B(b,b')$
+  \item 对 $1\le k < n$，$p_k:\Pi_1B(f y_k, fx_{k+1})$
+  \item 对 $1\le k\le n$，$q_k:\Pi_1C(gx_k, gy_k)$
+  \end{itemize}
+  该商由如下等式生成：
+  \begin{align*}
+    (\dots, q_k, y_k, \refl{fy_k}, y_k, q_{k+1},\dots)
+    &= (\dots, q_k\ct q_{k+1},\dots)\\
+    (\dots, p_k, x_k, \refl{gx_k}, x_k, p_{k+1},\dots)
+    &= (\dots, p_k\ct p_{k+1},\dots)
+  \end{align*}
+  （见下文 \cref{rmk:naive}）。
+  我们把该序列类型精确定义为归纳类型的细节留给读者。
+\item $\code(jc,jc')$ 与上面同构，只是交换 $B$ 与 $C$ 的角色。
+  我们也相应地在记号上交换 $x$ 与 $y$、$p$ 与 $q$ 的角色。
+\item $\code(ib,jc)$ 与 $\code(jc,ib)$ 类似，只是奇偶顺序调整为从一个类型起始并在另一个类型结束。
+\item 对 $a:A$ 与 $b:B$，我们需要一个等价
+  \begin{equation}
+    \code(ib, ifa) \eqvsym \code(ib,jga).\label{eq:bfa-bga}
+  \end{equation}
+  我们把它定义为如下两个在序列上定义的函数：
+  \begin{align*}
+    (\dots, y_n, p_n,fa) &\mapsto (\dots,y_n,p_n,a,\refl{ga},ga),\\
+    (\dots, x_n, p_n, a, \refl{fa}, fa) &\mapsfrom (\dots, x_n, p_n, ga).
+  \end{align*}
+  这两个函数都很容易看出尊重等价关系，因此可在编码类型上定义函数。
+  左到右再到左的复合为
+  \[ (\dots, y_n, p_n,fa) \mapsto
+  (\dots,y_n,p_n,a,\refl{ga},a,\refl{fa},fa)
+  \]
+  它由商的一个生成等式可知与恒等相等。
+  另一复合同理。
+  因而我们定义了等价~\eqref{eq:bfa-bga}。
+\item 类似地，我们还需要等价
+  \begin{align*}
+    \code(jc,ifa) &\eqvsym \code(jc,jga)\\
+    \code(ifa,ib)&\eqvsym (jga,ib)\\
+    \code(ifa,jc)&\eqvsym (jga,jc)
+  \end{align*}
+  它们都以完全相同的方式定义（后两个是在序列开头而非末尾添加反身项）。
+\item 最后，我们还需要对 $a,a':A$ 知道下图交换：
+  \begin{equation}\label{eq:bfa-bga-comm}
+  \vcenter{\xymatrix{
+      \code(ifa,ifa') \ar[r]\ar[d] &
+      \code(ifa,jga')\ar[d]\\
+      \code(jga,ifa')\ar[r] &
+      \code(jga,jga')
+      }}
+  \end{equation}
+  这意味着：若在序列开头加一段再在末尾加一段，与反过来做是一样的。
+\end{itemize}
+
+\begin{rmk}\label{rmk:naive}
+  人们或许会期待在 \code 的定义中再加入一些集合商的生成等式，例如
+  \begin{align*}
+    (\dots, p_{k-1} \ct fw, x_{k}', q_{k}, \dots) &=
+    (\dots, p_{k-1}, x_{k}, gw \ct q_{k}, \dots)
+    \tag{其中 $w:\Pi_1A(x_{k},x_{k}')$}\\
+    (\dots, q_k \ct gw, y_k', p_k, \dots) &=
+    (\dots, q_k, y_k, fw \ct p_k, \dots).
+    \tag{其中 $w:\Pi_1A(y_k, y_k')$}
+  \end{align*}
+  然而这些并不必要！
+  事实上，它们可由对 $w$ 的路径归纳自动推出。
+  这正是“朴素”van Kampen 定理与下一小节更精细版本之间的主要差别。
+\end{rmk}
+
+继续下去，我们可以刻画纤维化 $\code$ 中的传送：
+\begin{itemize}
+\item 对 $p:b=_B b'$ 与 $u:P$，有
+  \[ \mathsf{transport}^{b\mapsto \code(u,ib)}(p, (\dots, y_n,p_n,b))
+  = (\dots,y_n,p_n\ct p,b').
+  \]
+\item 对 $q:c=_C c'$ 与 $u:P$，有
+  \[ \mathsf{transport}^{c\mapsto \code(u,jc)}(q, (\dots, x_n,q_n,c))
+  = (\dots,x_n,q_n\ct q,c').
+  \]
+\end{itemize}
+这里我们有一点记号滥用：同一个符号既表示 $X$ 中路径，也表示它在 $\Pi_1X$ 中的像。
+注意在 $\Pi_1X$ 中，传送同样由与（路径像的）连接给出。
+据此可对 $u$ 归纳证明上面陈述。
+另外还有：
+\begin{itemize}
+\item 对 $a:A$ 与 $u:P$，
+  \[ \mathsf{transport}^{v\mapsto \code(u,v)}(ha, (\dots, y_n,p_n,fa))
+  = (\dots,y_n,p_n,a,\refl{ga},ga).
+  \]
+\end{itemize}
+这本质上直接来自 \code 的定义。
+
+我们还通过对 $u$ 归纳构造函数
+\[ r : \prd{u:P} \code(u,u) \]
+如下：
+\begin{align*}
+  rib &\defeq (b,\refl{b},b)\\
+  rjc &\defeq (c,\refl{c},c)
+\end{align*}
+而 $rka$ 取下列复合等式：
+\begin{align*}
+  (ka,ka)_* (fa,\refl{fa},fa)
+  &= (ga,\refl{ga},a,\refl{fa},a,\refl{ga},ga) \\
+  &= (ga,\refl{ga},ga)
+\end{align*}
+第一条等式由上面对 $\code$ 中传送的观察得到，第二条等式是定义 \code 时使用的集合商关系的一个实例。
+
+现在我们证明：
+\begin{thm}[朴素 van Kampen 定理]\label{thm:naive-van-kampen}
+  对所有 $u,v:P$，存在等价
+  \[ \Pi_1P(u,v) \eqvsym \code(u,v). \]
+\end{thm}
+\begin{proof}
+
+要定义函数
+\[ \encode : \Pi_1P(u,v) \to \code(u,v) \]
+由于 $\code(u,v)$ 是集合，只需定义函数 $(u=_P v) \to \code(u,v)$。
+我们用传送定义：
+\[\encode(p) \defeq \mathsf{transport}^{v\mapsto \code(u,v)}(p,r(u)).\]
+再定义
+\[ \decode: \code(u,v) \to \Pi_1P(u,v) \]
+时，照常对 $u,v:P$ 做归纳。
+在 $u,v$ 的各个情形里，我们按需把所有等式 $p_k,q_k$ 施加 $i$ 或 $j$，并在 $P$ 中把结果连接起来，同时用 $h$ 识别端点。
+例如当 $u\jdeq ib$ 且 $v\jdeq ib'$ 时，定义
+\begin{narrowmultline}\label{eq:decode}
+ \decode(b, p_0, x_1, q_1, y_1, p_1, \dots, y_n, p_n, b') \defeq\narrowbreak
+ (p_0)\ct h(x_1) \ct j(q_1) \ct \opp{h(y_1)} \ct i(p_1) \ct \cdots \ct \opp{h(y_n)}\ct i(p_n).
+\end{narrowmultline}
+这尊重集合商的等价关系，也尊重如~\eqref{eq:bfa-bga} 的等价，因为 $h: fi \htpy gj$ 是自然的，且 $f,g$ 是函子性的。
+
+照常，要证明复合
+\[ \Pi_1P(u,v) \xrightarrow{\encode} \code(u,v) \xrightarrow{\decode} \Pi_1P(u,v) \]
+是恒等，先去掉 0-截断（因为陪域是集合），再作路径归纳。
+输入 $\refl{u}$ 会先送到 $ru$，再回到 $\refl u$（此处再对 $u$ 做一次归纳以分解 $\decode(ru)$）。
+
+最后看复合
+\[  \code(u,v) \xrightarrow{\decode} \Pi_1P(u,v) \xrightarrow{\encode} \code(u,v). \]
+我们对 $u,v:P$ 归纳。
+当 $u\jdeq ib$ 且 $v\jdeq ib'$ 时，该复合为
+%
+\begin{narrowmultline*}
+(b, p_0, x_1, q_1, y_1, p_1, \dots, y_n, p_n, b')
+\narrowbreak
+\begin{aligned}[t]
+  &\mapsto \Big(ip_0\ct hx_1 \ct jq_1 \ct \opp{hy_1} \ct ip_1 \ct \cdots \ct \opp{hy_n}\ct ip_n\Big)_*(rib)\\
+  &= (ip_n)_* \cdots(jq_1)_* (hx_1)_*(ip_0)_*(b,\refl{b},b)\\
+  &= (ip_n)_* \cdots(jq_1)_* (hx_1)_*(b,p_0,ifx_1)\\
+  &= (ip_n)_* \cdots(jq_1)_* (b,p_0,x_1,\refl{gx_1},jgx_1)\\
+  &= (ip_n)_* \cdots (b,p_0,x_1,q_1,jgy_1)\\
+  &= \quad\vdots\\
+  &= (b, p_0, x_1, q_1, y_1, p_1, \dots, y_n, p_n, b').
+\end{aligned}
+\end{narrowmultline*}
+%
+即恒等函数。
+（严格说这里还隐含一个归纳论证。）
+其余三个点情形同理；路径情形则是平凡的，因为所有类型都是集合。
+\end{proof}
+
+\index{encode-decode method|)}%
+
+\cref{thm:naive-van-kampen} 可用于计算许多类型的基本群，前提是 $A$ 是集合；因为在这种情况下，每个 $\code(u,v)$ 按定义都是某个\emph{集合}按关系取商得到的集合商。
+
+\begin{eg}\label{eg:circle}
+  令 $A\defeq \bool$、$B\defeq\unit$、$C\defeq \unit$。
+  则 $P \eqvsym S^1$。
+  检查（例如）$\code(i(\ttt),i(\ttt))$ 的定义可见：路径都可视作平凡，因此唯一信息在于元素序列 $x_1,y_1,\dots,x_n,y_n: \bool$。
+  进一步地，若某个 $k$ 满足 $x_k=y_k$ 或 $y_k=x_{k+1}$，则集合商关系允许我们把这两个元素同时删去。
+  因而每个序列都等于一个规范的\emph{约化}序列，其中相邻元素不相等。
+  显然，这样的约化序列由其长度（自然数 $n$）唯一确定；并且当 $n>1$ 时，再加上 $x_1$ 是 $\bfalse$ 还是 $\btrue$ 的信息即可唯一确定整个序列。
+  这些数据当然可以识别为一个整数：$n$ 给绝对值，$x_1$ 编码符号。
+  因而我们重新得到 $\pi_1(S^1)\cong \Z$。
+\end{eg}
+
+由于 \cref{thm:naive-van-kampen} 只断言集合族间的双射，这里的同构 $\pi_1(S^1)\cong \Z$ 也仅是集合意义下的双射。
+不过我们可以在 $\code$ 上定义连接运算（通过连接序列），并证明 $\encode$ 与 $\decode$ 给出一个保持该结构的同构。
+（用 \cref{cha:category-theory} 的语言，这些将是“原群胚”。）
+细节留给读者。
+
+\index{fundamental!group|(}%
+
+\begin{eg}\label{eg:suspension}
+  更一般地，令 $B\defeq\unit$ 与 $C\defeq \unit$，而 $A$ 任意，于是 $P$ 是 $A$ 的悬垂。
+  此时同样地，路径 $p_k$ 与 $q_k$ 都是平凡的，因此路径编码中的唯一信息是元素序列 $x_1,y_1,\dots,x_n,y_n: A$。
+  前两个生成等式说明相邻且相等的元素可约去，因此可把该序列看作群中的单词
+  \[ x_1 y_1^{-1} x_2 y_2^{-1} \cdots x_n y_n^{-1} \]
+  的形式。
+  的确，这看起来类似于 $A$ 上的自由群（等价地在 $\trunc0A$ 上；见 \cref{thm:freegroup-nonset}），但我们只考虑以下单词：以未取逆元素开头，随后在取逆与未取逆之间交替，且以取逆元素结尾。
+  这实际上把生成元集合的大小减少了 1。
+  例如若 $A$ 有一点 $a:A$，则可将 $\pi_1(\susp A)$ 与如下群识别：以 $\trunc0A$ 为生成元并加关系 $\tproj0a = e$；细节见 \cref{ex:vksusppt,ex:vksuspnopt}。
+\end{eg}
+
+\begin{eg}\label{eg:wedge}
+  令 $A\defeq\unit$，$B$ 与 $C$ 任意，于是 $f,g$ 仅仅为 $B,C$ 分别指定基点 $b,c$。
+  则 $P$ 是 $B$ 与 $C$ 的\emph{楔和} $B\vee C$（带基点空间范畴中的余积）。
+  在此情形中平凡的是 $x_k,y_k$，因此唯一信息是回路序列 $(p_0,q_1,p_1,\dots,p_n)$，其中 $p_k:\pi_1(B,b)$、$q_k:\pi_1(C,c)$。
+  在我们施加的等价关系下，这些序列很容易与 \cref{sec:free-algebras} 中构造的群 $\pi_1(B,b)$ 与 $\pi_1(C,c)$ 的\emph{自由积}的显式描述对应。
+  因而有 $\pi_1(B\vee C) \cong \pi_1(B) * \pi_1(C)$。
+\end{eg}
+
+\index{fundamental!group|)}%
+
+然而，\cref{thm:naive-van-kampen} 与经典完整版 van Kampen 定理仅差一步：经典定理处理 $A$ 不必为集合的情形，并断言 $\pi_1(B\sqcup^A C) \cong \pi_1(B) *_{\pi_1(A)} \pi_1(C)$（基点来自 $A$）。
+确实，\cref{thm:naive-van-kampen} 的结论完全没有直接提到 $\pi_1(A)$；$A$ 中路径以类型论方式“内建于商化过程”，难以提取显式信息，因为 $\code(u,v)$ 是非集合按关系取商得到的集合商。
+因此，下一小节我们考虑一个更好的 van Kampen 定理版本。
+
+
+\subsection{带基点集合的 van Kampen 定理}
+\label{sec:better-vankampen}
+
+\index{basepoint!set of}%
+我们现在给出的改进版 van Kampen，与经典代数拓扑中的对应改进非常类似：当时给 $A$ 配备了一个\emph{基点集合 $S$}。
+事实上，在我们的证明里，“基点集合”并不一定非得是\emph{集合}，完全可以是任意类型；假设 $S$ 是集合的效用主要出现在后续应用定理做计算时。
+关键要求是：$S$ 至少在 $A$ 的每个连通分支中含有一点。
+在类型论中这表达为：给定类型 $S$ 与函数 $k:S \to A$，且该函数满射，即 $(-1)$-连通。
+若 $S\jdeq A$ 且 $k$ 是恒等函数，就恢复朴素 van Kampen 定理。
+另一个可记住的例子：当 $A$ 带基点且（0-）连通，取 $k:\unit\to A$ 为该点；由 \cref{thm:minusoneconn-surjective,thm:connected-pointed}，该映射满射当且仅当 $A$ 是 0-连通。
+
+令 $A,B,C,f,g,P,i,j,h$ 与上一小节相同。
+现在给定满射 $k:S\to A$，我们定义一个辅助类型以改善 $k$ 的连通性。
+令 $T$ 是如下高阶归纳类型：
+\begin{itemize}
+\item 一个函数 $\ell:S\to T$，
+\item 对每个 $s,s':S$，一个函数 $m:(\id[A]{ks}{ks'}) \to (\id[T]{\ell s}{\ell s'})$。
+\end{itemize}
+显然诱导出函数 $\kbar:T\to A$，满足 $\kbar \ell = k$；并且任意 $p:ks=ks'$ 都等于复合 $ks = \kbar \ell s \overset{\kbar m p}{=} \kbar \ell s' = k s'$。
+
+\begin{lem}\label{thm:kbar}
+  $\kbar$ 是 0-连通的。
+\end{lem}
+\begin{proof}
+  我们需证明：对所有 $a:A$，类型 $\sm{t:T}(\kbar t = a)$ 的 0-截断是可缩的。
+  由于可缩性是纯命题且 $k$ 是 $(-1)$-连通的，可设 $a=ks$（某个 $s:S$）。
+  此时可把可缩中心取为 $\tproj0{(\ell s,q)}$，其中 $q$ 是等式 $\kbar\ell s = k s$。
+
+  还需证明：任意 $\phi:\trunc0{\sm{t:T} (\kbar t = ks)}$ 都满足 $\phi = \tproj0{(\ell s,q)}$。
+  因为后者是纯命题，尤其是集合，可设 $\phi=\tproj0{(t,p)}$，其中 $t:T$ 且 $p:\kbar t = ks$。
+
+  现在可对 $t:T$ 归纳。
+  若 $t\jdeq\ell s'$，则 $ks' = \kbar \ell s' \overset{p}{=} ks$ 通过 $m$ 给出等式 $\ell s = \ell s'$。
+  因而根据 $\kbar$ 及同伦纤维中等式的定义，可得 $(ks',p) = (ks,q)$，于是 $\tproj0{(ks',p)} = \tproj0{(ks,q)}$。
+  接下来要证明当 $t$ 沿 $m$ 变化时这些等式相容。
+  但它们是集合中的等式（即 $\trunc0{\sm{t:T} (\kbar t = ks)}$），因此自动成立。
+\end{proof}
+
+\begin{rmk}
+  \index{kernel!pair}%
+  $T$ 可看作 $k$ 的“核对”（kernel pair）的（同伦）余等化子。
+  若 $S$ 和 $A$ 是集合，则 $k$ 的 $(-1)$-连通性蕴含 $A$ 是该余等化子的 $0$-截断（见 \cref{cha:set-math}）。
+  对一般类型，更高拓扑斯理论提示：$k$ 的 $(-1)$-连通性应当意味着 $A$ 是 $k$ 的“单纯核”（simplicial kernel）的余极限（又称“几何实现”）。
+  \index{.infinity1-topos@$(\infty,1)$-topos}%
+  \index{geometric realization}%
+  \index{simplicial!kernel}%
+  \index{kernel!simplicial}%
+  类型 $T$ 是该单纯核的“1-骨架”的余极限，因此它把 $k$ 的连通性提升 1 是合理的。
+  更一般地，我们可期待 $n$-骨架\index{skeleton!of a CW-complex} 的余极限能把连通性提升 $n$。
+\end{rmk}
+
+\index{encode-decode method|(}%
+
+现在通过双重归纳如下定义 $\code:P\to P\to \type$
+\begin{itemize}
+\item $\code(ib,ib')$ 现在是如下序列类型的集合商
+  \[ (b, p_0, x_1, q_1, y_1, p_1, x_2, q_2, y_2, p_2, \dots, y_n, p_n, b') \]
+  其中
+  \begin{itemize}
+  \item $n:\mathbb{N}$,
+  \item 对 $0<k \le n$，$x_k:S$ 与 $y_k:S$,
+  \item 当 $n>0$ 时，$p_0:\Pi_1B(b,f k x_1)$ 与 $p_n:\Pi_1B(f k y_n, b')$；当 $n=0$ 时，$p_0:\Pi_1B(b,b')$,
+  \item 对 $1\le k < n$，$p_k:\Pi_1B(fk y_k, fkx_{k+1})$,
+  \item 对 $1\le k\le n$，$q_k:\Pi_1C(gkx_k, gky_k)$.
+  \end{itemize}
+  该商由下列等式生成（见 \cref{rmk:naive}）：
+  \begin{align*}
+    (\dots, q_k, y_k, \refl{fy_k}, y_k, q_{k+1},\dots)
+    &= (\dots, q_k\ct q_{k+1},\dots)\\
+    (\dots, p_k, x_k, \refl{gx_k}, x_k, p_{k+1},\dots)
+    &= (\dots, p_k\ct p_{k+1},\dots)\\
+    (\dots, p_{k-1} \ct fw, x_{k}', q_{k}, \dots) &=
+    (\dots, p_{k-1}, x_{k}, gw \ct q_{k}, \dots)
+    \tag{其中 $w:\Pi_1A(kx_{k},kx_{k}')$}\\
+    (\dots, q_k \ct gw, y_k', p_k, \dots) &=
+    (\dots, q_k, y_k, fw \ct p_k, \dots).
+    \tag{其中 $w:\Pi_1A(ky_k, ky_k')$}
+  \end{align*}
+  下文会用到 $\decode$ 在此类序列上的定义：与之前一样，把所有 $p_k$ 与 $q_k$ 连同若干 $h$ 的实例连接起来，得到 $\Pi_1P(ifb,ifb')$ 的一个元素，参见~\eqref{eq:decode}。
+  与之前一样，其余三个点情形几乎完全相同。
+\item 对 $a:A$ 与 $b:B$，需要一个等价
+  \begin{equation}
+    \code(ib, ifa) \eqvsym \code(ib,jga).\label{eq:bfa-bga2}
+  \end{equation}
+  由于 $\code$ 取值于集合，由 \cref{thm:kbar} 可设 $a=\kbar t$（某个 $t:T$）。
+  接着可对 $t$ 归纳。
+  若 $t\jdeq \ell s$（$s:S$），则像 \cref{sec:naive-vankampen} 一样定义~\eqref{eq:bfa-bga2}：
+  \begin{align*}
+    (\dots, y_n, p_n,fks) &\mapsto (\dots,y_n,p_n,s,\refl{gks},gks),\\
+    (\dots, x_n, p_n, s, \refl{fks}, fks) &\mapsfrom (\dots, x_n, p_n, gks).
+  \end{align*}
+  它们尊重等价关系，并像之前那样给出拟逆。
+  现在设 $t$ 沿某个 $w:ks=ks'$ 所对应的 $m_{s,s'}(w)$ 变化；我们须证明~\eqref{eq:bfa-bga2} 与沿 $\kbar mw$ 的传送相容。
+  按 $\kbar$ 的定义，这本质上归结为沿 $w$ 本身传送。
+  由路径类型中传送的刻画，我们需证明
+  \[ w_*(\dots, y_n, p_n,fks) = (\dots,y_n, p_n \ct fw, fks') \]
+  经过~\eqref{eq:bfa-bga2} 映到
+  \[ w_*(\dots,y_n,p_n,s,\refl{gks},gks) = (\dots, y_n, p_n, s, \refl{gks} \ct gw, gks') \]
+  这直接由我们为定义 \code 的集合商关系新增的生成元得到。
+\item 其余三个所需等价同理定义。
+\item 最后，由于交换性~\eqref{eq:bfa-bga-comm} 是纯命题，利用 $k$ 的 $(-1)$-连通性，可设 $a=ks$、$a'=ks'$，于是与先前完全一样。
+\end{itemize}
+
+\begin{thm}[带基点集合的 van Kampen 定理]\label{thm:van-Kampen}
+  对所有 $u,v:P$，存在等价
+  \[ \Pi_1P(u,v) \eqvsym \code(u,v). \]
+  其中 \code 按本节方式定义。
+\end{thm}
+
+\begin{proof}
+  基本与之前相同。
+  要证明 $\decode$ 尊重商关系新增的生成元，使用 $h$ 的自然性。
+  要证明 $\decode$ 尊重如~\eqref{eq:bfa-bga2} 的等价，需要沿 $\kbar$ 与 $T$ 归纳，把这些等价分解回其定义；之后又只剩 $f,g$ 的函子性。
+  其余都很直接。
+  特别地，$\encode\circ\decode$ 不需要额外论证，因为目标是在集合中证明等式，因此 $h$ 的情形是平凡的。
+\end{proof}
+
+\index{encode-decode method|)}%
+
+\index{fundamental!group|(}%
+\cref{thm:van-Kampen} 允许我们计算空间~$A$ 的基本群，
+即使 $A$ 不是集合也可以，只要 $S$ 是集合；因为这时每个
+$\code(u,v)$ 按定义都是某个\emph{集合}按关系取商所得的集合商。
+在这点上，它优于
+\cref{thm:naive-van-kampen}。
+
+\begin{eg}\label{eg:clvk}
+  设 $S\defeq \unit$，于是 $A$ 有基点 $a \defeq k(\ttt)$ 且连通。
+  则余推中回路的编码可识别为由 $\pi_1(B,f(a))$ 与 $\pi_1(C,g(a))$ 的回路交替组成的序列，模去一种等价关系：该关系允许我们把 $\pi_1(A,a)$ 的元素（分别经 $f,g$ 作用后）在两者之间“滑动”。
+  因而，$\pi_1(P)$ 可识别为\emph{带并合的自由积}
+  \index{amalgamated free product}%
+  \index{free!product!amalgamated}%
+  $\pi_1(B) *_{\pi_1(A)} \pi_1(C)$（群范畴中的余推），其构造见 \cref{sec:free-algebras}。
+  这（当 $B,C$ 是 $P$ 的开子空间而 $A$ 为其交时）大概是 van Kampen 定理最经典的版本。
+\end{eg}
+
+\begin{eg}\label{eg:cofiber}
+  \index{cofiber}
+  作为 \cref{eg:clvk} 的特例，再设 $C\defeq\unit$，则 $P$ 是余纤维 $B/A$。
+  这时 $C$ 中任意回路都等于反身性，因此路径编码上的关系可把所有序列收缩为 $B$ 中单个回路。
+  附加关系要求：用 $\pi_1(A)$ 的像中元素在左、右或中间相乘都等于恒等。
+  因而可将 $\pi_1(B/A)$ 识别为群 $\pi_1(B)$ 对“由 $\pi_1(A)$ 的像生成的正规子群”所取的商。
+\end{eg}
+
+\begin{eg}\label{eg:torus}
+  \index{torus}
+  再作为 \cref{eg:cofiber} 的特例，令 $B\defeq S^1 \vee S^1$、$A\defeq S^1$，并令 $f:A\to B$ 取复合回路 $p \ct q \ct \opp p \ct \opp q$，其中 $p,q$ 是组成 $B$ 的两份 $S^1$ 上的生成回路。
+  则 $P$ 给出环面 $T^2$ 的一个表示。
+  的确，不难把 $P$ 与 \cref{sec:hubs-spokes} 中描述的 $T^2$ 表示（在某条特定回路上加锥）对应起来。
+  因而，$\pi_1(T^2)$ 是“两个生成元的自由群\index{generator!of a group}（即 $\pi_1(B)$）对关系 $p \ct q \ct \opp p \ct \opp q = 1$ 取商”。
+  这显然给出两个生成元上的自由\emph{阿贝尔}\index{group!abelian}群，即 $\Z\times\Z$。
+\end{eg}
+
+
+\begin{eg}
+  \index{CW complex}
+  \index{hub and spoke}
+  更一般地，任意 CW 复形都可通过反复“给球面加锥”得到，如 \cref{sec:hubs-spokes} 所述。
+  即先从一个点集 $X_0$（“0-胞腔”）开始，它是该 CW 复形的“0-骨架”。
+  取余推
+  \begin{equation*}
+    \vcenter{\xymatrix{
+        S_1 \times \Sn^0\ar[r]^-{f_1}\ar[d] &
+        X_0\ar[d]\\
+        \unit \ar[r] &
+        X_1
+      }}
+  \end{equation*}
+  其中 $S_1$ 是 1-胞腔集合，$f_1$ 是一族“粘附映射”，得到“1-骨架”\index{skeleton!of a CW-complex} $X_1$。
+  \index{attaching map}%
+  再取余推
+  \begin{equation*}
+    \vcenter{\xymatrix{
+        S_2 \times \Sn^1\ar[r]^{f_2}\ar[d] &
+        X_1\ar[d]\\
+        \unit \ar[r] &
+        X_2
+      }}
+  \end{equation*}
+  其中 $S_2$ 是 2-胞腔集合，$f_2$ 是一族粘附映射，得到 2-骨架 $X_2$，依此类推。
+  每一步余推的基本群都可由 van Kampen 定理计算：得到一个由 1-骨架导出的生成元以及由 $S_2,f_2$ 导出的关系所给出的群。
+  此后阶段的余推不会改变基本群，因为当 $n>1$ 时 $\pi_1(\Sn^n)$ 平凡（见 \cref{sec:pik-le-n}）。
+\end{eg}
+
+
+\begin{eg}\label{eg:kg1}
+  特别地，设给定任意（集合）群 $G = \langle X \mid R \rangle$ 的一个表示\index{presentation!of a group}，其中 $X$ 是生成元集合，$R$ 是这些生成元上的词集合\index{generator!of a group}。
+  令 $B\defeq \bigvee_X S^1$、$A\defeq \bigvee_R S^1$，并令 $f:A\to B$ 把每份 $S^1$ 送到 $B$ 中生成回路上的对应词。
+  则 $\pi_1(P) \cong G$；因此我们构造了一个连通类型，其基本群是 $G$。
+  由于任意群都有表示，任意群都可实现为某个类型的基本群。
+  对这样的类型取 1-截断，可得一个只有同伦群 $G$ 非平凡的类型；这称为 \define{Eilenberg--Mac Lane 空间} $K(G,1)$。%
+  \indexdef{Eilenberg--Mac Lane space}%
+\end{eg}
+
+\index{fundamental!group|)}%
+
+\index{van Kampen theorem|)}%
+\index{theorem!van Kampen|)}%
+\section{Whitehead 定理与 Whitehead 原理}
+\label{sec:whitehead}
+
+在经典同伦论中，若映射 $f:A\to B$ 对 $A$ 中每个点 $a$ 都诱导同构 $\pi_n(A,a) \cong \pi_n(B,f(a))$（并且还诱导 $\pi_0(A)\cong\pi_0(B)$ 的同构），则只要空间 $A,B$ 足够“良好”（例如具有 CW 复形的同伦型），$f$ 必为同伦等价。
+\index{theorem!Whitehead's}%
+\index{Whitehead's!theorem}%
+这称为\emph{Whitehead 定理}。
+实际上，使 Whitehead 定理失效的那些“病态”空间在类型论中是不可见的。
+粗略地说，良好的拓扑空间足以呈现 $\infty$-群胚，%
+\index{.infinity-groupoid@$\infty$-groupoid}
+而同伦类型论是直接处理 $\infty$-群胚，而非实际的拓扑空间。
+因此，人们可能会预期 Whitehead 定理在单价基础中成立。
+
+然而这\emph{并不}成立：Whitehead 定理不可证明。
+事实上，已有类型论模型使其失效，尽管其失效原因与病态拓扑空间情形完全不同。
+这些模型是“非 hypercomplete 的 $\infty$-topos”
+\index{.infinity1-topos@$(\infty,1)$-topos}%
+\index{.infinity1-topos@$(\infty,1)$-topos!non-hypercomplete}%
+（见~\cite{lurie:higher-topoi}）；粗略地说，它们由定义在 $\infty$ 维底空间上的 $\infty$-群胚层组成。
+
+\index{axiom!Whitehead's principle|(}%
+\index{Whitehead's!principle|(}%
+
+因此，从基础观点看，我们可把\emph{Whitehead 原理}看作一种“经典性公理”，类似于 \LEM{} 与 \choice{}。
+它可以在一致性上被假设，但它不属于以计算动机为核心的类型论，也并非在所有自然模型中都成立。
+但在集合论基础下，这个原理是不可见的：在一个由集合搭建 $\infty$-群胚的世界里（无论用拓扑空间、单纯集合或其他模型），它不可能失效。
+
+这看起来也许奇怪，但其实并不意外。
+同伦类型论是同伦类型的\emph{抽象}理论，而集合论中拓扑空间或单纯集合的同伦论是该理论的一个\emph{具体}模型，就像整数是环的抽象理论的一个具体模型一样。
+可以预期任何具体模型都会有一些并非抽象理论内在要求的特殊性质；但我们有时可能希望把这些性质作为附加公理（例如整数是主理想整环，但并非所有环都如此）。
+
+本书不讨论类型论模型的具体构造，因此我们不会解释 Whitehead 原理如何在某些模型中失效。
+不过我们能证明：只要涉及的类型对某个有限 $n$ 是 $n$-截断的，该原理就成立；证明采用对 $n$ 的“向下”归纳。
+这不仅本身有意义（例如它蕴含 Eilenberg--Mac Lane 空间的本质唯一性），而且其证明还希望能提供一些直观解释：为什么在没有截断假设时，我们不能期待证明对应定理。
+
+我们先给出 \cref{thm:mono-surj-equiv} 的如下改型，它最终将提供截断版 Whitehead 原理证明中的归纳步。
+可将其视作经典命题“全忠实且本质满的函子是范畴等价”的类型论化、$\infty$-群胚化版本。
+
+\begin{thm}\label{thm:whitehead0}
+  设 $f:A\to B$ 是函数，满足
+  \begin{enumerate}
+  \item $\trunc0 f : \trunc0 A \to \trunc0 B$ 是满射，且\label{item:whitehead01}
+  \item 对任意 $x,y:A$，函数 $\apfunc f : (\id[A]xy) \to (\id[B]{f(x)}{f(y)})$ 是等价。\label{item:whitehead02}
+  \end{enumerate}
+  则 $f$ 是等价。
+\end{thm}
+\begin{proof}
+  注意~\ref{item:whitehead02} 正是 $f$ 是嵌入的陈述，参见~\cref{sec:mono-surj}。
+  因此由 \cref{thm:mono-surj-equiv}，只需证明 $f$ 满射，即对任意 $b:B$ 有 $\trunc{-1}{\hfib f b}$。
+  固定 $b$；由于 $\trunc0 f$ 满射，仅存在 $a:A$ 使得 $\trunc 0 f(\tproj0a) = \tproj0b$。
+  由于目标是纯命题，可设给定这样的 $a$。
+  于是有 $\tproj0{f(a)} = \trunc 0 f(\tproj0a) =\tproj0b$，故 $\trunc{-1}{f(a)=b}$。
+  再次因为目标仍是纯命题，可设 $f(a)=b$。
+  因而 $\hfib f b$ 有元素，从而仅有元素存在。
+\end{proof}
+
+由于同伦群是环路空间\index{loop space}的截断，而非路径空间的截断，我们需要把此定理改写成环路空间版本。回忆 \cref{def:loopfunctor} 中的映射 $\Omega f$。
+
+\begin{cor}\label{thm:whitehead1}
+  设 $f:A\to B$ 是函数，满足
+  \begin{enumerate}
+  \item $\trunc0 f : \trunc0 A \to \trunc0 B$ 是双射，且
+  \item 对任意 $x:A$，函数 $\Omega f : \Omega(A,x) \to \Omega(B,f(x))$ 是等价。
+  \end{enumerate}
+  则 $f$ 是等价。
+\end{cor}
+\begin{proof}
+  由 \cref{thm:whitehead0}，只需证明：任意 $x,y:A$ 下，$\apfunc f : (\id[A]xy) \to (\id[B]{f(x)}{f(y)})$ 是等价。
+  由 \cref{thm:equiv-inhabcod}，可设 $\id[B]{f(x)}{f(y)}$ 可居住。
+  特别地，$\tproj0{f(x)} = \tproj0{f(y)}$；又因 $\trunc0 f$ 是等价，得 $\tproj0 x = \tproj0y$，故 $\tproj{-1}{x=y}$。
+  由于我们要证明的是纯命题（$\apfunc f$ 为等价），可设给定 $p:x=y$。
+  这时下方方块在同伦意义下交换：
+  \begin{equation*}
+  \vcenter{\xymatrix@C=3pc{
+      \Omega(A,x)\ar[r]^-{\blank\ct p}\ar[d]_{\Omega f} &
+      (\id[A]xy) \ar[d]^{\apfunc f}\\
+      \Omega(B,f(x))\ar[r]_-{\blank\ct f(p)} &
+      (\id[B]{f(x)}{f(y)}).
+      }}
+  \end{equation*}
+  上下两条映射是等价，左边映射按假设也是等价。
+  因而由 2-out-of-3 性质，右边映射也是等价。
+\end{proof}
+
+现在可以证明截断版 Whitehead 原理。
+
+\begin{thm}\label{thm:whiteheadn}
+  设 $A,B$ 是 $n$-类型，且 $f:A\to B$ 满足
+  \begin{enumerate}
+  \item $\trunc0f:\trunc0A \to \trunc0B$ 是双射，且\label{item:wh0}
+  \item 对所有 $k\ge 1$ 与所有 $x:A$，$\pi_k(f):\pi_k(A,x) \to \pi_k(B,f(x))$ 是双射。\label{item:whk}
+  \end{enumerate}
+  则 $f$ 是等价。
+\end{thm}
+
+\noindent
+条件~\ref{item:wh0} 几乎就是~\ref{item:whk} 在 $k=0$ 时的情形，只是它不涉及任何基点 $x:A$。
+
+\begin{proof}
+  我们对 $n$ 归纳。
+  当 $n=-2$ 时命题平凡。
+  设它对所有 $n$-类型间函数成立，取 $A,B$ 为 $(n+1)$-类型，$f:A\to B$ 如上。
+  \cref{thm:whitehead1} 的第一条件按假设成立，因此只需证明：任意 $x:A$ 下，$\Omega f: \Omega(A,x) \to \Omega(B,f(x))$ 是等价。
+
+  因为 $\Omega(A,x)$ 与 $\Omega(B,f(x))$ 都是 $n$-类型，可应用归纳假设。
+  需检验：$\trunc 0{\Omega f}$ 是双射；并且对所有 $k\geq1$ 与 $p : x = x$，映射 $\pi_k(\Omega f):\pi_k(x = x,p) \to \pi_k(f(x) = f(x),\Omega f(p))$ 是双射。
+  第一条由假设立即成立，因为 $\trunc 0{\Omega f} \jdeq \pi_1(f)$。
+  为证明第二条，先作推广：对所有 $y : A$ 与 $q : x = y$，证明 $\pi_k(\apfunc f):\pi_k(x = y,q) \to \pi_k(f(x) = f(y),\apfunc f(q))$。
+  这蕴含所需结论，因为当 $y\defeq x$ 时，识别基点 $\Omega f(p)=\apfunc f(p)$ 后，$\pi_k(\Omega f)=\pi_k(\apfunc f)$。
+  要证该推广，由路径归纳只需证明 $q$ 为 $\refl{a}$ 的情形。
+  此时 $\pi_k(\apfunc f) = \pi_k(\Omega f) = \pi_{k+1}(f)$，而按原始假设 $\pi_{k+1}(f)$ 是双射。
+\end{proof}
+
+注意：若 $A,B$ 对任意有限 $n$ 都不是 $n$-类型，则此归纳没有起点可用。
+
+\begin{cor}\label{thm:whitehead-contr}
+  若 $A$ 是一个 0-连通的 $n$-类型，且对所有 $k$ 与 $a:A$ 都有 $\pi_k(A,a)=0$，则 $A$ 可缩。
+\end{cor}
+\begin{proof}
+  把 \cref{thm:whiteheadn} 应用于映射 $A\to\unit$。
+\end{proof}
+
+作为应用，我们可推出 \cref{thm:conn-pik} 的逆命题。
+
+\begin{cor}\label{thm:pik-conn}
+  对 $n\ge 0$，映射 $f:A\to B$ 为 $n$-连通当且仅当下列条件都成立：
+  \begin{enumerate}
+  \item $\trunc0f:\trunc0A \to \trunc0B$ 是同构。
+  \item 对任意 $a:A$ 与 $k\le n$，映射 $\pi_k(f):\pi_k(A,a) \to \pi_k(B,f(a))$ 是同构。
+  \item 对任意 $a:A$，映射 $\pi_{n+1}(f):\pi_{n+1}(A,a) \to \pi_{n+1}(B,f(a))$ 是满射。
+  \end{enumerate}
+\end{cor}
+\begin{proof}
+  “仅当”方向即 \cref{thm:conn-pik}。
+  反过来，由纤维化长正合序列（\cref{thm:les}），
+  \index{sequence!exact}%
+  这些假设蕴含：对所有 $k\le n$ 与 $a:A$，$\pi_k(\hfib f {f(a)})=0$，且 $\trunc 0{\hfib f{f(a)}}$ 可缩。
+  由于对 $k\le n$ 有 $\pi_k(\hfib f {f(a)}) = \pi_k(\trunc n{\hfib f{f(a)}})$，而 $\trunc n{\hfib f{f(a)}}$ 是 $n$-连通的，故由 \cref{thm:whitehead-contr} 可知任意 $a$ 下它都是可缩的。
+
+  还需证明：当 $b:B$ 不一定形如 $f(a)$ 时，$\trunc n{\hfib f{b}}$ 也可缩。
+  然而按假设，存在 $x:\trunc0A$ 使 $\tproj 0b = \trunc0f(x)$。
+  因可缩性是纯命题，可设 $x$ 形如 $\tproj0a$（某个 $a:A$），此时 $\tproj 0 b = \trunc0f(\tproj0a) = \tproj0{f(a)}$，从而 $\trunc{-1}{b=f(a)}$。
+  再因可缩性是纯命题，可设 $b=f(a)$，结论即得。
+\end{proof}
+
+满足“$\trunc0f$ 为双射且对所有 $k$，$\pi_k(f)$ 为双射”的映射 $f$ 称为\define{$\infty$-连通}%
+\indexdef{function!.infinity-connected@$\infty$-connected}%
+\indexdef{.infinity-connected function@$\infty$-connected function}
+或\define{弱等价}。%
+\indexdef{equivalence!weak}%
+\indexdef{weak equivalence!of types}
+这等价于要求 $f$ 对所有 $n$ 都是 $n$-连通的。
+若类型 $Z$ 满足：当 $f$ 为 $\infty$-连通时，诱导映射
+\[(\blank\circ f):(B\to Z) \to (A\to Z)\]
+是等价，则称 $Z$ 为\define{$\infty$-截断}%
+\indexdef{type!.infinity-truncated@$\infty$-truncated}%
+\indexdef{.infinity-truncated type@$\infty$-truncated type}
+或\define{超完备（hypercomplete）}%。
+\indexdef{type!hypercomplete}%
+\indexdef{hypercomplete type}
+也就是说，在 $Z$ 看来每个 $\infty$-连通映射都是等价。
+\indexdef{axiom!Whitehead's principle}%
+因此，若把 Whitehead 原理作为公理，可使用下列两个等价形式之一。
+\begin{itemize}
+\item 每个 $\infty$-连通函数都是等价。
+\item 每个类型都是 $\infty$-截断的。
+\end{itemize}
+在更高拓扑斯模型中，
+\index{.infinity1-topos@$(\infty,1)$-topos}%
+$\infty$-截断类型在 \cref{sec:modalities} 的意义下构成一个反射子宇宙（即某个 $(\infty,1)$-topos 的“hypercompletion”），但我们不知道这在一般情形是否成立。
+
+\index{axiom!Whitehead's principle|)}%
+\index{Whitehead's!principle|)}%
+
+乍看之下，未必明显真有类型对所有 $n$ 都不是 $n$-类型；但事实上确实存在。
+例如在经典同伦论中，对任意 $n\ge 2$，$\Sn^n$ 都有该性质。
+我们尚未在同伦类型论中证明此事实，不过还有其他类型可证明具有“无穷截断层级”。
+
+\begin{eg}
+  设有 $B:\nat\to\type$，使得每个 $n$ 的类型 $B(n)$ 都含有一个不等于 $n$ 重反身性的 $n$-环路\index{loop!n-@$n$-}，记作 $p_n:\Omega^n(B(n),b_n)$ 且 $p_n \neq \refl{b_n}^n$。
+  （例如可定义 $B(n)\defeq \Sn^n$，并令 $p_n$ 为同构 $\pi_n(\Sn^n)\cong \Z$ 下 $1:\Z$ 的像。）
+  考虑 $C\defeq \prd{n:\nat} B(n)$，点 $c:C$ 定义为 $c(n)\defeq b_n$。
+  由于环路空间与积交换，对任意 $m$ 有
+  \[\eqvspaced{\Omega^m (C,c)}{\prd{n:\nat}\Omega^m(B(n),b_n)}.\]
+  在该等价下，$\refl{c}^m$ 对应函数 $(n\mapsto \refl{b_n}^m)$。
+  现在在右侧类型中定义 $q_m$ 为
+  \[ q_m(n) \defeq
+  \begin{cases}
+    p_n &\quad m=n\\
+    \refl{b_n}^m &\quad m\neq n.
+  \end{cases}
+  \]
+  若有 $q_m = (n\mapsto \refl{b_n}^m)$，则得到 $p_n = \refl{b_n}^n$，这与假设矛盾。
+  因而 $q_m \neq (n\mapsto \refl{b_n}^m)$，于是 $\Omega^m(C,c)$ 中存在一点不等于 $\refl{c}^m$。
+  故 $C$ 对任意 $m:\nat$ 都不是 $m$-类型。
+\end{eg}
+
+我们也预期可以证明：宇宙 $\UU$ 本身对任意 $n$ 都不是 $n$-类型，理由是它包含所有 $n$ 的 $\Sn^n$ 等高阶归纳类型。
+不过这件事目前尚未完成。
+\section{编码-解码方法的一般表述}
+\label{sec:general-encode-decode}
+
+\indexdef{encode-decode method}
+
+我们已经使用编码-解码方法来刻画多种类型的路径空间，
+包括余积（\cref{thm:path-coprod}）、自然
+数（\cref{thm:path-nat}）、截断（\cref{thm:path-truncation}）、
+圆（\cref{{cor:omega-s1}}）、悬挂（\cref{thm:freudenthal}）以及余推出
+（\cref{thm:van-Kampen}）。该技术的变体也用于本章导言中提到的
+许多其他定理的证明，例如 $\pi_n(\Sn^n)$ 的直接证明、Blakers--Massey 定理，
+以及 Eilenberg--Mac Lane 空间的构造。尽管人们很自然会尝试
+把这一方法抽象成一个引理，但这并不容易，
+因为不同问题需要略有差异的变体。
+例如，同一方法的不同变形可以用于刻画一个回路空间（如 \cref{thm:path-coprod,cor:omega-s1}），或
+整个路径空间（如 \cref{thm:path-nat}）；可以给出
+回路空间的完整刻画（例如 $\Omega^1(\Sn ^1)$），也可以只
+刻画其某个截断（例如 van Kampen）；还可以用于计算
+同伦群，或证明一个映射是 $n$-连通（例如 Freudenthal 和
+Blakers--Massey）。
+
+不过，我们可以为该方法的特定变体陈述引理。
+这些引理的证明几乎是平凡的；其主要目的在于
+通过一般形式的陈述来澄清方法。最简单的
+情形是使用编码-解码方法来刻画一个类型的回路空间，
+如 \cref{thm:path-coprod} 与 \cref{{cor:omega-s1}} 所示。
+
+\begin{lem}[回路空间的编码-解码]\label{lem:encode-decode-loop}
+  \index{loop space}%
+给定带点类型 $(A,a_0)$ 与一个纤维化
+$\code : A \to \type$，若
+\begin{enumerate}
+\item $c_0 : \code(a_0)$,\label{item:ed1}
+\item $\decode : \prd{x:A} \code(x) \to (\id{a_0}{x})$,\label{item:ed2}
+\item 对所有 $c : \code(a_0)$，\id{\transfib{\code}{\decode(c)}{c_0}}{c}, 且\label{item:ed3}
+\item $\id{\decode(c_0)}{\refl{}}$,\label{item:ed4}
+\end{enumerate}
+则 $(\id{a_0}{a_0})$ 与 $\code(a_0)$ 等价。
+\end{lem}
+
+\begin{proof}
+定义
+$\encode : \prd{x:A} (\id{a_0}{x}) \to \code(x)$ 为
+\[
+\encode_x(\alpha) = \transfib{\code}{\alpha}{c_0}.
+\]
+我们证明 $\encode_{a_0}$ 与 $\decode_{a_0}$ 互为拟逆。
+复合 $\encode_{a_0} \circ \decode_{a_0}$ 由
+假设~\ref{item:ed3} 立即得到。对另一个复合，我们证明
+\[
+\prd{x:A}{p : \id{a_0}{x}} \id{\decode_{x} (\encode_{x} p)}{p}.
+\]
+由路径归纳，只需证明
+$\id{{\decode_{{a_0}} (\encode_{{a_o}} \refl{})}}{\refl{}}$。
+把 $\mathsf{transport}$ 约化后，只需证明
+$\id{{\decode_{{a_0}} (c_0)}}{\refl{}}$，这正是假设~\ref{item:ed4}。
+\end{proof}
+
+若希望得到 $(\id{a_0}{\blank})$ 与 $\code$ 之间的逐纤维等价，
+只需把条件 (iii) 加强为
+\[
+\prd{x:A}{c : \code(x)} \id{\encode_{x}(\decode_{x}(c))}{c}.
+\]
+然而，为了计算一个回路空间（例如 $\Omega(\Sn ^1)$），这条
+更强的假设并非必要。
+
+另一种常见变体会在计算同伦
+群时出现，它刻画的是回路空间的截断：
+
+\begin{lem}[回路空间截断的编码-解码]
+设 $(A,a_0)$ 是带点类型，且有纤维化
+$\code : A \to \type$，其中对每个 $x$，$\code(x)$ 是一个 $k$-类型。
+定义
+\[
+\encode : \prd{x:A} \trunc{k}{\id{a_0}{x}} \to \code(x)
+\]
+通过截断递归给出（利用
+$\code(x)$ 是 $k$-类型这一事实），把 $\alpha : \id{a_0}{x}$ 映到
+\transfib{\code}{\alpha}{c_0}。设：
+\begin{enumerate}
+\item $c_0 : \code(a_0)$,
+\item $\decode : \prd{x:A} \code(x) \to \trunc{k}{\id{a_0}{x}}$,
+\item \label{item:decode-encode-loop-iii}
+  对所有 $c : \code(a_0)$，$\id{\encode_{a_0}(\decode_{a_0}(c))}{c}$, 且
+\item \label{item:decode-encode-loop-iv}
+  $\id{\decode(c_0)}{\tproj{}{\refl{}}}$.
+\end{enumerate}
+则 $\trunc{k}{\id{a_0}{a_0}}$ 与 $\code(a_0)$ 等价。
+\end{lem}
+
+\begin{proof}
+由 \ref{item:decode-encode-loop-iii}，$\decode \circ \encode$ 为恒等是直接的。
+%
+为证明 $\encode \circ \decode$，我们先做一次截断归纳，于是只需证明
+\[
+\prd{x:A}{p : \id{a_0}{x}} \id{\decode_{x}(\encode_{x}(\tproj{k}{p}))}{\tproj{k}{p}}.
+\]
+之所以允许做截断归纳，是因为 $k$-类型中的路径仍是一个
+$k$-类型。为证明这个类型，再做一次路径归纳；在约化
+\encode 后，使用假设~\ref{item:decode-encode-loop-iv} 即可。
+\end{proof}
+\section{附加结果}
+\label{sec:moreresults}
+
+虽然本章不呈现这些证明，但下列结果也已在同伦类型论中建立。
+
+\begin{thm}
+\index{homotopy!group!of sphere}
+存在一个 $k$，使得对所有 $n \ge 3$，$\pi_{n+1}(\Sn ^n) =
+\Z_k$.
+\end{thm}
+
+\begin{proof}[证明说明.]
+该证明由对 $\pi_4(\Sn ^3)$ 的计算构成，并结合
+稳定性的应用（\cref{cor:stability-spheres}）。在这一结果的经典
+表述中，$k$ 为 $2$。尽管我们尚未核查
+$k$ 事实上就是 $2$，我们对 $\pi_4(\Sn ^3)$ 的计算是构造性的，\index{mathematics!constructive}
+这与本章其余证明一致。
+（更精确地说，它不使用诸如 \LEM{} 或 \choice{} 之类的额外公理，因此其构造性程度与
+泛等和高阶归纳类型本身一致。）因此，一旦给出
+同伦类型论的计算解释，我们就可以在计算机上运行该
+证明以验证 $k$ 是 $2$。这个例子相当
+耐人寻味，因为这是我们第一次计算某个同伦群
+而无须预先知道答案。
+\end{proof}
+
+% Recall from \cref{sec:colimits} that $X \sqcup^C Y$ denotes the
+% (homotopy) pushout of $X$ and $Y$ along $C$.
+\index{pushout}%
+
+\begin{thm}[Blakers--Massey 定理]\label{Blakers-Massey}
+  \indexdef{theorem!Blakers--Massey}%
+  \indexsee{Blakers--Massey theorem}{theorem, Blakers--Massey}%
+  设给定映射 $f : C  \rightarrow X$ 与 $g : C \rightarrow Y$。先取 $f$ 与 $g$ 的余推出 $X \sqcup^C Y $，再对其包含映射 $\inl : X \rightarrow X \sqcup^C Y \leftarrow Y : \inr$ 取拉回，可得诱导映射 $C \to X \times_{(X \sqcup^C Y)} Y$。
+
+  若 $f$ 是 $i$-连通且 $g$ 是 $j$-连通，则该诱导映射是 $(i+j)$-连通。换言之，对任意点 $x:X$、$y:Y$，$(f,g) : C \to X \times Y $ 的对应纤维 $C_{x,y}$ 给出了余推出中路径空间 $\id[X \sqcup^C Y]{\inl(x)}{\inr(y)}$ 的一个近似。
+\end{thm}
+
+需要指出的是，在经典代数拓扑中，Blakers--Massey 定理常以略有不同的形式陈述：映射 $f$ 与 $g$ 被替换为 CW 复形子复形的包含映射，而同伦余推出与同伦拉回分别被并集与交集取代。
+为了在同伦类型论中表达该定理，我们必须把这类概念替换为同伦不变的概念。
+我们在 van Kampen 定理（\cref{sec:van-kampen}）中也见过另一个例子：那里我们必须把开子集的并替换为同伦余推出。
+
+\begin{thm}[Eilenberg--Mac Lane 空间]\label{Eilenberg-Mac-Lane-Spaces}
+\index{Eilenberg--Mac Lane space}
+对任意阿贝尔\index{group!abelian}群 $G$ 与正整数 $n$，存在一个 $n$-类型
+$K(G,n)$，使得 $\pi_n(K(G,n)) = G$，且  $\pi_k(K(G,n)) = 0$
+对 $k\neq n$ 成立。
+\end{thm}
+
+\begin{thm}[覆盖空间]\label{thm:covering-spaces}
+  \index{covering space}%
+  对连通空间 $A$，$A$ 上的覆盖空间与带有 $\pi_1(A)$ 作用的集合之间存在一个等价。
+\end{thm}
+
+
+\sectionNotes
+
+%% For the spheres,  two
+%% different definitions of the $n$-sphere $\Sn ^n$ have been used: the first as the
+%% suspension of $\Sn ^ {n-1}$ (\cref{sec:suspension}), and the second
+%% as a higher inductive type with one base point and one loop in
+%% $\Omega^n$ (\cref{sec:circle}); we list the status for both
+%% definitions.  The equivalence of the two can be deduced from the remarks
+%% at the end of \cref{sec:suspension}.
+
+{
+\newcommand{\humancheck}{\ding{52}}
+\newcommand{\computercheck}{\ding{52}\kern-0.5em\ding{52}}
+\begin{table}[htb]
+  \centering
+\begin{tabular}{lcc}
+\toprule
+定理         & 状态 \\
+\midrule
+$\pi_1(\Sn ^1)$                     & \computercheck \\
+$\pi_{k<n}(\Sn ^n)$                  & \computercheck \\
+%% $\pi_{k<n}(\Sn ^n)$ --- suspension  & \computercheck \\
+%% $\pi_2(\Sn ^2)$ --- suspension      & \computercheck \\
+同伦群长正合列 & \computercheck    \\
+Hopf 纤维化的总空间为 $\Sn ^3$ & \humancheck    \\
+$\pi_2(\Sn ^2)$                     & \computercheck \\
+$\pi_3(\Sn ^2)$                     & \humancheck    \\
+$\pi_n(\Sn ^n)$                     & \computercheck \\
+%% $\pi_n(\Sn ^n)$ --- suspension      & \computercheck \\
+$\pi_4(\Sn ^3)$                     & \humancheck    \\
+Freudenthal 悬挂定理      & \computercheck \\
+Blakers--Massey 定理              & \computercheck \\
+Eilenberg--Mac Lane 空间 $K(G,n)$ & \computercheck \\
+van Kampen 定理                & \computercheck \\
+覆盖空间                     & \computercheck \\
+$n$-类型上的 Whitehead 原理 & \computercheck \\
+\bottomrule
+\end{tabular}
+\caption{同伦理论定理的手工证明
+  （\humancheck）与机器证明（\computercheck）。}
+  \label{tab:theorems}
+\end{table}
+}
+
+本章描述的定理都是经典
+同伦理论中的标准结果；其中许多可见于 \cite{hatcher02topology}。在这些
+注记中，我们回顾这些定理在同伦
+类型论中新综合证明的发展过程。\cref{tab:theorems} 列出了已在同伦类型论中证明的同伦理论
+定理，以及它们是否
+经过机器校验。
+几乎所有这些结果都在 2013 年 IAS 春季学期期间发展出来，
+这是一次重要的协作努力的一部分。许多人
+以不同方式对这些结果作出贡献，例如作为某个证明
+的主要作者、提出可研究的问题、参与与这些问题有关的
+大量讨论与研讨，或对结果给出反馈。
+下列人员是以上定理第一批同伦类型论证明的主要作者。除非另有说明，对于
+那些已机器校验的定理，主要作者
+也往往是最早使用计算机证明
+助手将证明形式化\index{mathematics!formalized} 的人。
+\begin{itemize}
+\item
+Shulman 给出了 $\pi_1(\Sn^1)$ 的同伦论式计算。Licata 后来发现了
+编码-解码证明与编码-解码方法。
+
+\item
+Brunerie 计算了 $\pi_{k<n}(\Sn ^ n)$。
+Licata 后来给出了编码-解码版本。
+
+\item Voevodsky 构造了同伦群的长正合列。
+
+\item Lumsdaine 构造了 Hopf 纤维化。
+  Brunerie 证明其总空间为 $\Sn ^3$，从而计算出 $\pi_2(\Sn ^2)$ 与
+  $\pi_3(\Sn ^3)$。
+
+\item Licata 与 Brunerie 给出了
+$\pi_n(\Sn ^n)$ 的直接计算。
+
+\item
+  Lumsdaine 证明了 Freudenthal 悬挂定理；Licata 与
+  Lumsdaine 将该证明形式化。
+\item Lumsdaine、Finster 与 Licata 证明了 Blakers--Massey 定理；
+  Lumsdaine、Brunerie、Licata 与 Hou 完成了其形式化。
+
+\item
+Licata 给出了 $\pi_2(\Sn ^2)$ 的编码-解码计算，以及一个使用 Freudenthal 悬挂定理
+计算 $\pi_n(\Sn ^n)$ 的方法；利用类似
+技术，他构造了 $K(G,n)$。
+
+\item
+Shulman 证明了 van Kampen 定理；Hou 形式化了该证明。
+
+\item
+Licata 证明了 $n$-类型上的 Whitehead 定理。
+
+\item Brunerie 计算了 $\pi_4(\Sn ^3)$。
+
+\item
+Hou 建立并形式化了覆盖空间理论。
+\end{itemize}
+
+同伦理论与类型论之间的相互作用对这些结果的
+发展至关重要。例如，最早证明
+$\pi_1(\Sn ^1)=\mathbb{Z}$ 的是 \cref{subsec:pi1s1-homotopy-theory} 中给出的那个证明，它遵循了经典同伦理论证明。
+对该证明的类型论分析促成了
+编码-解码方法的发展。最早对 $\pi_2(\Sn ^2)$ 的计算也遵循
+经典方法，但很快导向了该结果的编码-解码证明。
+该编码-解码计算进一步推广到 $\pi_n(\Sn ^n)$，又进一步导向 Freudenthal 悬挂定理的证明：
+即把编码-解码论证与关于连通性的经典同伦论推理结合起来，继而导向 Blakers--Massey
+定理与 Eilenberg--Mac Lane 空间。这一
+系列结果的快速发展展示了我们对
+这两门学科联系之新理解的前景。
+
+\sectionExercises
+
+\begin{ex}\label{ex:homotopy-groups-resp-prod}
+  证明同伦群保持乘积：$\eqv{\pi_n(A\times B)}{\pi_n(A)\times \pi_n(B)}$。
+\end{ex}
+
+\begin{ex}\label{ex:decidable-equality-susp}
+  \index{decidable!equality}%
+  证明：若 $A$ 是具有可判定相等性（见 \cref{defn:decidable-equality}）的集合，则其悬挂 $\susp A$ 是一个 1-类型。
+  （是否可在不假设可判定相等性的情况下证明该结论，仍是一个开放问题\index{open!problem}。）
+\end{ex}
+
+\begin{ex}\label{ex:contr-infinity-sphere-colim}
+  将 $\Sn^\infty$ 定义为序列 $\Sn^0 \to \Sn^1 \to \Sn^2 \to\cdots$ 的余极限。
+  证明 $\Sn^\infty$ 是可缩的。
+\end{ex}
+
+\begin{ex}\label{ex:contr-infinity-sphere-susp}
+  将 $\Sn^\infty$ 定义为由下列数据生成的高阶归纳类型：
+  \begin{itemize}
+  \item 两个点 $\north:\Sn^\infty$ 与 $\south:\Sn^\infty$，以及
+  \item 对每个 $x:\Sn^\infty$，一条路径 $\merid(x):\north=\south$。
+  \end{itemize}
+  换言之，$\Sn^\infty$ 是其自身的悬挂。
+  证明 $\Sn^\infty$ 是可缩的。
+\end{ex}
+
+\begin{ex}\label{ex:unique-fiber}
+  设 $f:X\to Y$ 是一个函数，且 $Y$ 连通。
+  证明对任意 $y_1,y_2:Y$，有 $\brck{\eqv{\hfib f {y_1}}{\hfib f {y_2}}}$。
+\end{ex}
+
+\begin{ex}\label{ex:ap-path-inversion}
+  对任意带点类型 $A$，令 $i_A : \Omega A \to \Omega A$ 表示回路取逆，$i_A \defeq \lam{p} \rev{p}$。
+  证明 $i_{\Omega A} : \Omega^2 A \to \Omega^2 A$ 等于 $\Omega(i_A)$。
+\end{ex}
+
+\begin{ex}\label{ex:pointed-equivalences}
+  把\textbf{带点等价}定义为其底层函数是等价的带点映射。
+  \begin{enumerate}
+  \item 证明：带点类型 $(X,x_0)$ 与 $(Y,y_0)$ 之间的带点等价类型与 $\id[\pointed\type]{(X,x_0)}{(Y,y_0)}$ 等价。
+  \item 用 \cref{cha:equivalences} 中某种相干风格，将带点等价的概念改写为带点拟逆与带点同伦来表述。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:HopfJr}
+  按照 \cref{sec:hopf} 中 Hopf 纤维化的例子，定义\define{初级 Hopf 纤维化}
+  \indexdef{Hopf!fibration!junior}%
+为 $\Sn ^1$ 上的一个纤维化（即一个类型族），其在基点上的纤维是 $\Sn ^0$，其总空间是 $\Sn ^1$。这也称为圆 $\Sn ^1$ 的“扭曲双重覆盖”。
+\end{ex}
+
+\begin{ex}\label{ex:SuperHopf}
+同样参照 \cref{sec:hopf} 中 Hopf 纤维化的例子，定义一个在 $\Sn ^4$ 上的类似纤维化，其在基点上的纤维是 $\Sn ^3$，其总空间是 $\Sn ^7$。这在同伦类型论中是一个开放问题\index{open!problem}（在经典同伦理论中已知此类纤维化存在）。
+\end{ex}
+
+\begin{ex}\label{ex:vksusppt}
+  延续 \cref{eg:suspension}，证明：若 $A$ 有一点 $a:A$，则可将 $\pi_1(\susp A)$ 识别为由 $\trunc0A$ 作为生成元、并带关系 $\tproj0a = e$ 所给出的群。
+  然后证明：若再假设排中律，这也就是在 $\trunc0 A \setminus \{\tproj0 a \}$ 上的自由群。
+\end{ex}
+
+\begin{ex}\label{ex:vksuspnopt}
+  仍延续 \cref{eg:suspension}，但这次不假设 $A$ 带点，证明可将 $\pi_1(\susp A)$ 识别为由生成元 $\trunc0A \times \trunc0A$ 与如下关系给出的群
+  \begin{equation*}
+    (a,b) = \opp{(b,a)},
+    \qquad
+    (a,c) = (a,b)\cdot (b,c),
+    \qquad\text{且}\qquad
+    (a,a) = e.
+  \end{equation*}
+\end{ex}
+
+\index{acceptance|)}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "hott-online"
+%%% End:

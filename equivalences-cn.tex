@@ -1,0 +1,1108 @@
+\chapter{等价}
+\label{cha:equivalences}
+
+我们现在更详细地研究在 \cref{sec:basics-equivalences} 中简要引入的\emph{类型等价}概念。
+具体地，我们将给出若干种定义类型 $\isequiv(f)$ 的方式，并使其满足那里提到的性质。
+回忆一下，我们希望 $\isequiv(f)$ 具有如下性质，这里重述如下：
+\begin{enumerate}
+\item $\qinv(f) \to \isequiv (f)$.\label{item:beb1}
+\item $\isequiv (f) \to \qinv(f)$.\label{item:beb2}
+\item $\isequiv(f)$ 是一个纯命题.\label{item:beb3}
+\end{enumerate}
+这里 $\qinv(f)$ 表示 $f$ 的拟逆类型：
+\begin{equation*}
+  \sm{g:B\to A} \big((f \circ g \htpy \idfunc[B]) \times (g\circ f \htpy \idfunc[A])\big).
+\end{equation*}
+由函数外延性可知，$\qinv(f)$ 与如下类型等价
+\begin{equation*}
+  \sm{g:B\to A} \big((f \circ g = \idfunc[B]) \times (g\circ f = \idfunc[A])\big).
+\end{equation*}
+我们将定义三种不同的类型，它们都满足性质~\ref{item:beb1}--\ref{item:beb3}，分别称为
+\begin{itemize}
+\item 半伴随等价，
+\item 双可逆映射，
+  \index{function!bi-invertible}
+  以及
+\item 可缩函数。
+\end{itemize}
+我们还将证明这些类型彼此等价。
+这些名称是有意取得稍显繁复的，因为在我们知道它们彼此等价并且满足性质~\ref{item:beb1}--\ref{item:beb3} 后，就可以回到直接说“等价”，而无需指定采用哪一个具体定义。
+但为了本章中的比较，我们需要为每个定义使用不同名称。
+
+不过，在考察不同的等价概念之前，我们先进一步解释为什么需要一个不同于拟可逆性的概念。
+
+\section{拟逆}
+\label{sec:quasi-inverses}
+
+\index{quasi-inverse|(}%
+我们说过，$\qinv(f)$ 不够理想，因为它不是纯命题，而我们更希望一个给定函数“是一个等价”的方式至多只有一种。
+不过，我们此前并没有给出 $\qinv(f)$ 不是纯命题的证据。
+本节我们给出一个具体反例。
+
+\begin{lem}\label{lem:qinv-autohtpy}
+  若 $f:A\to B$ 满足 $\qinv (f)$ 可居留，则
+  \[\eqv{\qinv(f)}{\Parens{\prd{x:A}(x=x)}}.\]
+\end{lem}
+\begin{proof}
+  由假设，$f$ 是一个等价；也就是说，我们有 $e:\isequiv(f)$，从而 $(f,e):\eqv A B$。
+  由泛等可知，$\idtoeqv:(A=B) \to (\eqv A B)$ 是一个等价，因此可设 $(f,e)$ 形如某个 $p:A=B$ 的 $\idtoeqv(p)$。
+  然后由路径归纳，可设 $p$ 是 $\refl{A}$，此时 $f$ 就是 $\idfunc[A]$。
+  因此我们归约为证明 $\eqv{\qinv(\idfunc[A])}{(\prd{x:A}(x=x))}$。
+  现在按定义有
+  \[ \qinv(\idfunc[A]) \jdeq
+  \sm{g:A\to A} \big((g \htpy \idfunc[A]) \times (g \htpy \idfunc[A])\big).
+  \]
+  由函数外延性，这等价于
+  \[ \sm{g:A\to A} \big((g = \idfunc[A]) \times (g = \idfunc[A])\big).
+  \]
+  并且由 \cref{ex:sigma-assoc}，这又等价于
+  \[ \sm{h:\sm{g:A\to A} (g = \idfunc[A])} (\proj1(h) = \idfunc[A])
+  \]
+  然而，由 \cref{thm:contr-paths}，$\sm{g:A\to A} (g = \idfunc[A])$ 以 $(\idfunc[A],\refl{\idfunc[A]})$ 为中心可缩；因此由 \cref{thm:omit-contr} 该类型等价于 $\idfunc[A] = \idfunc[A]$。
+  再由函数外延性，$\idfunc[A] = \idfunc[A]$ 等价于 $\prd{x:A} x=x$。
+\end{proof}
+
+\noindent
+我们指出，\cref{ex:qinv-autohtpy-no-univalence} 要求给出上述引理的一个不使用泛等的证明。
+
+因此，我们需要某个 $A$，使得 $\prd{x:A}(x=x)$ 有一个非平凡元素。
+把 $A$ 看作一个高阶群胚时，$\prd{x:A}(x=x)$ 的一个居留元就是从 $A$ 的恒等函子到其自身的自然变换\index{natural!transformation}。
+这类变换被称为\define{范畴的中心}，
+\index{center!of a category}%
+\index{category!center of}%
+因为自然性公理要求它们与所有态射交换。
+在经典情形下，若 $A$ 只是被视为单对象群胚的一个群，那么这恰好给出通常群论意义下的中心。
+这为下面的结果提供了一些动机。
+
+\begin{lem}\label{lem:autohtpy}
+  设有类型 $A$，以及 $a:A$ 与 $q:a=a$，满足
+  \begin{enumerate}
+  \item 类型 $a=a$ 是一个集合。\label{item:autohtpy1}
+  \item 对任意 $x:A$，有 $\brck{a=x}$。\label{item:autohtpy2}
+  \item 对任意 $p:a=a$，有 $p\ct q = q \ct p$。\label{item:autohtpy3}
+  \end{enumerate}
+  则存在 $f:\prd{x:A} (x=x)$ 使得 $f(a)=q$。
+\end{lem}
+\begin{proof}
+  令 $g:\prd{x:A} \brck{a=x}$ 由~\ref{item:autohtpy2} 给出。首先我们
+  观察到每个类型 $\id[A]xy$ 都是集合。因为“是集合”是一个纯命题，
+  所以可以应用命题截断的归纳原理，并设 $g(x)=\bproj
+  p$ 且 $g(y)=\bproj{p'}$，其中 $p:a=x$ 且 $p':a=y$。在这种情形下，与
+  $p$ 及 $\opp{p'}$ 复合给出一个等价 $\eqv{(x=y)}{(a=a)}$。而 $(a=a)$ 由~\ref{item:autohtpy1} 是
+  集合，因此 $(x=y)$ 也是集合。
+
+  现在我们希望通过给每个 $x$ 指派路径 $\opp{g(x)}
+  \ct q \ct g(x)$ 来定义 $f$，但这行不通，因为 $g(x)$ 的类型不是 $a=x$
+  而是 $\brck{a=x}$，并且类型 $(x=x)$ 未必是纯命题，
+  因而不能对命题截断做归纳。于是我们改用
+  \cref{sec:unique-choice} 中提到的技巧：唯一地刻画我们
+  想构造的对象。对每个 $x:A$，定义类型
+  \[ B(x) \defeq \sm{r:x=x} \prd{s:a=x} (r = \opp s \ct q\ct s).\]
+  我们断言对每个 $x:A$，$B(x)$ 都是纯命题。
+  由于这个断言本身也是纯命题，我们可以再次对
+  截断做归纳，并设 $g(x) = \bproj p$，其中 $p:a=x$。
+  现在设 $(r,h)$ 和 $(r',h')$ 是 $B(x)$ 的两个元素；则有
+  \[ h(p) \ct \opp{h'(p)} : r = r'. \]
+  还需证明：沿此等式传送后，$h$ 与 $h'$ 被识别；这由恒等类型与函数类型中的传送（\cref{sec:compute-paths,sec:compute-pi}）可化简为证明
+  \[ h(s) = h(p) \ct \opp{h'(p)} \ct h'(s) \]
+  对任意 $s:a=x$ 成立。
+  但上式两边都是 $(x=x)$ 中元素之间的等式，因此由前面的观察可知 $(x=x)$ 是集合，从而成立。
+
+  因此，每个 $B(x)$ 都是纯命题；我们断言 $\prd{x:A} B(x)$。
+  给定 $x:A$，现在可调用命题截断的归纳原理，设 $g(x) = \bproj p$，其中 $p:a=x$。
+  定义 $r \defeq \opp p \ct q \ct p$；要构造 $B(x)$ 的元素，还需证明对任意 $s:a=x$ 都有
+  $r = \opp s \ct q \ct s$。
+  对路径进行变形后，这归约为证明 $q\ct (p\ct \opp s) = (p\ct \opp s) \ct q$。
+  而这正是~\ref{item:autohtpy3} 的一个实例。
+\end{proof}
+
+\begin{thm}\label{thm:qinv-notprop}
+  存在类型 $A$ 与 $B$ 以及函数 $f:A\to B$，使得 $\qinv(f)$ 不是纯命题。
+\end{thm}
+\begin{proof}
+  只需给出一个类型 $X$，使得 $\prd{x:X} (x=x)$ 不是纯命题。
+  定义 $X\defeq \sm{A:\type} \brck{\bool=A}$，如 \cref{thm:no-higher-ac} 的证明中那样。
+  只需构造一个 $f:\prd{x:X} (x=x)$，它不等于 $\lam{x} \refl{x}$。
+
+  令 $a \defeq (\bool,\bproj{\refl{\bool}}) : X$，并令 $q:a=a$ 为与非恒等等价 $e:\eqv\bool\bool$ 对应的路径，其中 $e(\bfalse)\defeq\btrue$ 且 $e(\btrue)\defeq\bfalse$。
+  我们希望应用 \cref{lem:autohtpy} 来构造 $f$。
+  由 $X$ 的定义、子集类型中的等式（\cref{subsec:prop-subsets}）以及泛等，可得 $\eqv{(a=a)}{(\eqv{\bool}{\bool})}$，后者是集合，因此~\ref{item:autohtpy1} 成立。
+  同理，由 $X$ 的定义与子集类型中的等式可得~\ref{item:autohtpy2}。
+  最后，\cref{ex:eqvboolbool} 蕴含每个等价 $\eqv\bool\bool$ 都等于 $\idfunc[\bool]$ 或 $e$，因此可通过四分情形分析证明~\ref{item:autohtpy3}。
+
+  于是我们得到 $f:\prd{x:X} (x=x)$ 且 $f(a) = q$。
+  由于 $e$ 不等于 $\idfunc[\bool]$，$q$ 不等于 $\refl{a}$，从而 $f$ 不等于 $\lam{x} \refl{x}$。
+  因此，$\prd{x:X} (x=x)$ 不是纯命题。
+\end{proof}
+
+更一般地，\cref{lem:autohtpy} 蕴含任何 ``Eilenberg--Mac Lane space'' $K(G,1)$，其中 $G$ 是非平凡阿贝尔\index{group!abelian}群，都可提供一个反例；见 \cref{cha:homotopy}。
+我们使用的类型 $X$ 事实上等价于 $K(\mathbb{Z}_2,1)$。
+在 \cref{cha:hits} 中我们将看到，圆周 $\Sn^1 = K(\mathbb{Z},1)$ 是另一个易于描述的例子。
+
+我们现在转向描述更好的等价概念。
+
+\index{quasi-inverse|)}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{半伴随等价}
+\label{sec:hae}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\index{equivalence!half adjoint|(defstyle}%
+\index{half adjoint equivalence|(defstyle}%
+\index{adjoint!equivalence!of types, half|(defstyle}%
+
+在 \cref{sec:quasi-inverses} 中，我们通过丢弃一个可缩类型，得出 $\qinv(f)$ 与 $\prd{x:A} (x=x)$ 等价。
+粗略地说，类型 $\qinv(f)$ 包含三份数据 $g$、$\eta$ 和 $\epsilon$，其中两份（$g$ 与 $\eta$）在 $f$ 为等价时可共同看作一个可缩类型。
+问题在于，移除这些数据后还会剩下一份（$\epsilon$）。
+为解决这个问题，思路是再加入一个\emph{额外的}数据，使其与 $\epsilon$ 一起形成一个可缩类型。
+
+\begin{defn}\label{defn:ishae}
+  函数 $f:A\to B$ 称为\define{半伴随等价}
+  ，如果存在 $g:B\to A$ 以及同伦 $\eta: g \circ f \htpy \idfunc[A]$ 与 $\epsilon:f \circ g \htpy \idfunc[B]$，并且存在同伦
+  \[\tau : \prd{x:A} \map{f}{\eta x} = \epsilon(fx).\]
+\end{defn}
+
+因此我们得到类型 $\ishae(f)$，定义为
+\begin{equation*}
+  \sm{g:B\to A}{\eta: g \circ f \htpy \idfunc[A]}{\epsilon:f \circ g \htpy \idfunc[B]} \prd{x:A} \map{f}{\eta x} = \epsilon(fx).
+\end{equation*}
+注意在上述定义中，关联 $\eta$ 与 $\epsilon$ 的相干\index{coherence}条件只涉及 $f$。
+我们也可以考虑一个涉及 $g$ 的类似相干条件：
+\[\upsilon : \prd{y:B} \map{g}{\epsilon y} = \eta(gy)\]
+以及相应的类似定义 $\ishae'(f)$。
+
+幸运的是，这两个条件各自都可推出另一个：
+
+\begin{lem}\label{lem:coh-equiv}
+对函数 $f : A \to B$、$g:B\to A$ 以及同伦 $\eta: g \circ f \htpy \idfunc[A]$ 与 $\epsilon:f \circ g \htpy \idfunc[B]$，下列条件在逻辑上等价：
+\begin{itemize}
+\item $\prd{x:A} \map{f}{\eta x} = \epsilon(fx)$
+\item $\prd{y:B} \map{g}{\epsilon y} = \eta(gy)$
+\end{itemize}
+\end{lem}
+\begin{proof}
+  只需证明一个方向；另一个方向可通过分别用 $B$、$g$、$\epsilon$ 替换 $A$、$f$、$\eta$ 得到。
+  设 $\tau : \prd{x:A}\;\map{f}{\eta x} = \epsilon(fx)$。
+  固定 $y : B$。
+  利用 $\epsilon$ 的自然性并施加 $g$，得到如下交换路径图：
+\[\uppercurveobject{{ }}\lowercurveobject{{ }}\twocellhead{{ }}
+  \xymatrix@C=3pc{gfgfgy \ar@{=}^-{gfg(\epsilon y)}[r] \ar@{=}_{g(\epsilon (fgy))}[d] & gfgy \ar@{=}^{g(\epsilon y)}[d] \\ gfgy \ar@{=}_{g(\epsilon y)}[r] & gy
+  }\]
+在图左侧使用 $\tau(gy)$，得到
+\[\uppercurveobject{{ }}\lowercurveobject{{ }}\twocellhead{{ }}
+  \xymatrix@C=3pc{gfgfgy \ar@{=}^-{gfg(\epsilon y)}[r] \ar@{=}_{gf(\eta (gy))}[d] & gfgy \ar@{=}^{g(\epsilon y)}[d] \\ gfgy \ar@{=}_{g(\epsilon y)}[r] & gy
+  }\]
+利用 $\eta$ 与 $g \circ f$ 的可交换性（\cref{cor:hom-fg}），有
+\[\uppercurveobject{{ }}\lowercurveobject{{ }}\twocellhead{{ }}
+  \xymatrix@C=3pc{gfgfgy \ar@{=}^-{gfg(\epsilon y)}[r] \ar@{=}_{\eta (gfgy)}[d] & gfgy \ar@{=}^{g(\epsilon y)}[d] \\ gfgy \ar@{=}_{g(\epsilon y)}[r] & gy
+  }\]
+然而，由 $\eta$ 的自然性，我们也有
+\[\uppercurveobject{{ }}\lowercurveobject{{ }}\twocellhead{{ }}
+  \xymatrix@C=3pc{gfgfgy \ar@{=}^-{gfg(\epsilon y)}[r] \ar@{=}_{\eta (gfgy)}[d] & gfgy \ar@{=}^{\eta(gy)}[d] \\ gfgy \ar@{=}_{g(\epsilon y)}[r] & gy
+  }\]
+因此，约去除右侧同伦之外的其余部分，得到所需的 $g(\epsilon y) = \eta(g y)$。
+\end{proof}
+
+不过，关键在于我们不能在 $\ishae (f)$ 的定义中\emph{同时}包含 $\tau$ 与 $\upsilon$（这也是“\emph{半}伴随等价”这一名称的由来）。
+若如此做，那么在约去可缩类型后仍会剩下一份数据 --- 除非我们再加入一个更高阶的相干条件。
+一般而言，我们预期在奇数个相干条件处截断时，才能得到性质良好的类型。
+
+当然，$\ishae(f) \to\qinv(f)$ 是显然的：只需忘掉相干数据。
+反方向则是同伦论与范畴论中的一个标准论证版本。
+
+\begin{thm}\label{thm:equiv-iso-adj}
+  对任意 $f:A\to B$，有 $\qinv(f)\to\ishae(f)$。
+\end{thm}
+\begin{proof}
+设 $(g,\eta,\epsilon)$ 是 $f$ 的一个拟逆。我们需要给出一个四元组 $(g',\eta',\epsilon',\tau)$ 来见证 $f$ 是半伴随等价。为定义 $g'$ 和 $\eta'$，可以直接做显然选择，即取 $g'
+\defeq g$ 且 $\eta'\defeq \eta$。但在定义 $\epsilon'$ 时，我们必须开始考虑 $\tau$ 的构造，因此不能直接顺手取 $\epsilon'=\epsilon$。我们改取
+\begin{equation*}
+\epsilon'(b) \defeq \opp{\epsilon(f(g(b)))}\ct (\ap{f}{\eta(g(b))}\ct \epsilon(b)).
+\end{equation*}
+现在我们需要构造
+\begin{equation*}
+\tau(a): \ap{f}{\eta(a)}=\opp{\epsilon(f(g(f(a))))}\ct (\ap{f}{\eta(g(f(a)))}\ct \epsilon(f(a))).
+\end{equation*}
+先注意由 \cref{cor:hom-fg}，我们有
+%$\eta(g(f(a)))\ct\eta(a)=\ap{g}{\ap{f}{\eta(a)}}\ct\eta(a)$ and hence it follows that
+$\eta(g(f(a)))=\ap{g}{\ap{f}{\eta(a)}}$。因此可应用
+\cref{lem:htpy-natural} 计算
+\begin{align*}
+\ap{f}{\eta(g(f(a)))}\ct \epsilon(f(a))
+& = \ap{f}{\ap{g}{\ap{f}{\eta(a)}}}\ct \epsilon(f(a))\\
+& = \epsilon(f(g(f(a))))\ct \ap{f}{\eta(a)}
+\end{align*}
+由此即可得到所需路径 $\tau(a)$。
+\end{proof}
+
+将其与 \cref{lem:coh-equiv} 结合（或将上述证明对称化），我们也有 $\qinv(f)\to\ishae'(f)$。
+
+还剩下要证明 $\ishae(f)$ 是纯命题。
+为此，我们需要知道等价的纤维是可缩的。
+
+\begin{defn}\label{defn:homotopy-fiber}
+  映射 $f:A\to B$ 在点 $y:B$ 上的\define{纤维}
+  \indexdef{fiber}%
+  \indexsee{function!fiber of}{fiber}%
+  定义为
+  \[ \hfib f y \defeq \sm{x:A} (f(x) = y).\]
+\end{defn}
+
+在同伦论中，这称为 $f$ 的\emph{同伦纤维}。
+\cref{sec:computational} 中关于路径的引理给出纤维中路径的如下刻画：
+
+\begin{lem}\label{lem:hfib}
+  对任意 $f : A \to B$、$y : B$ 与 $(x,p),(x',p') : \hfib{f}{y}$，有
+  \[ \big((x,p) = (x',p')\big) \eqvsym \Parens{\sm{\gamma : x = x'} f(\gamma) \ct p' = p} \qedhere\]
+\end{lem}
+
+\begin{thm}\label{thm:contr-hae}
+  若 $f:A\to B$ 是半伴随等价，则对任意 $y:B$，纤维 $\hfib f y$ 可缩。
+\end{thm}
+\begin{proof}
+  设 $(g,\eta,\epsilon,\tau) : \ishae(f)$，并固定 $y : B$。
+  作为 $\hfib{f}{y}$ 的收缩中心，我们取 $(gy, \epsilon y)$。
+  现在任取 $(x,p) : \hfib{f}{y}$；我们要构造一条从 $(gy, \epsilon y)$ 到 $(x,p)$ 的路径。
+  由 \cref{lem:hfib}，只需给出一条路径 $\gamma : \id{gy}{x}$，使得 $\ap f\gamma \ct p = \epsilon y$。
+  我们取 $\gamma \defeq \opp{g(p)} \ct \eta x$。
+  则有
+  \begin{align*}
+    f(\gamma) \ct p & = \opp{fg(p)} \ct f (\eta x) \ct p \\
+    & = \opp{fg(p)} \ct \epsilon(fx) \ct p \\
+    & = \epsilon y
+  \end{align*}
+  其中第二个等式由 $\tau x$ 得到，第三个等式来自 $\epsilon$ 的自然性。
+\end{proof}
+
+现在我们定义用于封装可缩数据对的类型。
+下面的类型把拟逆 $g$ 与同伦中的一个组合在一起。
+
+\begin{defn}\label{defn:linv-rinv}
+  给定函数 $f:A\to B$，定义类型
+    \begin{align*}
+      \linv(f) &\defeq \sm{g:B\to A} (g\circ f\htpy \idfunc[A])\\
+      \rinv(f) &\defeq \sm{g:B\to A} (f\circ g\htpy \idfunc[B])
+    \end{align*}
+  分别为 $f$ 的\define{左逆}
+  \indexdef{left!inverse}%
+  \indexdef{inverse!left}%
+  与\define{右逆}
+  \indexdef{right!inverse}%
+  \indexdef{inverse!right}%
+  。
+  若 $\linv(f)$ 可居留，我们称 $f$ \define{左可逆}
+  \indexdef{function!left invertible}%
+  \indexdef{function!right invertible}%
+  ；类似地，若 $\rinv(f)$ 可居留，则称其\define{右可逆}
+  \indexdef{left!invertible function}%
+  \indexdef{right!invertible function}%
+  。
+\end{defn}
+
+\begin{lem}\label{thm:equiv-compose-equiv}
+  若 $f:A\to B$ 有拟逆，则下列映射也有拟逆：
+  \begin{align*}
+    (f\circ \blank) &: (C\to A) \to (C\to B)\\
+    (\blank\circ f) &: (B\to C) \to (A\to C).
+  \end{align*}
+\end{lem}
+\begin{proof}
+  若 $g$ 是 $f$ 的拟逆，则 $(g\circ \blank)$ 与 $(\blank\circ g)$ 分别是 $(f\circ \blank)$ 与 $(\blank\circ f)$ 的拟逆。
+\end{proof}
+
+\begin{lem}\label{lem:inv-hprop}
+  若 $f : A \to B$ 有拟逆，则类型 $\rinv(f)$ 与 $\linv(f)$ 都可缩。
+\end{lem}
+\begin{proof}
+  由函数外延性，有
+  \[\eqv{\linv(f)}{\sm{g:B\to A} (g\circ f = \idfunc[A])}.\]
+  但这正是 $(\blank\circ f)$ 在 $\idfunc[A]$ 处的纤维，因此
+  由 \cref{thm:equiv-compose-equiv,thm:equiv-iso-adj,thm:contr-hae} 可知其可缩。
+  同理，$\rinv(f)$ 等价于 $(f\circ \blank)$ 在 $\idfunc[B]$ 处的纤维，因此也可缩。
+\end{proof}
+
+接下来我们定义把另一个同伦与额外相干数据组合在一起的类型。\index{coherence}%
+
+\begin{defn}\label{defn:lcoh-rcoh}
+对 $f : A \to B$、左逆 $(g,\eta) : \linv(f)$ 以及右逆 $(g,\epsilon) : \rinv(f)$，记
+\begin{align*}
+\lcoh{f}{g}{\eta} & \defeq \sm{\epsilon : f\circ g \htpy \idfunc[B]} \prd{y:B} g(\epsilon y) = \eta (gy), \\
+\rcoh{f}{g}{\epsilon} & \defeq \sm{\eta : g\circ f \htpy \idfunc[A]} \prd{x:A} f(\eta x) = \epsilon (fx).
+\end{align*}
+\end{defn}
+
+\begin{lem}\label{lem:coh-hfib}
+对任意 $f,g,\epsilon,\eta$，有
+\begin{align*}
+\lcoh{f}{g}{\eta} & \eqvsym {\prd{y:B} \id[\hfib{g}{gy}]{(fgy,\eta(gy))}{(y,\refl{gy})}}, \\
+\rcoh{f}{g}{\epsilon} & \eqvsym {\prd{x:A} \id[\hfib{f}{fx}]{(gfx,\epsilon(fx))}{(x,\refl{fx})}}.
+\end{align*}
+\end{lem}
+\begin{proof}
+使用 \cref{lem:hfib}。
+\end{proof}
+
+\begin{lem}\label{lem:coh-hprop}
+  若 $f$ 是半伴随等价，则对任意 $(g,\epsilon) : \rinv(f)$，类型 $\rcoh{f}{g}{\epsilon}$ 可缩。
+\end{lem}
+\begin{proof}
+  由 \cref{lem:coh-hfib} 以及依值函数类型保持可缩空间这一事实，只需证明对每个 $x:A$，类型 $\id[\hfib{f}{fx}]{(gfx,\epsilon(fx))}{(x,\refl{fx})}$ 可缩。
+  但由 \cref{thm:contr-hae}，$\hfib{f}{fx}$ 可缩，而可缩空间的任一路径空间本身也可缩。
+\end{proof}
+
+\begin{thm}\label{thm:hae-hprop}
+  对任意 $f : A \to B$，类型 $\ishae(f)$ 是纯命题。
+\end{thm}
+\begin{proof}
+  由 \cref{ex:prop-inhabcontr}，只需假设 $f$ 是半伴随等价并证明 $\ishae(f)$ 可缩。
+  现在由 $\Sigma$ 的结合律（\cref{ex:sigma-assoc}），类型 $\ishae(f)$ 等价于
+  \[\sm{u : \rinv(f)} \rcoh{f}{\proj{1}(u)}{\proj{2}(u)}.\]
+  而由 \cref{lem:inv-hprop,lem:coh-hprop} 以及 $\Sigma$ 保持可缩性可知，后者类型也可缩。
+\end{proof}
+
+因此，我们已经证明 $\ishae(f)$ 满足类型 $\isequiv(f)$ 所要求的三个条件。
+在接下来的两节中，我们将考察另外两种可能定义。
+
+\index{equivalence!half adjoint|)}%
+\index{half adjoint equivalence|)}%
+\index{adjoint!equivalence!of types, half|)}%
+
+\section{双可逆映射}
+\label{sec:biinv}
+
+\index{function!bi-invertible|(defstyle}%
+\index{bi-invertible function|(defstyle}%
+\index{equivalence!as bi-invertible function|(defstyle}%
+
+使用 \cref{sec:hae} 中引入的语言，我们可以将 \cref{sec:basics-equivalences} 中提出的定义重述如下。
+
+\begin{defn}\label{defn:biinv}
+  我们称 $f:A\to B$ 是\define{双可逆}
+  ，如果它同时有左逆和右逆：
+  \[ \biinv (f) \defeq \linv(f) \times \rinv(f). \]
+\end{defn}
+
+在 \cref{sec:basics-equivalences} 中我们已经证明 $\qinv(f)\to\biinv(f)$ 与 $\biinv(f)\to\qinv(f)$。
+剩下的是下面这一点。
+
+\begin{thm}\label{thm:isprop-biinv}
+  对任意 $f:A\to B$，类型 $\biinv(f)$ 是纯命题。
+\end{thm}
+\begin{proof}
+  我们可设 $f$ 是双可逆并证明 $\biinv(f)$ 可缩。
+  但由于 $\biinv(f)\to\qinv(f)$，由 \cref{lem:inv-hprop} 可知此时 $\linv(f)$ 与 $\rinv(f)$ 都可缩，而可缩类型的乘积仍可缩。
+\end{proof}
+
+注意这也契合 \cref{sec:hae} 开头提出的思路：把 $g$ 与 $\eta$ 组合成一个可缩类型，并再加入一份可与 $\epsilon$ 组合成可缩类型的额外数据。
+不同之处在于：我们不是加入一个与 $\epsilon$ 组合的\emph{更高阶}数据（二维路径），而是加入一个\emph{更低阶}数据（与左逆分离的右逆）。
+
+\begin{cor}\label{thm:equiv-biinv-isequiv}
+  对任意 $f:A\to B$，有 $\eqv{\biinv(f)}{\ishae(f)}$。
+\end{cor}
+\begin{proof}
+  我们有 $\biinv(f) \to \qinv(f) \to \ishae(f)$ 以及 $\ishae(f) \to \qinv(f) \to \biinv(f)$。
+  由于 $\ishae(f)$ 与 $\biinv(f)$ 都是纯命题，该等价由 \cref{lem:equiv-iff-hprop} 得出。
+\end{proof}
+
+\index{function!bi-invertible|)}%
+\index{bi-invertible function|)}%
+\index{equivalence!as bi-invertible function|)}%
+
+\section{可缩纤维}
+\label{sec:contrf}
+
+\index{function!contractible|(defstyle}%
+\index{contractible!function|(defstyle}%
+\index{equivalence!as contractible function|(defstyle}%
+
+注意，我们关于 $\ishae(f)$ 与 $\biinv(f)$ 的证明都本质地使用了一个事实：等价的纤维是可缩的。
+事实上，这个性质本身就构成了等价的一个充分定义。
+
+\begin{defn}[可缩映射] \label{defn:equivalence}
+  映射 $f:A\to B$ 称为\define{可缩的}
+  ，若对所有 $y:B$，纤维 $\hfib f y$ 都是可缩的。
+\end{defn}
+
+因此，类型 $\iscontr(f)$ 定义为
+\begin{align}
+  \iscontr(f) &\defeq \prd{y:B} \iscontr(\hfib f y)\label{eq:iscontrf}
+  % \\
+  % &\defeq \prd{y:B} \iscontr (\setof{x:A | f(x) = y}).
+\end{align}
+注意，在 \cref{sec:contractibility} 中我们定义了一个\emph{类型}是可缩的含义。
+这里我们定义的是一个\emph{映射}是可缩的含义。
+我们的术语遵循同伦论的一般做法：若一个映射的所有（同伦）纤维都具有某性质，就说该映射具有该性质。
+因此，类型 $A$ 可缩，当且仅当映射 $A\to\unit$ 可缩。
+从 \cref{cha:hlevels} 开始，我们也将可缩映射和可缩类型称为\emph{$(-2)$-截断}。
+
+我们已经在 \cref{thm:contr-hae} 中证明了 $\ishae(f) \to \iscontr(f)$。
+反过来：
+
+\begin{thm}\label{thm:lequiv-contr-hae}
+对任意 $f:A\to B$，有 ${\iscontr(f)} \to {\ishae(f)}$。
+\end{thm}
+\begin{proof}
+设 $P : \iscontr(f)$。我们定义一个逆向映射 $g : B \to A$：把每个 $y : B$ 送到在 $y$ 处纤维收缩中心的第一分量：
+\[ g(y) \defeq \proj{1}(\proj{1}(Py)). \]
+于是可定义同伦 $\epsilon$：把 $y$ 映到证明 $g(y)$ 的确属于 $y$ 处纤维的见证：
+\[ \epsilon(y) \defeq \proj{2}(\proj{1}(P y)). \]
+剩下的是定义 $\eta$ 与 $\tau$。这当然等价于给出一个 $\rcoh{f}{g}{\epsilon}$ 的元素。由 \cref{lem:coh-hfib}，这又等价于：对每个 $x:A$，在 $f$ 于 $fx$ 上的纤维中，给出一条从 $(gfx,\epsilon(fx))$ 到 $(x,\refl{fx})$ 的路径。但这很容易：任取 $x : A$，类型 $\hfib{f}{fx}$
+按假设是可缩的，因此这样的路径必然存在。我们可显式构造为
+\[\opp{\big(\proj{2}(P(fx))(gfx,\epsilon(fx))\big)} \ct \big(\proj{2}(P(fx)) (x,\refl{fx})\big). \qedhere \]
+\end{proof}
+
+还容易看出：
+
+\begin{lem}\label{thm:contr-hprop}
+  对任意 $f$，类型 $\iscontr(f)$ 是一个纯命题。
+\end{lem}
+\begin{proof}
+  由 \cref{thm:isprop-iscontr}，每个类型 $\iscontr (\hfib f y)$ 都是纯命题。
+  因此由 \cref{thm:isprop-forall}，~\eqref{eq:iscontrf} 也是纯命题。
+\end{proof}
+
+\begin{thm}\label{thm:equiv-contr-hae}
+  对任意 $f:A\to B$，有 $\eqv{\iscontr(f)}{\ishae(f)}$。
+\end{thm}
+\begin{proof}
+  我们已经建立了逻辑等价 ${\iscontr(f)} \Leftrightarrow {\ishae(f)}$，且二者都是纯命题（\cref{thm:contr-hprop,thm:hae-hprop}）。
+  因此可应用 \cref{lem:equiv-iff-hprop}。
+\end{proof}
+
+通常，我们通过给出一个拟逆来证明函数是等价，但有时这个定义更方便。
+例如，它意味着在证明一个函数为等价时，我们可以自由假设其余域是有居留的。
+
+\begin{cor}\label{thm:equiv-inhabcod}
+  若 $f:A\to B$ 满足 $B\to \isequiv(f)$，则 $f$ 是等价。
+\end{cor}
+\begin{proof}
+  要证明 $f$ 是等价，只需对任意 $y:B$ 证明 $\hfib f y$ 可缩。
+  但若 $e:B\to \isequiv(f)$，则对任意这样的 $y$ 都有 $e(y):\isequiv(f)$，从而 $f$ 是等价，故 $\hfib f y$ 可缩，得证。
+\end{proof}
+
+\index{function!contractible|)}%
+\index{contractible!function|)}%
+\index{equivalence!as contractible function|)}%
+
+\section{关于等价定义的说明}
+\label{sec:concluding-remarks}
+
+\indexdef{equivalence}
+我们已经证明，等价的三个定义都满足三个理想性质，并且两两等价：
+\[ \iscontr(f) \eqvsym \ishae(f) \eqvsym \biinv(f). \]
+（等价其实还有更多可能的定义，但我们在此止于这三个。
+更多内容见 \cref{ex:brck-qinv} 以及本章习题。）
+因此，我们可以从中任选一个作为 $\isequiv (f)$ 的“定义”。
+为明确起见，我们选择定义
+\[ \isequiv(f) \defeq \ishae(f).\]
+\index{mathematics!formalized}%
+这一选择有利于形式化，因为 $\ishae(f)$ 含有最直接有用的数据。
+另一方面，在其他目的下，$\biinv(f)$ 往往更易处理，因为它不包含二维路径，且其两个对称部分可以彼此独立地处理。
+不过对本书而言，具体选哪一个差别不大。
+
+在本章余下部分，我们研究等价的另外一些性质与刻画。
+\index{equivalence!properties of}%
+
+\section{满射与嵌入}
+\label{sec:mono-surj}
+
+\index{set}
+当 $A$ 和 $B$ 是集合且 $f:A\to B$ 是等价时，我们也称其为\define{同构}
+\indexdef{isomorphism!of sets}%
+或\define{双射}。
+\indexdef{bijection}%
+\indexsee{function!bijective}{bijection}%
+（对于不是集合的类型，我们避免使用这些词，因为在同伦论与高阶范畴论中，它们常常表示一种比同伦等价更严格的“相同性”概念。）
+在集合论中，函数是双射当且仅当它既是单射又是满射。
+在类型论中也同样如此，只要我们恰当地表述这些条件。
+为清晰起见，当处理不是集合的类型时，我们用\emph{嵌入}而不是单射。
+
+\begin{defn}\label{defn:surj-emb}
+  设 $f:A\to B$。
+  \begin{enumerate}
+  \item 我们称 $f$ 是\define{满射}
+    \indexsee{surjective!function}{function, surjective}%
+    \indexdef{function!surjective}%
+    （或称一个\define{满射映射}）
+    \indexsee{surjection}{function, surjective}%
+    ，如果对每个 $b:B$ 都有 $\brck{\hfib f b}$。
+  \item 我们称 $f$ 是一个\define{嵌入}
+    \indexdef{function!embedding}%
+    \indexsee{embedding}{function, embedding}%
+    ，如果对每个 $x,y:A$，函数 $\apfunc f : (\id[A]xy) \to (\id[B]{f(x)}{f(y)})$ 都是等价。
+  \end{enumerate}
+\end{defn}
+
+换言之，$f$ 是满射，当且仅当 $f$ 的每个纤维都只是有居留的；等价地说，对所有 $b:B$，仅仅存在 $a:A$ 使得 $f(a)=b$。
+用传统逻辑记号，$f$ 满射即 $\fall{b:B}\exis{a:A} (f(a)=b)$。
+这必须与更强的断言 $\prd{b:B}\sm{a:A} (f(a)=b)$ 区分开来；若后者成立，我们称 $f$ 为\define{可分裂满射}。
+\indexsee{split!surjection}{function, split surjective}%
+\indexsee{surjection!split}{function, split surjective}%
+\indexsee{surjective!function!split}{function, split surjective}%
+\indexdef{function!split surjective}%
+（由于后一个类型等价于 $\sm{g:B\to A}\prd{b:B} (f(g(b))=b)$，可分裂满射与 \cref{sec:contractibility} 中定义的\emph{退化}是同一回事。）
+\index{retraction}%
+\index{function!retraction}%
+
+\cref{sec:axiom-choice} 中的选择公理恰好断言：\emph{集合之间}的每个满射都是可分裂的。
+然而，在泛等公理存在时，\emph{所有}满射都可分裂这一命题就是错误的。
+在 \cref{thm:no-higher-ac} 中，我们构造了一个类型族 $Y:X\to \type$，使得 $\prd{x:X} \brck{Y(x)}$ 但 $\neg \prd{x:X} Y(x)$；
+对任意这样的类型族，第一投影 $(\sm{x:X} Y(x)) \to X$ 是一个不可分裂的满射。
+
+若 $A$ 和 $B$ 是集合，则由 \cref{lem:equiv-iff-hprop}，$f$ 是嵌入当且仅当
+\begin{equation}
+  \prd{x,y:A} (\id[B]{f(x)}{f(y)}) \to (\id[A]xy).\label{eq:injective}
+\end{equation}
+在这种情形下，我们称 $f$ 为\define{单射}，
+\indexsee{injective function}{function, injective}%
+\indexdef{function!injective}%
+或称一个\define{单射映射}。
+\indexsee{injection}{function, injective}%
+对于非集合类型我们避免使用这些词，因为它们可能被理解为~\eqref{eq:injective}，而这对非集合来说是一个性质不良的概念。
+还可以证明：集合之间的任意函数在适当意义下是\emph{满态射}当且仅当它是满射；但这对更一般的类型不成立，而满射性通常是更重要的概念。
+
+\begin{thm}\label{thm:mono-surj-equiv}
+  函数 $f:A\to B$ 是等价，当且仅当它既是满射又是嵌入。
+\end{thm}
+\begin{proof}
+  若 $f$ 是等价，则每个 $\hfib f b$ 都可缩，因此 $\brck{\hfib f b}$ 也可缩，从而 $f$ 是满射。
+  且我们已在 \cref{thm:paths-respects-equiv} 中证明任意等价都是嵌入。
+
+  反过来，设 $f$ 是满射且是嵌入。
+  取 $b:B$；我们证明 $\sm{x:A}(f(x)=b)$ 可缩。
+  因为 $f$ 满射，仅仅存在某个 $a:A$ 使得 $f(a)=b$。
+  因此，$f$ 在 $b$ 上的纤维有居留；剩下只需证明它是纯命题。
+  为此，设给定 $x,y:A$ 及 $p:f(x)=b$ 与 $q:f(y)=b$。
+  由于 $\apfunc f$ 是等价，存在 $r:x=y$ 使得 $\apfunc f (r) = p \ct \opp q$。
+  然而，利用 $\Sigma$-类型中路径的刻画，后一个等式可改写为 $\trans{r}{p} = q$。
+  因此，连同 $r$ 一起，它给出了在 $f$ 于 $b$ 上的纤维中 $(x,p) = (y,q)$。
+\end{proof}
+
+\begin{cor}
+  对任意 $f:A\to B$，有
+  \[ \isequiv(f) \eqvsym (\mathsf{isEmbedding}(f) \times \mathsf{isSurjective}(f)).\]
+\end{cor}
+\begin{proof}
+  满射性与嵌入性都是纯命题；现在应用 \cref{lem:equiv-iff-hprop}。
+\end{proof}
+
+当然，这不能作为“等价”的定义，因为嵌入的定义本身引用了等价。
+不过，这一刻画仍然有用；见 \cref{sec:whitehead}。
+我们将在 \cref{cha:hlevels} 中将其推广。
+
+
+% \section{Fiberwise equivalences}
+\section{等价的封闭性质}
+\label{sec:equiv-closures}
+\label{sec:fiberwise-equivalences}
+\index{equivalence!properties of}%
+
+
+% We end this chapter by observing some important closure properties of equivalences.
+我们以观察等价的一些重要封闭性质来结束本章。
+我们已经在 \cref{thm:equiv-eqrel} 中看到，等价在复合下封闭。
+此外，我们还有：
+
+\begin{thm}[2-out-of-3 性质]\label{thm:two-out-of-three}
+  \index{2-out-of-3 property}%
+  设 $f:A\to B$ 且 $g:B\to C$。
+  若 $f$、$g$ 与 $g\circ f$ 中任意两个是等价，则第三个也是等价。
+\end{thm}
+\begin{proof}
+  若 $g\circ f$ 与 $g$ 是等价，则 $\opp{(g\circ f)} \circ g$ 是 $f$ 的一个拟逆。
+  一方面有 $\opp{(g\circ f)} \circ g \circ f \htpy \idfunc[A]$，另一方面有
+  \begin{align*}
+    f \circ \opp{(g\circ f)} \circ g
+    &\htpy \opp g \circ g \circ f \circ \opp{(g\circ f)} \circ g\\
+    &\htpy \opp g \circ g\\
+    &\htpy \idfunc[B].
+  \end{align*}
+  类似地，若 $g\circ f$ 与 $f$ 是等价，则 $f\circ \opp{(g\circ f)}$ 是 $g$ 的一个拟逆。
+\end{proof}
+
+这是同伦论中关于等价的一个标准封闭条件。
+另一个众所周知的事实是，它们对缩回也封闭，其含义如下。
+
+\index{retract!of a function|(defstyle}%
+
+\begin{defn}\label{defn:retract}
+函数 $g:A\to B$ 称为一个 \define{缩回}（相对于函数 $f:X\to Y$），如果存在图表
+\begin{equation*}
+  \xymatrix{
+    {A} \ar[r]^{s} \ar[d]_{g}
+    &
+    {X} \ar[r]^{r} \ar[d]_{f}
+    &
+    {A} \ar[d]^{g}
+    \\
+    {B} \ar[r]_{s'}
+    &
+    {Y} \ar[r]_{r'}
+    &
+    {B}
+  }
+\end{equation*}
+并且满足
+\begin{enumerate}
+\item 同伦 $R:r\circ s \htpy \idfunc[A]$。
+\item 同伦 $R':r'\circ s' \htpy\idfunc[B]$。
+\item 同伦 $L:f\circ s\htpy s'\circ g$。
+\item 同伦 $K:g\circ r\htpy r'\circ f$。
+\item 对每个 $a:A$，存在路径 $H(a)$ 见证下方方块可交换：
+\begin{equation*}
+  \xymatrix@C=3pc{
+    {g(r(s(a)))} \ar@{=}[r]^-{K(s(a))} \ar@{=}[d]_{\ap g{R(a)}}
+    &
+    {r'(f(s(a)))} \ar@{=}[d]^{\ap{r'}{L(a)}}
+    \\
+    {g(a)} \ar@{=}[r]_-{\opp{R'(g(a))}}
+    &
+    {r'(s'(g(a)))}
+  }
+\end{equation*}
+\end{enumerate}
+\end{defn}
+
+回忆在 \cref{sec:contractibility} 中我们定义了一个类型是另一个类型的缩回的含义。
+这是上述定义在 $B$ 与 $Y$ 都是 $\unit$ 时的特例。
+反过来，就像可缩性那样，映射的缩回会诱导其纤维的缩回。
+
+\begin{lem}\label{lem:func_retract_to_fiber_retract}
+若函数 $g:A\to B$ 是函数 $f:X\to Y$ 的缩回，则对每个 $b:B$，$\hfib{g}b$ 是 $\hfib{f}{s'(b)}$
+的缩回，其中 $s':B\to Y$ 如 \cref{defn:retract} 所示。
+\end{lem}
+
+\begin{proof}
+设 $g:A\to B$ 是 $f:X\to Y$ 的缩回。则对任意 $b:B$，有函数
+\begin{align*}
+\varphi_b &: \hfiber{g}b\to\hfib{f}{s'(b)}, &
+\varphi_b(a,p) & \defeq \pairr{s(a),L(a)\ct s'(p)},\\
+\psi_b &: \hfib{f}{s'(b)}\to\hfib{g}b, &
+\psi_b(x,q) &\defeq \pairr{r(x),K(x)\ct r'(q)\ct R'(b)}.
+\end{align*}
+于是有 $\psi_b(\varphi_b({a,p}))\equiv\pairr{r(s(a)),K(s(a))\ct r'(L(a)\ct s'(p))\ct R'(b)}$。
+我们声称对所有 $b:B$，$\psi_b$ 以 $\varphi_b$ 为截面构成缩回，也即对所有 $(a,p):\hfib g b$ 有 $\psi_b(\varphi_b({a,p}))= \pairr{a,p}$。
+换句话说，我们要证明
+\begin{equation*}
+\prd{b:B}{a:A}{p:g(a)=b} \psi_b(\varphi_b({a,p}))= \pairr{a,p}.
+\end{equation*}
+通过交换前两个 $\Pi$ 并应用 \cref{thm:omit-contr} 的一个版本，这等价于
+\begin{equation*}
+\prd{a:A}\psi_{g(a)}(\varphi_{g(a)}({a,\refl{g(a)}}))=\pairr{a,\refl{g(a)}}.
+\end{equation*}
+对任意 $a$，由 \cref{thm:path-sigma}，这一对偶的相等等价于一对相等式。第一分量由 $R(a):r(s(a))= a$ 相等，因此只需证明
+\begin{equation*}
+\trans{R(a)}{K(s(a))\ct r'(L(a))\ct R'(g(a))} = \refl{g(a)}.
+\end{equation*}
+而该传送可计算为 $\opp{g(R(a))}\ct K(s(a))\ct r'(L(a))\ct R'(g(a))$，故所需路径由 $H(a)$ 给出。
+\end{proof}
+
+\begin{thm}\label{thm:retract-equiv}
+  若 $g$ 是一个等价 $f$ 的缩回，则 $g$ 也是等价。
+\end{thm}
+\begin{proof}
+  由 \cref{lem:func_retract_to_fiber_retract}，$g$ 的每个纤维都是 $f$ 的某个纤维的缩回。
+  因此由 \cref{thm:retract-contr}，若后者全都可缩，则前者也全都可缩。
+\end{proof}
+
+\index{retract!of a function|)}%
+
+\index{fibration}%
+\index{total!space}%
+最后，我们说明逐纤维等价可由全空间的等价来刻画。
+为解释术语，回忆 \cref{sec:fibrations}：类型族 $P:A\to\type$ 可看作 $A$ 上的一个纤维化，其全空间是 $\sm{x:A} P(x)$，该纤维化即投影 $\proj1:\sm{x:A} P(x) \to A$。
+从这个观点看，给定两个类型族 $P,Q:A\to\type$，我们可将函数 $f:\prd{x:A} (P(x)\to Q(x))$ 称为 \define{逐纤维映射} 或 \define{逐纤维变换}。
+\indexsee{transformation!fiberwise}{fiberwise transformation}%
+\indexsee{function!fiberwise}{fiberwise transformation}%
+\index{fiberwise!transformation|(defstyle}%
+\indexsee{fiberwise!map}{fiberwise transformation}%
+\indexsee{map!fiberwise}{fiberwise transformation}
+这样的映射诱导全空间上的函数：
+
+\begin{defn}\label{defn:total-map}
+  给定类型族 $P,Q:A\to\type$ 及映射 $f:\prd{x:A} P(x)\to Q(x)$，定义
+  \begin{equation*}
+    \total f  \defeq \lam{w}\pairr{\proj{1}w,f(\proj{1}w,\proj{2}w)} : \sm{x:A}P(x)\to\sm{x:A}Q(x).
+  \end{equation*}
+\end{defn}
+
+\begin{thm}\label{fibwise-fiber-total-fiber-equiv}
+设 $f$ 是类型 $A$ 上类型族 $P$ 与
+$Q$ 之间的一个逐纤维变换，取 $x:A$ 与 $v:Q(x)$。则有等价
+\begin{equation*}
+\eqv{\hfib{\total{f}}{\pairr{x,v}}}{\hfib{f(x)}{v}}.
+\end{equation*}
+\end{thm}
+\begin{proof}
+  我们计算：
+\begin{align}
+  \hfib{\total{f}}{\pairr{x,v}}
+  & \jdeq \sm{w:\sm{x:A}P(x)}\pairr{\proj{1}w,f(\proj{1}w,\proj{2}w)}=\pairr{x,v}
+  \notag \\
+  & \eqv{}{} \sm{a:A}{u:P(a)}\pairr{a,f(a,u)}=\pairr{x,v}
+  \tag{by~\cref{ex:sigma-assoc}} \\
+  & \eqv{}{} \sm{a:A}{u:P(a)}{p:a=x}\trans{p}{f(a,u)}=v
+  \tag{by \cref{thm:path-sigma}} \\
+  & \eqv{}{} \sm{a:A}{p:a=x}{u:P(a)}\trans{p}{f(a,u)}=v
+  \notag \\
+  & \eqv{}{} \sm{u:P(x)}f(x,u)=v
+  \tag{$*$}\label{eq:uses-sum-over-paths} \\
+  & \jdeq \hfib{f(x)}{v}. \notag
+\end{align}
+等价~\eqref{eq:uses-sum-over-paths} 由 \cref{thm:omit-contr,thm:contr-paths,ex:sigma-assoc} 推得。
+\end{proof}
+
+我们称逐纤维变换 $f:\prd{x:A} P(x)\to Q(x)$ 为一个 \define{逐纤维等价}%
+\indexdef{fiberwise!equivalence}%
+\indexdef{equivalence!fiberwise}
+若每个 $f(x):P(x) \to Q(x)$ 都是等价。
+
+\begin{thm}\label{thm:total-fiber-equiv}
+设 $f$ 是类型
+$A$ 上类型族 $P$ 与 $Q$ 之间的逐纤维变换。
+则 $f$ 是逐纤维等价，当且仅当 $\total{f}$ 是等价。
+\end{thm}
+
+\begin{proof}
+设 $f$、$P$、$Q$、$A$ 如定理陈述。
+由 \cref{fibwise-fiber-total-fiber-equiv}，对所有
+$x:A$ 与 $v:Q(x)$，
+$\hfib{\total{f}}{\pairr{x,v}}$ 可缩当且仅当
+$\hfib{f(x)}{v}$ 可缩。
+因此，$\hfib{\total{f}}{w}$ 对所有 $w:\sm{x:A}Q(x)$ 都可缩，当且仅当 $\hfib{f(x)}{v}$ 对所有 $x:A$ 与 $v:Q(x)$ 都可缩。
+\end{proof}
+
+\index{fiberwise!transformation|)}%
+\section{对象分类子}
+\label{sec:object-classification}
+
+在类型论中，我们有一个关于\emph{类型族}的基本概念，即函数 $B:A\to\type$。
+我们已经看到，这样的类型族在某种程度上类似同伦论中的\emph{纤维化}，其中纤维化是投影 $\proj1:\sm{a:A} B(a) \to A$。
+同伦论中的一个基本事实是，每个映射都等价于一个纤维化。
+在泛等可用的情况下，我们也能在类型论中证明同样的结论。
+
+\begin{lem}\label{thm:fiber-of-a-fibration}
+  对任意类型族 $B:A\to\type$，$\proj1:\sm{x:A} B(x) \to A$ 在 $a:A$ 上的纤维与 $B(a)$ 等价：
+  \[ \eqv{\hfib{\proj1}{a}}{B(a)} \]
+\end{lem}
+\begin{proof}
+  我们有
+  \begin{align*}
+    \hfib{\proj1}{a} &\defeq \sm{u:\sm{x:A} B(x)} \proj1(u)=a\\
+    &\eqvsym \sm{x:A}{b:B(x)} (x=a)\\
+    &\eqvsym \sm{x:A}{p:x=a} B(x)\\
+    &\eqvsym B(a)
+  \end{align*}
+  这里使用了恒等类型的左泛性质。
+\end{proof}
+
+\begin{lem}\label{thm:total-space-of-the-fibers}
+  对任意函数 $f:A\to B$，有 $\eqv{A}{\sm{b:B}\hfib{f}{b}}$。
+\end{lem}
+\begin{proof}
+  我们有
+  \begin{align*}
+    \sm{b:B}\hfib{f}{b} &\defeq \sm{b:B}{a:A} (f(a)=b)\\
+    &\eqvsym \sm{a:A}{b:B} (f(a)=b)\\
+    &\eqvsym A
+  \end{align*}
+  这里使用了 $\sm{b:B} (f(a)=b)$ 可缩这一事实。
+\end{proof}
+
+\begin{thm}\label{thm:nobject-classifier-appetizer}
+对任意类型 $B$，存在一个等价
+\begin{equation*}
+\chi:\Parens{\sm{A:\type} (A\to B)}\eqvsym (B\to\type).
+\end{equation*}
+\end{thm}
+\begin{proof}
+我们要构造拟逆
+\begin{align*}
+\chi & : \Parens{\sm{A:\type} (A\to B)}\to B\to\type\\
+\psi & : (B\to\type)\to\Parens{\sm{A:\type} (A\to B)}.
+\end{align*}
+定义 $\chi$ 为 $\chi((A,f),b)\defeq\hfiber{f}b$，定义 $\psi$ 为 $\psi(P)\defeq\Pairr{(\sm{b:B} P(b)),\proj1}$。
+现在需验证 $\chi\circ\psi\htpy\idfunc{}$ 以及 $\psi\circ\chi \htpy\idfunc{}$。
+\begin{enumerate}
+\item 设 $P:B\to\type$。
+  由 \cref{thm:fiber-of-a-fibration}，
+对任意 $b:B$，$\hfiber{\proj1}{b}\eqvsym P(b)$，因此立刻得到
+$P\htpy\chi(\psi(P))$。
+\item 设 $f:A\to B$ 是一个函数。我们需要找一条路径
+\begin{equation*}
+\Pairr{\tsm{b:B} \hfiber{f}b,\,\proj1}=\pairr{A,f}.
+\end{equation*}
+先注意由 \cref{thm:total-space-of-the-fibers}，我们有
+$e:\sm{b:B} \hfiber{f}b\eqvsym A$，其中 $e(b,a,p)\defeq a$ 且 $e^{-1}(a)
+\defeq(f(a),a,\refl{f(a)})$。
+由 \cref{thm:path-sigma}，只需再证 $\trans{(\ua(e))}{\proj1} = f$。
+但由泛等的计算规则和~\eqref{eq:transport-arrow}，有 $\trans{(\ua(e))}{\proj1} = \proj1\circ e^{-1}$，而 $e^{-1}$ 的定义立刻给出 $\proj1 \circ e^{-1} \jdeq f$。\qedhere
+\end{enumerate}
+\end{proof}
+
+\noindent
+\indexdef{object!classifier}%
+\indexdef{classifier!object}%
+\index{.infinity1-topos@$(\infty,1)$-topos}%
+特别地，这说明我们在高阶拓扑斯理论的意义下拥有一个\emph{对象分类子}。
+回忆 \cref{def:pointedtype}，$\pointed\type$ 表示带点类型的类型 $\sm{A:\type} A$。
+
+\begin{thm}\label{thm:object-classifier}
+设 $f:A\to B$ 是一个函数。则图表
+\begin{equation*}
+  \vcenter{\xymatrix{
+      A\ar[r]^-{\vartheta_f} \ar[d]_{f} &
+      \pointed{\type}\ar[d]^{\proj1}\\
+      B\ar[r]_{\chi_f} &
+      \type
+      }}
+\end{equation*}
+是一个拉回\index{pullback}方块（见 \cref{ex:pullback}）。
+这里函数 $\vartheta_f$ 定义为
+\begin{equation*}
+ \lam{a} \pairr{\hfiber{f}{f(a)},\pairr{a,\refl{f(a)}}}.
+\end{equation*}
+\end{thm}
+\begin{proof}
+注意我们有等价
+\begin{align*}
+A & \eqvsym \sm{b:B} \hfiber{f}b\\
+& \eqvsym \sm{b:B}{X:\type}{p:\hfiber{f}b= X} X\\
+& \eqvsym \sm{b:B}{X:\type}{x:X} \hfiber{f}b= X\\
+& \eqvsym \sm{b:B}{Y:\pointed{\type}} \hfiber{f}b = \proj1 Y\\
+& \jdeq B\times_{\type}\pointed{\type}
+\end{align*}
+这给出一个复合等价 $e:A\eqvsym B\times_\type\pointed{\type}$。
+我们可以逐步写出这个复合等价的作用：
+\begin{align*}
+a & \mapsto \pairr{f(a),\; \pairr{a,\refl{f(a)}}}\\
+& \mapsto \pairr{f(a), \; \hfiber{f}{f(a)}, \; \refl{\hfiber{f}{f(a)}}, \; \pairr{a,\refl{f(a)}}}\\
+& \mapsto \pairr{f(a), \; \hfiber{f}{f(a)}, \; \pairr{a,\refl{f(a)}}, \; \refl{\hfiber{f}{f(a)}}}\\
+& \mapsto \pairr{f(a), \; \pairr{\hfiber{f}{f(a)}, \; \pairr{a,\refl{f(a)}}}, \; \refl{\hfiber{f}{f(a)}}}.
+\end{align*}
+因此我们得到同伦 $f\htpy\proj1\circ e$ 以及 $\vartheta_f\htpy \proj2\circ e$。
+\end{proof}
+
+
+\section{泛等蕴含函数外延性}
+\label{sec:univalence-implies-funext}
+
+\index{function extensionality!proof from univalence}%
+在本章最后一节，我们给出一个证明：泛等公理蕴含函数
+外延性。因此，本节在工作时\emph{不}假设函数外延公理。
+证明分两步。首先，我们在 \cref{uatowfe} 中证明泛等
+公理蕴含函数外延性的一个弱形式，该弱形式见下方 \cref{weakfunext}。这个弱函数外延性原理进而蕴含通常的函数外延性，
+并且这一点不需要泛等公理（\cref{wfetofe}）。
+
+\index{univalence axiom}%
+设 $\type$ 是一个宇宙；我们会明确指出何处假设它是泛等的。
+
+\begin{defn}\label{weakfunext}
+\define{弱函数外延性原理}
+\indexdef{function extensionality!weak}%
+断言存在一个函数
+\begin{equation*}
+\Parens{\prd{x:A}\iscontr(P(x))} \to\iscontr\Parens{\prd{x:A}P(x)}
+\end{equation*}
+对任意类型 $A$ 上的任意类型族 $P:A\to\type$。
+\end{defn}
+
+下面这个引理在使用函数外延性时很容易证明；这里的要点是，即使不额外假设函数外延性，它也可由泛等推出。
+
+\begin{lem} \label{UA-eqv-hom-eqv}
+假设 $\type$ 是泛等的。对任意 $A,B,X:\type$ 及任意 $e:\eqv{A}{B}$，存在一个等价
+\begin{equation*}
+\eqv{(X\to A)}{(X\to B)}
+\end{equation*}
+其底层映射由与 $e$ 的底层函数作后复合给出。
+\end{lem}
+
+\begin{proof}
+  % Immediate by induction on $\eqv{}{}$ (see \cref{thm:equiv-induction}).
+  如同 \cref{lem:qinv-autohtpy} 的证明，我们可设 $e = \idtoeqv(p)$，其中 $p:A=B$。
+  再由路径归纳，可设 $p$ 是 $\refl{A}$，从而 $e = \idfunc[A]$。
+  但此时与 $e$ 后复合就是恒等映射，因此是等价。
+\end{proof}
+
+\begin{cor}\label{contrfamtotalpostcompequiv}
+设 $P:A\to\type$ 是一个由可缩类型组成的类型族，即\ \narrowequation{\prd{x:A}\iscontr(P(x)).}
+则投影 $\proj{1}:(\sm{x:A}P(x))\to A$ 是等价。若再假设 $\type$ 是泛等的，立刻得到与 $\proj{1}$ 后复合给出的等价
+\begin{equation*}
+\alpha : \eqv{\Parens{A\to\sm{x:A}P(x)}}{(A\to A)}.
+\end{equation*}
+\end{cor}
+
+\begin{proof}
+  由 \cref{thm:fiber-of-a-fibration}，对 $\proj{1}:(\sm{x:A}P(x))\to A$ 与任意 $x:A$，有等价
+  \begin{equation*}
+    \eqv{\hfiber{\proj{1}}{x}}{P(x)}.
+  \end{equation*}
+  因此当每个 $P(x)$ 都可缩时，$\proj{1}$ 是等价。该断言随后由 \cref{UA-eqv-hom-eqv} 得出。
+\end{proof}
+
+特别地，上述等价在 $\idfunc[A]$ 处的同伦纤维是可缩的。因此，我们只需证明依值函数类型 $\prd{x:A}P(x)$ 是 $\hfiber{\alpha}{\idfunc[A]}$ 的一个缩回，就能证明泛等蕴含弱函数外延性。
+
+\begin{thm}\label{uatowfe}
+在一个泛等宇宙 $\type$ 中，设 $P:A\to\type$ 是由可缩类型组成的类型族，
+并令 $\alpha$ 为 \cref{contrfamtotalpostcompequiv} 中的函数。
+则 $\prd{x:A}P(x)$ 是 $\hfiber{\alpha}{\idfunc[A]}$ 的一个缩回。因此，$\prd{x:A}P(x)$ 可缩。
+换言之，泛等公理蕴含弱函数外延性原理。
+\end{thm}
+
+\begin{proof}
+定义函数
+\begin{align*}
+  \varphi &: (\tprd{x:A}P(x))\to\hfiber{\alpha}{\idfunc[A]},\\
+  \varphi(f) &\defeq (\lam{x} (x,f(x)),\refl{\idfunc[A]}),
+\intertext{以及}
+  \psi &: \hfiber{\alpha}{\idfunc[A]}\to \tprd{x:A}P(x), \\
+  \psi(g,p) &\defeq \lam{x} \trans {\happly (p,x)}{\proj{2} (g(x))}.
+\end{align*}
+于是 $\psi(\varphi(f))=\lam{x} f(x)$，由依值函数类型的唯一性原理，这就是 $f$。
+\end{proof}
+
+下面我们证明：弱函数外延性蕴含通常的函数外延性。
+回忆~\eqref{eq:happly} 中的函数 $\happly (f,g) : (f = g)\to(f\htpy g)$，它将函数相等转换为同伦。在下面的证明中，不使用泛等
+公理。
+
+\begin{thm}\label{wfetofe}
+  \index{function extensionality}%
+弱函数外延性蕴含函数外延性 \cref{axiom:funext}。
+\end{thm}
+
+\begin{proof}
+我们要证明
+\begin{equation*}
+\prd{A:\type}{P:A\to\type}{f,g:\prd{x:A}P(x)}\isequiv(\happly (f,g)).
+\end{equation*}
+由 \cref{thm:total-fiber-equiv}，逐纤维映射诱导全空间等价当且仅当它逐纤维上是等价，因此只需证明下面这个类型的函数是等价：
+\begin{equation*}
+\Parens{\sm{g:\prd{x:A}P(x)}(f= g)} \to \sm{g:\prd{x:A}P(x)}(f\htpy g)
+\end{equation*}
+它由 $\lam{g:\prd{x:A}P(x)} \happly (f,g)$ 诱导。
+由于左侧类型由 \cref{thm:contr-paths} 可知是可缩的，只需证明右侧类型：
+\begin{equation}\label{eq:uatofesp}
+\sm{g:\prd{x:A}P(x)}\prd{x:A}f(x)= g(x)
+\end{equation}
+是可缩的。
+现在 \cref{thm:ttac} 说明它与
+\begin{equation}\label{eq:uatofeps}
+\prd{x:A}\sm{u:P(x)}f(x)= u.
+\end{equation}
+等价。
+\cref{thm:ttac} 的证明使用了函数外延性，但只用于其中一个复合。
+因此，在不假设函数外延性的情况下，我们仍可得出：~\eqref{eq:uatofesp} 是一个缩回\index{retract!of a type}，对应于~\eqref{eq:uatofeps}。
+而~\eqref{eq:uatofeps} 是可缩类型的乘积，由弱函数外延性原理可知可缩；于是~\eqref{eq:uatofesp} 也可缩。
+\end{proof}
+
+\sectionNotes
+
+连续映射连同拟逆所构成的空间具有错误同伦类型，因此不能作为“同伦等价空间”，这是代数拓扑中的已知事实。
+在该语境下，“同伦等价空间” $(\eqv AB)$ 通常仅定义为函数空间 $(A\to B)$ 中由同伦等价函数组成的子空间。
+在类型论中，这最接近于 $\sm{f:A\to B} \brck{\qinv(f)}$；见 \cref{ex:brck-qinv}。
+
+同伦类型论中最早给出的等价定义是我们称作 $\iscontr(f)$ 的定义，它由 Voevodsky 提出。
+之后，其他定义的可能性被多位研究者观察到。
+关于伴随等价\index{adjoint!equivalence}的基本定理，如 \cref{lem:coh-equiv,thm:equiv-iso-adj}，是高阶范畴论与同伦论中标准事实的改写。
+将双可逆性作为等价定义是 Andr\'e Joyal 的建议。
+
+\cref{sec:mono-surj,sec:equiv-closures} 中讨论的等价性质在同伦论中是众所周知的。
+其中多数最早由 Voevodsky 在类型论中证明。
+
+“每个函数都等价于某个纤维化”是同伦论中的标准事实。
+对象分类子
+\index{object!classifier}%
+\index{classifier!object}%
+在 $(\infty,1)$-范畴
+\index{.infinity1-category@$(\infty,1)$-category}%
+理论中的概念（\cref{thm:nobject-classifier-appetizer} 的范畴对应物）归功于 Rezk（见~\cite{Rezk05,lurie:higher-topoi}）。
+
+最后，泛等蕴含函数外延性（\cref{sec:univalence-implies-funext}）这一事实归功于 Voevodsky。
+我们的证明是其证明的一个简化版本。
+\cref{ex:funext-from-nondep} 也归功于 Voevodsky。
+
+\sectionExercises
+
+\begin{ex}\label{ex:two-sided-adjoint-equivalences}
+  考虑“二侧伴随等价\index{adjoint!equivalence}数据”在 $f:A\to B$ 情形下的类型：
+  \begin{narrowmultline*}
+    \sm{g:B\to A}{\eta: g \circ f \htpy \idfunc[A]}{\epsilon:f \circ g \htpy \idfunc[B]}
+    \narrowbreak
+    \Parens{\prd{x:A} \map{f}{\eta x} = \epsilon(fx)} \times
+    \Parens{\prd{y:B} \map{g}{\epsilon y} = \eta(gy) }.
+  \end{narrowmultline*}
+  由 \cref{lem:coh-equiv}，我们知道若 $f$ 是等价，则该类型可居留。
+  给出一个与 \cref{lem:qinv-autohtpy} 类似的该类型刻画。
+
+  你能否给出一个例子，说明该类型一般并非纯命题？
+  （这在 \cref{cha:hits} 之后会更容易。）
+\end{ex}
+
+\begin{ex}\label{ex:symmetric-equiv}
+  证明对任意 $A,B:\UU$，下述类型与 $\eqv A B$ 等价。
+  \begin{equation*}
+    \sm{R:A\to B\to \type}
+    \Parens{\prd{a:A} \iscontr\Parens{\sm{b:B} R(a,b)}} \times
+    \Parens{\prd{b:B} \iscontr\Parens{\sm{a:A} R(a,b)}}.
+  \end{equation*}
+  你能否从中提炼出一个满足 $\isequiv(f)$ 三条要求的类型定义？
+\end{ex}
+
+\begin{ex} \label{ex:qinv-autohtpy-no-univalence}
+  在不使用泛等的前提下，重述 \cref{lem:qinv-autohtpy} 的证明。
+\end{ex}
+
+\begin{ex}[不稳定八面体公理]\label{ex:unstable-octahedron}
+  \index{axiom!unstable octahedral}%
+  \index{octahedral axiom, unstable}%
+  设 $f:A\to B$、$g:B\to C$ 且 $b:B$。
+  \begin{enumerate}
+  \item 证明存在一个自然映射 $\hfib{g\circ f}{g(b)} \to \hfib{g}{g(b)}$，其在 $(b,\refl{g(b)})$ 上的纤维与 $\hfib f b$ 等价。
+  \item 证明 $\eqv{\hfib{g\circ f}{c}}{\sm{w:\hfib{g}{c}} \hfib f {\proj1 w}}$。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:2-out-of-6}
+  \index{2-out-of-6 property}%
+  证明等价满足 \emph{2-out-of-6 性质}：给定 $f:A\to B$、$g:B\to C$、$h:C\to D$，若 $g\circ f$ 与 $h\circ g$ 是等价，则 $f$、$g$、$h$ 及 $h\circ g\circ f$ 也都是等价。
+  利用该性质给出 \cref{thm:paths-respects-equiv} 的一个更高层次证明。
+\end{ex}
+
+\begin{ex}\label{ex:qinv-univalence}
+  对 $A,B:\UU$，定义
+  \[ \mathsf{idtoqinv}_{A,B} :(A=B) \to \sm{f:A\to B}\qinv(f) \]
+  以显然方式按路径归纳给出。
+  令 \textbf{\textsf{qinv}-univalence} 表示泛等公理的一个改写：它断言对所有 $A,B:\UU$，函数 $\mathsf{idtoqinv}_{A,B}$ 具有拟逆。
+  \begin{enumerate}
+  \item 证明 \qinv-univalence 可在 \cref{sec:univalence-implies-funext} 的函数外延性证明中代替泛等。
+  \item 证明 \qinv-univalence 可在 \cref{thm:qinv-notprop} 的证明中代替泛等。
+  \item 证明 \qinv-univalence 不一致（即可以构造 $\emptyt$ 的一个元素）。
+    因此，在泛等的陈述中使用“良好”的 $\isequiv$ 版本是本质性的。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:embedding-cancellable}
+  证明函数 $f:A\to B$ 是嵌入，当且仅当以下两个条件成立：
+  \begin{enumerate}
+  \item $f$ 是\emph{左可消的}，i.e.\ 对任意 $x,y:A$，若 $f(x)=f(y)$ 则 $x=y$。\label{item:ex:ec1}
+  \item 对任意 $x:A$，映射 $\apfunc f: \Omega(A,x) \to \Omega(B,f(x))$ 是等价。\label{item:ex:ec2}
+  \end{enumerate}
+  （特别地，若 $A$ 是集合，则 $f$ 是嵌入当且仅当它左可消，且对所有 $x:A$，$\Omega(B,f(x))$ 可缩。）
+  给出例子说明~\ref{item:ex:ec1} 与~\ref{item:ex:ec2} 彼此都不能推出对方。
+\end{ex}
+
+\begin{ex}\label{ex:cancellable-from-bool}
+  证明左可消函数 $\bool\to B$ 的类型（见 \cref{ex:embedding-cancellable}）与 $\sm{x,y:B}(x\neq y)$ 等价。
+  再给出嵌入 $\bool\to B$ 的类型的类似显式刻画。
+\end{ex}
+
+\begin{ex}\label{ex:funext-from-nondep}
+  \textbf{朴素（na\"{i}ve）的非依值函数外延公理}断言：对 $A,B:\type$ 与 $f,g:A\to B$，存在函数 $(\prd{x:A} f(x)=g(x)) \to (f=g)$。
+  \indexdef{function extensionality!non-dependent}%
+  修改 \cref{sec:univalence-implies-funext} 的论证以说明：该公理蕴含完整的函数外延公理（\cref{axiom:funext}）。
+\end{ex}
+
+% Local Variables:
+% TeX-master: "hott-online"
+% End:

@@ -1,0 +1,1988 @@
+\chapter{集合论}
+\label{cha:set-math}
+
+\index{set|(}%
+
+我们把集合理解为具有特别简单同伦特征的类型，参见
+\cref{sec:basics-sets}。这与 Zermelo--Fraenkel\index{set theory!Zermelo--Fraenkel} 集合论中的集合非常不同；后者形成一个累积层级，并具有复杂的嵌套隶属结构。
+对于许多数学目的而言，同伦论意义下的集合与
+Zermelo--Fraenkel 意义下的集合同样好用，但二者也存在重要差异。
+
+本章首先在 \cref{sec:piw-pretopos} 证明：范畴 $\uset$ 具有（大部分）通常“集合范畴”所具备的性质。
+\index{mathematics!constructive}%
+\index{mathematics!predicative}%
+在构造性、直谓、泛等基础中，它是一个“$\Pi\mathsf{W}$-预拓扑斯”；若再假设命题缩放
+\index{propositional!resizing}%
+（\cref{subsec:prop-subsets}），则它是一个初等拓扑斯，\index{topos}；若再假设 \LEM{} 与 \choice{}，则它是 Lawvere 的\emph{集合范畴初等理论}\index{Lawvere} 的一个模型。
+\index{Elementary Theory of the Category of Sets}%
+这些结果足以保证：同伦类型论中的集合，其行为与大多数非集合论数学家所使用的集合一致。
+
+本章余下部分讨论一些传统上属于“集合论”的主题。
+在 \cref{sec:cardinals,sec:ordinals,sec:wellorderings} 中，我们研究基数与序数。
+在传统集合论中，它们通常借助全局隶属关系定义；但我们将看到，泛等公理使一种同样便利、且更“结构化”的做法成为可能。
+
+最后，在 \cref{sec:cumulative-hierarchy} 中，我们考虑是否能在同伦类型论\emph{内部}构造一个集合的累积层级，并配备一个类似 Zermelo--Fraenkel 集合论的二元隶属关系。
+这结合了高阶归纳类型与代数集合论中的思想。
+\index{algebraic set theory}%
+\index{set theory!algebraic}%
+
+本章中我们会频繁使用 \cref{subsec:prop-trunc} 所述的传统逻辑记号。
+除 \cref{cha:basics,cha:logic} 的基础理论外，我们还会使用 \cref{sec:colimits,sec:set-quotients} 中关于余极限与商的高阶归纳类型，以及 \cref{cha:hlevels} 中关于截断的部分理论，特别是 \cref{sec:image-factorization} 在 $n=-1$ 情形下的分解系统。
+在 \cref{sec:ordinals} 中，我们使用一个归纳族（\cref{sec:generalizations}）来描述良基性；在 \cref{sec:cumulative-hierarchy} 中，我们使用一个更复杂的高阶归纳类型来给出累积层级。
+
+
+%\section{\texorpdfstring{$\set$}{Set} is a \texorpdfstring{$\Pi$}{Π}W-pretopos}
+\section{集合范畴}
+\label{sec:piw-pretopos}
+
+回忆在 \cref{cha:category-theory} 中，我们把范畴 \uset 定义为由全部 $0$-类型（位于某个宇宙 \UU 中）及其间映射组成，并指出它是一个范畴（而不只是预范畴）。
+下面我们依次考察 \uset 具备的结构层级。
+
+\subsection{极限与余极限}
+\label{subsec:limits-sets}
+
+\index{limit!of sets}%
+\index{colimit!of sets}%
+
+由于集合在乘积下封闭，\cref{thm:prod-ump} 中乘积的泛性质立刻说明 \uset 具有有限乘积。
+事实上，无穷乘积也同样直接来自等价
+\[ \Parens{X\to \prd{a:A} B(a)} \eqvsym \Parens{\prd{a:A} (X\to B(a))}.\]
+并且我们在 \cref{ex:pullback}\index{pullback} 中看到，$f:A\to C$ 与 $g:B\to C$ 的拉回可定义为 $\sm{a:A}{b:B} f(a)=g(b)$；若 $A,B,C$ 是集合，则它也是集合，并继承正确的泛性质。
+因此，\uset 在显然意义下是\emph{完备}范畴。
+\index{category!complete}%
+\index{complete!category}%
+
+由于集合在 $+$ 下封闭且包含 \emptyt，\uset 具有有限余积。
+同样地，若 $A$ 与每个 $B(a)$ 都是集合，则 $\sm{a:A}B(a)$ 是集合，从而给出 \uset 中类型族 $B$ 的一个余积。
+最后，我们在 \cref{sec:pushouts} 证明了余推出在 $n$-类型中存在，这当然特别包含 \uset。
+因此，\uset 也是\emph{余完备}的。
+\index{category!cocomplete}%
+\index{cocomplete category}%
+
+\subsection{像}
+\label{sec:image}
+
+%We will show that $\uset$ is a $\Pi$W-pretopos.
+接下来我们证明 \uset 是一个\define{正则范畴}，即：
+\indexdef{category!regular}%
+\indexdef{regular!category}%
+%
+\begin{enumerate}
+\item $\uset$ 是有限完备的。\label{item:reg1}
+\item 任意函数 $f : A \to B$ 的核对 $\proj1,\proj2: (\sm{x,y:A} f(x)= f(y)) \to A$
+  具有一个余等化子。\label{item:reg2}
+  \indexdef{kernel!pair}
+\item 正则满态射的拉回仍是正则满态射。\label{item:reg3}
+\end{enumerate}
+%
+回忆，\define{正则满态射}
+\indexdef{epimorphism!regular}%
+\indexdef{regular!epimorphism}%
+是某\emph{一对}映射的余等化子。
+因此在~\ref{item:reg3} 中，要求余等化子的拉回仍是余等化子，但不必是被拉回那一对映射的余等化子。
+
+\index{set-coequalizer}%
+\index{image}
+$f:A\to B$ 的核对之余等化子的显然候选，是 \cref{sec:image-factorization} 定义的 $f$ 的\emph{像}。
+回忆我们定义了 $\im(f)\defeq \sm{b:B} \brck{\hfib f b}$，并定义函数
+$\tilde{f}:A\to\im(f)$ 与 $i_f:\im(f)\to B$ 为
+\begin{align*}
+  \tilde{f} & \defeq \lam{a} \Pairr{f(a),\,\bproj{\pairr{a,\refl{f(a)}}}}\\
+i_f & \defeq \proj1
+\end{align*}
+它们满足下图：
+\begin{equation*}
+  \xymatrix{
+    **[l]{\sm{x,y:A} f(x)= f(y)}
+    \ar@<0.25em>[r]^{\proj1}
+    \ar@<-0.25em>[r]_{\proj2}
+    &
+    {A}
+    \ar[r]^(0.4){\tilde{f}}
+    \ar[rd]_{f}
+    &
+    {\im(f)}
+    \ar@{..>}[d]^{i_f}
+    \\ & &
+    B
+  }
+\end{equation*}
+
+回忆函数 $f:A\to B$ 称为\emph{满射}，当且仅当
+\index{function!surjective}%
+\narrowequation{\fall{b:B}\brck{\hfib f b},}
+等价地，$\fall{b:B} \exis{a:A} f(a)=b$。
+我们也说集合间函数 $f:A\to B$ 是\emph{单射}，当且仅当
+\index{function!injective}%
+$\fall{a,a':A} (f(a) = f(a')) \Rightarrow (a=a')$，等价地，当且仅当它的每条纤维都是纯命题。
+由于这正是 \cref{cha:hlevels} 意义下的 $(-1)$-连通与 $(-1)$-截断映射，上述一般理论推出：上面的 $\tilde f$ 是满射，$i_f$ 是单射，且该分解在拉回下稳定。
+
+现在我们把满射与单射与相应的范畴论概念对应起来。
+先观察：范畴中的单态射与满态射有一个稍强但等价的刻画。
+
+\begin{lem}\label{thm:mono}
+  对范畴 $A$ 中的态射 $f:\hom_A(a,b)$，下列条件等价。
+  \begin{enumerate}
+  \item $f$ 是一个\define{单态射}：
+    \indexdef{monomorphism}%
+    对所有 $x:A$ 与 ${g,h:\hom_A(x,a)}$，若 $f\circ g = f\circ h$ 则 $g=h$。\label{item:mono1}
+  \item （若 $A$ 有拉回）对角映射 $a\to a\times_b a$ 是同构。\label{item:mono4}
+  \item 对所有 $x:A$ 与 $k:\hom_A(x,b)$，类型 $\sm{h:\hom_A(x,a)} (k = f\circ h)$ 是纯命题。\label{item:mono2}
+  \item 对所有 $x:A$ 与 ${g:\hom_A(x,a)}$，类型 $\sm{h:\hom_A(x,a)} (f\circ g = f\circ h)$ 是可缩的。\label{item:mono3}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  条件~\ref{item:mono1} 与~\ref{item:mono4} 的等价性是标准范畴论结论。
+  现在考虑集合间函数 $(f\circ \blank ):\hom_A(x,a) \to \hom_A(x,b)$。
+  条件~\ref{item:mono1} 说它是单射，而~\ref{item:mono2} 说它的纤维是纯命题；因此两者等价。
+  又取 $k\defeq f\circ g$，并回忆“有元素的纯命题是可缩的”，可得~\ref{item:mono2} 蕴含~\ref{item:mono3}。
+  最后，~\ref{item:mono3} 蕴含~\ref{item:mono1}：若 $p:f\circ g= f\circ h$，则 $(g,\refl{})$ 与 $(h,p)$ 都落在~\ref{item:mono3} 的类型里，故二者相等，从而 $g=h$。
+\end{proof}
+
+\begin{lem}\label{thm:inj-mono}
+  集合间函数 $f:A\to B$ 单射，当且仅当它在 \uset 中是单态射\index{monomorphism}。
+\end{lem}
+\begin{proof}
+  留作读者练习。
+\end{proof}
+
+当然，\define{满态射}
+\indexdef{epimorphism}%
+\indexsee{epi}{epimorphism}%
+就是对偶范畴中的单态射。
+现在我们证明：在 \uset 中，满态射恰好是满射，也恰好是余等化子（正则满态射）。
+
+\uset 中一对映射 $f,g:A\to B$ 的余等化子，定义为一般（同伦）余等化子的 0-截断。
+为清晰起见，我们可称其为\define{集合余等化子}。
+\indexdef{set-coequalizer}%
+\indexsee{coequalizer!of sets}{set-coequalizer}%
+将其泛性质写成如下形式较为方便。
+
+\begin{lem}
+\index{universal!property!of set-coequalizer}%
+设 $f,g:A\to B$ 是集合 $A,B$ 之间的函数。该
+集合余等化子 $c_{f,g}:B\to Q$ 具有如下性质：对任意集合 $C$ 及任意满足 $h\circ f = h\circ g$ 的 $h:B\to C$，类型
+\begin{equation*}
+\sm{k:Q\to C} (k\circ c_{f,g} = h)
+\end{equation*}
+是可缩的。
+\end{lem}
+
+\begin{lem}\label{epis-surj}
+对任意集合间函数 $f:A\to B$，下列命题等价：
+\begin{enumerate}
+\item $f$ 是满态射。
+\item 考虑在 \uset 中定义映射锥\index{cone!of a function} 的余推出图
+\begin{equation*}
+  \xymatrix{
+    {A}
+    \ar[r]^{f}
+    \ar[d]
+    &
+    {B}
+    \ar[d]^{\iota}
+    \\
+    {\unit}
+    \ar[r]_{t}
+    &
+    {C_f}
+  }
+\end{equation*}
+则类型 $C_f$ 可缩。
+\item $f$ 是满射。
+\end{enumerate}
+\end{lem}
+
+\begin{proof}
+设 $f:A\to B$ 是集合间函数，并假设它是满态射；我们证明 $C_f$ 可缩。
+$C_f$ 的构造子 $\unit\to C_f$ 给出一个元素 $t:C_f$。
+我们需要证明
+\begin{equation*}
+\prd{x:C_f} x= t.
+\end{equation*}
+注意 $x=t$ 是纯命题，因此可对 $C_f$ 做归纳。
+当 $x$ 为 $t$ 时显然有 $\refl{t}:t=t$，故只需构造
+\begin{align*}
+I_0 & : \prd{b:B} \iota(b)= t\\
+I_1 & : \prd{a:A} \opp{\alpha_1(a)} \ct I_0(f(a))=\refl{t}
+\end{align*}
+其中 $\iota:B\to C_f$ 与 $\alpha_1:\prd{a:A} \iota(f(a))= t$ 是 $C_f$ 的另外两个构造子。
+注意 $\alpha_1$ 是从 $\iota\circ f$ 到
+$\mathsf{const}_t\circ f$ 的同伦，因此得到元素
+\begin{equation*}
+\pairr{\iota,\refl{\iota\circ f}},\pairr{\mathsf{const}_t,\alpha_1}:
+\sm{h:B\to C_f} \iota\circ f \htpy h\circ f.
+\end{equation*}
+由 \cref{thm:mono}\ref{item:mono3} 的对偶形式（以及函数外延性），存在路径
+\begin{equation*}
+\gamma:\pairr{\iota,\refl{\iota\circ f}}=\pairr{\mathsf{const}_t,\alpha_1}.
+\end{equation*}
+于是可定义 $I_0(b)\defeq \happly(\projpath1(\gamma),b):\iota(b)=t$。
+我们还得到
+\[\projpath2(\gamma) : \trans{\projpath1(\gamma)}{\refl{\iota\circ f}} = \alpha_1. \]
+这个传送涉及与 $f$ 的前复合，它与 $\happly$ 交换。
+因此，由路径类型中的传送可得对任意 $a:A$ 有 $I_0(f(a)) = \alpha_1(a)$，从而得到 $I_1$。
+
+现在反过来，假设 $C_f$ 可缩；我们证明 $f$ 满射。
+先用对 $C_f$ 的递归构造类型族 $P:C_f\to\prop$，这是可行的，因为 \prop 是集合。
+在点构造子上定义
+\begin{align*}
+P(t) & \defeq \unit\\
+P(\iota(b)) & \defeq \brck{\hfiber{f}b}.
+\end{align*}
+要完成 $P$ 的构造，还需给出对所有 $a:A$ 的路径
+\narrowequation{\brck{\hfiber{f}{f(a)}} =_\prop \unit}
+然而，$\brck{\hfiber{f}{f(a)}}$ 由 $(f(a),\refl{f(a)})$ 可居留。
+由于它是纯命题，这意味着它可缩——因此等价，进而相等于 \unit。
+由此 $P$ 定义完成。
+现由于假设 $C_f$ 可缩，故对任意 $x:C_f$，$P(x)$ 与 $P(t)$ 等价。
+特别地，对每个 $b:B$，$P(\iota(b))\jdeq \brck{\hfiber{f}b}$ 与 $P(t)\jdeq \unit$ 等价，因而可缩。
+所以 $f$ 是满射。
+
+最后，设 $f:A\to B$ 满射，取集合 $C$ 及函数
+$g,h:B\to C$，满足 $g\circ f = h\circ f$。由于假设 $f$
+满射，对所有 $b:B$，类型 $\brck{\hfib f b}$ 都可缩。
+于是有以下等价：
+\begin{align*}
+\prd{b:B} (g(b)= h(b))
+& \eqvsym \prd{b:B} \Parens{\brck{\hfib f b} \to (g(b)= h(b))}\\
+& \eqvsym \prd{b:B} \Parens{\hfib f b \to (g(b)= h(b))}\\
+& \eqvsym \prd{b:B}{a:A}{p:f(a)= b} g(b)= h(b)\\
+& \eqvsym \prd{a:A} g(f(a))= h(f(a))
+\end{align*}
+第二行用到：因 $C$ 是集合，$g(b)=h(b)$ 是纯命题。
+而后一个类型按假设有元素。
+\end{proof}
+
+% \begin{rem}
+% The above theorem is not true when we replace $\set$ by $\type$
+% (replacing it also in the definition of $\mathsf{epi}$ and $\mathsf{epi}'$).
+% However, we do
+% get the implications $\textit{ii.}\Rightarrow\textit{iii.}\Rightarrow
+% \textit{iv.}$
+% \end{rem}
+
+\begin{thm}\label{thm:set_regular}\label{lem:images_are_coequalizers}
+范畴 $\uset$ 是正则范畴。此外，集合间的满射函数是正则满态射。
+\end{thm}
+
+\begin{proof}
+范畴论中有一个标准引理：只要一个范畴具有有限极限，以及一个在拉回下稳定的正交
+分解系统\index{orthogonal factorization system} $(\mathcal{E},\mathcal{M})$，其中 $\mathcal{M}$ 为单态射，则该范畴就是正则的；此时 $\mathcal{E}$ 自动由
+正则满态射组成。
+（例如见~\cite[A1.3.4]{elephant}。）
+该分解系统的存在性已在 \cref{thm:orth-fact} 中证明。
+\end{proof}
+
+\begin{lem}\label{lem:pb_of_coeq_is_coeq}
+\uset 中正则满态射的拉回仍是正则满态射。
+\end{lem}
+\begin{proof}
+  我们在 \cref{thm:stable-images} 已证明：$n$-连通函数的拉回仍 $n$-连通。
+  由 \cref{lem:images_are_coequalizers}，只需在 $n=-1$ 的情形应用该结论。
+\end{proof}
+
+\indexdef{image!of a subset}
+\uset 是正则范畴的一个推论是：我们有对子集的“像”运算。
+即给定 $f:A\to B$，任一子集 $P:\power A$（即一个直谓 $P:A\to \prop$）都有一个\define{像}，它是 $B$ 的子集。
+可直接定义为 $\setof{ y:B | \exis{x:A} f(x)=y \land P(x)}$，也可间接定义为复合函数
+\[ \setof{ x:A | P(x) } \to A \xrightarrow{f} B.\]
+在先前意义下的像。
+\symlabel{subset-image}
+我们也会有时使用常见记号 $\setof{f(x) | P(x)}$ 表示 $P$ 的像。
+
+
+\subsection{商}\label{subsec:quotients}
+
+\index{set-quotient|(}%
+既然已知 $\uset$ 是正则的，为证明 $\uset$ 是正合范畴，我们需要证明每个
+等价关系都是有效的。
+\index{effective!equivalence relation|(}%
+\index{relation!effective equivalence|(}%
+换言之，给定等价关系
+$R:A\to A\to\prop$，存在一对映射
+$\proj1,\proj2:\sm{x,y:A} R(x,y)\to A$ 的余等化子 $c_R$，并且 $\proj1$ 与 $\proj2$
+构成 $c_R$ 的核\index{kernel!pair}对。
+
+我们已在 \cref{sec:set-quotients} 中看到，构造集合按等价关系 $R:A\to A\to\prop$ 取商有两种一般方法。
+第一种可描述为两个投影
+\[\proj1,\proj2:\Parens{\sm{x,y:A} R(x,y)} \to A.\]
+的集合余等化子。
+这类商的重要性质如下。
+
+\begin{defn}
+  关系 $R:A\to A\to\prop$ 称为\define{有效的}
+  \indexdef{effective!relation}
+  \indexdef{effective!equivalence relation}%
+  \indexdef{relation!effective equivalence}%
+  ，若方块
+\begin{equation*}
+  \xymatrix{
+    {\sm{x,y:A} R (x,y)}
+    \ar[r]^(0.7){\proj1}
+    \ar[d]_{\proj2}
+    &
+    {A}
+    \ar[d]^{c_R}
+    \\
+    {A}
+    \ar[r]_{c_R}
+    &
+    {A/R}
+    }
+\end{equation*}
+是拉回。
+\end{defn}
+
+由于 $c_R$ 与其自身的标准拉回是 $\sm{x,y:A} (c_R(x)=c_R(y))$，由 \cref{thm:total-fiber-equiv}，这等价于要求典范变换 $\prd{x,y:A} R(x,y) \to (c_R(x)=c_R(y))$ 是逐纤维等价。
+
+\begin{lem}\label{lem:sets_exact}
+设 $\pairr{A,R}$ 是一个等价关系。则对任意 $x,y:A$，存在等价
+\begin{equation*}
+(c_R(x)= c_R(y))\eqvsym R(x,y)
+\end{equation*}
+换言之，等价关系是有效的。
+\end{lem}
+
+\begin{proof}
+我们先把 $R$ 扩展为关系 $\widetilde{R}:A/R\to A/R\to\prop$，随后证明它与 $A/R$ 上的恒等类型等价。
+我们通过对
+$A/R$ 的双重归纳定义 $\widetilde{R}$（注意 \prop 由纯命题的泛等可知是集合）。
+定义 $\widetilde{R}(c_R(x),c_R(y)) \defeq R(x,y)$。给定 $r:R(x,x')$ 与 $s:R(y,y')$，
+$R$ 的传递性与对称性给出从 $R(x,y)$ 到 $R(x',y')$ 的等价。
+这就完成了
+$\widetilde{R}$ 的定义。
+
+剩下要证明：对每个 $w,w':A/R$，有 $\widetilde{R}(w,w')\eqvsym (w= w')$。
+方向 $(w=w')\to \widetilde{R}(w,w')$ 可由传送得到，只需先证明 $\widetilde{R}$ 自反，这通过简单归纳即可。
+另一方向 $\widetilde{R}(w,w')\to (w= w')$ 是纯命题，因此由于 $c_R:A\to A/R$ 满射，足以假设 $w,w'$ 分别形如 $c_R(x),c_R(y)$。
+但在这种情况下，我们有典范映射 $\widetilde{R}(c_R(x),c_R(y)) \defeq R(x,y) \to (c_R(x)=c_R(y))$。
+（再次出现了编码-解码方法。\index{encode-decode method}）
+\end{proof}
+
+第二种商构造是把它定义为 $R$ 的等价类集合（其幂集\index{power set}的一个子集）：
+\[ A\sslash R \defeq \setof{ P:A\to\prop | P \text{ is an equivalence class of } R}. \]
+为使其与 $A,R$ 处在同一宇宙，需要命题缩放\index{propositional resizing}\index{impredicative!quotient}\index{resizing}。
+
+注意若把 $R$ 视为从 $A$ 到 $A\to \prop$ 的函数，则 $A\sslash R$ 与 \cref{sec:image} 中构造的 $\im(R)$ 等价。
+而在 \cref{lem:images_are_coequalizers} 中我们已证明像是
+余等化子。特别地，立刻得到余等化图
+\begin{equation*}
+  \xymatrix{
+    **[l]{\sm{x,y:A} R (x)= R (y)}
+    \ar@<0.25em>[r]^{\proj1}
+    \ar@<-0.25em>[r]_{\proj2}
+    &
+    {A}
+    \ar[r]
+    &
+    {A \sslash R.}
+  }
+\end{equation*}
+我们可用它给出另一种证明：任意等价关系都是有效的，且两种商定义一致。
+
+\begin{thm}\label{prop:kernels_are_effective}
+对任意两个集合之间的函数 $f:A\to B$，
+由
+$\ker(f,x,y)\defeq (f(x)= f(y))$
+给出的关系 $\ker(f):A\to A\to\prop$ 是有效的。
+\end{thm}
+
+\begin{proof}
+我们将用到：$\im(f)$ 是
+$\proj1,\proj2:(\sm{x,y:A} f(x)= f(y))\to A$ 的余等化子。
+%we get this equivalence from~\cref{prop:images_are_coequalizers}
+注意函数
+\[c_f\defeq\lam{a} \Parens{f(a),\brck{\pairr{a,\refl{f(a)}}}}
+: A \to \im(f)
+\]
+的核对由两个投影
+\begin{equation*}
+\proj1,\proj2:\Parens{\sm{x,y:A} c_f(x)= c_f(y)}\to A.
+\end{equation*}
+构成。
+对任意 $x,y:A$，有等价
+\begin{align*}
+  (c_f(x)= c_f(y))
+  & \eqvsym \Parens{\sm{p:f(x)= f(y)} \trans{p}{\brck{\pairr{x,\refl{f(x)}}}} =\brck{\pairr{y,\refl{f(x)}}}}\\
+  & \eqvsym (f(x)= f(y)),
+\end{align*}
+其中最后一个等价成立，因为
+对任意 $b:B$，$\brck{\hfiber{f}b}$ 是纯命题。
+因此得到
+\begin{equation*}
+\Parens{\sm{x,y:A} c_f(x)= c_f(y)}\eqvsym \Parens{\sm{x,y:A} f(x)= f(y)}
+\end{equation*}
+从而可得：对任意函数 $f$，$\ker f$ 都是有效关系。
+\end{proof}
+
+\begin{thm}
+等价关系是有效的，且存在等价 $A/R \eqvsym A\sslash  R $。
+\end{thm}
+
+\begin{proof}
+我们需要分析余等化图
+\begin{equation*}
+  \xymatrix{
+    **[l]{\sm{x,y:A} R (x)= R (y)}
+    \ar@<0.25em>[r]^{\proj1}
+    \ar@<-0.25em>[r]_{\proj2}
+    &
+    {A}
+    \ar[r]
+    &
+    {A \sslash R}
+  }
+\end{equation*}
+由泛等公理，类型 $R(x) = R(y)$ 等价于从 $R(x)$ 到 $R(y)$ 的同伦类型，即等价于
+\narrowequation{\prd{z:A} R (x,z)\eqvsym R (y,z).}
+由于 $R$ 是等价关系，后者又与 $R(x,y)$ 等价。
+综上，得到 $(R(x) = R(y)) \eqvsym R(x,y)$，因此 $R$ 与一个有效关系等价，故 $R$ 有效。
+并且，图
+\begin{equation*}
+  \xymatrix{
+    **[l]{\sm{x,y:A} R(x, y)}
+    \ar@<0.25em>[r]^{\proj1}
+    \ar@<-0.25em>[r]_{\proj2}
+    &
+    {A}
+    \ar[r]
+    &
+    {A \sslash R.}
+  }
+\end{equation*}
+是一个余等化图。由于余等化子在等价意义下唯一，推出 $A/R \eqvsym A\sslash  R $。
+\end{proof}
+
+本节最后提及集合 $A$ 按等价关系 $R$ 取商的第三种可能构造。
+考虑对象为 $A$、hom-集为 $R$ 的预范畴；其 Rezk 完备化
+\index{completion!Rezk}%
+（见 \cref{sec:rezk}）的对象类型将是该
+商。细节留待读者检验。
+
+\index{effective!equivalence relation|)}%
+\index{relation!effective equivalence|)}%
+\index{set-quotient|)}%
+
+\subsection{\texorpdfstring{$\uset$}{Set} 是一个 \texorpdfstring{$\Pi\mathsf{W}$}{ΠW}-预拓扑斯}
+\label{subsec:piw}
+
+\index{structural!set theory|(}%
+
+\emph{$\Pi\mathsf{W}$-预拓扑斯}
+\index{PiW-pretopos@$\Pi\mathsf{W}$-pretopos}%
+\indexsee{pretopos}{$\Pi\mathsf{W}$-pretopos}
+--- 即一个局部笛卡尔闭范畴
+\index{locally cartesian closed category}%
+\index{category!locally cartesian closed}%
+并且具有不交有限余积、有效等价关系以及多项式自函子的初始代数 --- 旨在成为“直谓”
+\index{mathematics!predicative}%
+意义下的拓扑斯概念，即“直谓集合”的范畴；它在构造数学\index{mathematics!constructive}%
+中的作用，类似于通常集合范畴在经典\index{mathematics!classical}%
+数学中的作用。
+
+通常在构造性类型论里，人们会诉诸外部构造“setoid”——即正合完备化——来得到具有此类闭包性质的范畴。
+\index{setoid}\index{completion!exact}%
+特别地，许多通常涉及（非构造性的）幂集的数学构造，都需要行为良好的商。值得注意的是，泛等基础能\emph{内部地}（通过高阶归纳类型）提供这些构造，而无需这种外部构造。正如后续例子将展示的，这体现了我们方法的重要优势。
+
+\begin{thm}
+  \index{PiW-pretopos@$\Pi\mathsf{W}$-pretopos}
+  范畴 $\uset$ 是一个 $\Pi\mathsf{W}$-预拓扑斯。
+\end{thm}
+\begin{proof}
+  我们有初对象
+  \index{initial!set}%
+  $\emptyt$ 与有限不交和 $A+B$。这些在拉回下稳定，仅因为拉回有一个右伴随\index{adjoint!functor}。事实上，\uset 是局部笛卡尔闭的：对任意集合间映射 $f:A\to B$，其“纤维化替换”\index{fibrant replacement} $\sm{a:A}f(a)=b$（在 $B$ 上）与 $A$ 等价，并且我们对该替换有依值函数类型。
+我们刚刚证明了 \uset 是正则的（\cref{thm:set_regular}），且商是有效的（\cref{lem:sets_exact}）。因此我们得到一个局部笛卡尔闭预拓扑斯。最后，由 \cref{ex:ntypes-closed-under-wtypes}，$n$-类型在构造 $W$-类型下封闭；又由 \cref{thm:w-hinit}，$W$-类型是多项式自函子的初始代数。故 \uset 是一个 $\Pi\mathsf{W}$-预拓扑斯。
+\end{proof}
+
+
+\index{topos|(}
+人们自然会问：究竟是什么（若有的话）阻止 \uset 成为一个（初等）拓扑斯？
+除上面提到的结构外，拓扑斯还具有
+\emph{子对象分类器}：
+\indexdef{subobject classifier}%
+\index{classifier!subobject}%
+\index{power set}%
+一个带点对象，用来分类（等价类意义下的）单态射\index{monomorphism}。（实际上，在有子对象
+分类器时，事情会更简单：只需笛卡尔闭就能得到余极限。）
+在同伦类型论中，泛等蕴含类型 $\prop \defeq \sm{X:\UU}\isprop(X)$ 确实分类单态射（论证与 \cref{sec:object-classification} 类似），但一般而言它与环境宇宙 $\UU$ 同样大。
+因此它在“是一个 $0$-类型”这个意义下是“集合”，但在“是 \UU 内对象（即 \uset 的对象）”这个意义下并不“小”。
+不过，若我们假设适当形式的命题缩放（见 \cref{subsec:prop-subsets}），就能找到一个小版本的 $\prop$，从而 \uset 成为一个初等拓扑斯。
+
+\begin{thm}\label{thm:settopos}
+  \index{propositional!resizing}%
+  若存在一个类型 $\Omega:\UU$ 包含全部纯命题，则范畴 $\uset_\UU$ 是一个初等拓扑斯。
+\end{thm}
+\index{topos|)}
+
+一个充分条件是排中律（即我们称作 \LEM{} 的“纯命题形式”）；因为此时有 $\prop = \bool$，它\emph{确实}是小的，并且也分类所有纯命题。
+此外，在拓扑斯理论中，一个众所周知的 \LEM{} 的充分条件是选择公理；而在经典\index{mathematics!classical}集合论中它当然也常作为公理被假设。
+下一节中，我们将简要考察这些条件在我们语境下的关系。
+
+\index{structural!set theory|)}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{选择公理蕴含排中律}
+\label{subsec:emacinsets}
+
+% In this section we prove a classic result that the axiom of choice implies excluded
+% middle.
+
+我们先给出如下引理。
+
+\begin{lem}\label{prop:trunc_of_prop_is_set}
+若 $A$ 是纯命题，则其悬挂 $\susp(A)$ 是集合，
+且 $A$ 与 $\id[\susp(A)]{\north}{\south}$ 等价。
+\end{lem}
+
+\begin{proof}
+为证明 $\susp(A)$ 是集合，我们定义一个
+类型族 $P:\susp(A)\to\susp(A)\to\type$，满足：对每个 $x,y:\susp(A)$，
+$P(x,y)$ 是纯命题，且与其恒等类型 $\idtypevar{\susp(A)}$ 等价。
+%
+定义如下：
+\begin{align*}
+P(\north,\north) & \defeq \unit &
+P(\south,\north) & \defeq A\\
+P(\north,\south) & \defeq A &
+P(\south,\south) & \defeq \unit.
+\end{align*}
+我们还需检查该定义与路径相容。
+给定任意 $a : A$，有子午线 $\merid(a) : \north = \south$，
+因此应有
+%
+\begin{equation*}
+  P(\north, \north) = P(\north, \south) = P(\south, \north) = P(\south, \south).
+\end{equation*}
+%
+但由于 $A$ 由 $a$ 可居留，它与 $\unit$ 等价，所以有
+%
+\begin{equation*}
+  P(\north, \north) \eqvsym P(\north, \south) \eqvsym P(\south, \north) \eqvsym P(\south, \south).
+\end{equation*}
+%
+泛等公理把这些等价转成所需相等。另外，$P(x,y)$ 对所有 $x,y : \susp(A)$ 都是纯命题，这可由对 $x,y$ 的归纳以及“是纯命题”本身也是纯命题这一事实得到。
+
+注意 $P$ 是自反关系。
+因此可应用 \cref{thm:h-set-refrel-in-paths-sets}，于是只需
+构造 $\tau : \prd{x,y:\susp(A)}P(x,y)\to(x=y)$。我们做双重归纳。
+当 $x$ 为 $\north$ 时，定义 $\tau(\north)$ 为
+%
+\begin{equation*}
+  \tau(\north,\north,u) \defeq \refl{\north}
+  \qquad\text{且}\qquad
+  \tau(\north,\south,a) \defeq \merid(a).
+\end{equation*}
+%
+若 $A$ 被某个 $a$ 所居留，则 $\merid(a) : \north = \south$，因此还需
+\narrowequation{
+  \trans{\merid(a)}{\tau(\north, \north)} = \tau(\north, \south).
+}
+这可由函数外延性得到，因为对所有 $x : A$，有
+%
+\begin{multline*}
+  \trans{\merid(a)}{\tau(\north,\north,x)} =
+  \tau(\north,\north,x) \ct \opp{\merid(a)} \jdeq \\
+  \refl{\north} \ct \merid(a) =
+  \merid(a) =
+  \merid(x) \jdeq
+  \tau(\north, \south, x).
+\end{multline*}
+类似地可定义 $\tau(\south)$ 为
+%
+\begin{equation*}
+  \tau(\south,\north, a) \defeq \opp{\merid(a)}
+  \qquad\text{且}\qquad
+  \tau(\south,\south, u) \defeq \refl{\south}.
+\end{equation*}
+%
+为完成 $\tau$ 的构造，还需验证：给定任意 $a : A$，有 $\trans{\merid(a)}{\tau(\north)} = \tau(\south)$。该验证与上面类似，通过对
+$\tau$ 的第二个参数归纳即可。
+
+因此由 \cref{thm:h-set-refrel-in-paths-sets}，可得 $\susp(A)$ 是集合，且对所有 $x,y:\susp(A)$ 有 $P(x,y) \eqvsym (\id{x}{y})$。
+取 $x\defeq \north$ 与 $y\defeq \south$ 即得所需 $\eqv{A}{(\id[\susp(A)]\north\south)}$。
+\end{proof}
+
+\begin{thm}[Diaconescu]\label{thm:1surj_to_surj_to_pem}
+  \index{axiom!of choice}%
+  \index{excluded middle}%
+  \index{Diaconescu's theorem}\index{theorem!Diaconescu's}%
+  选择公理蕴含排中律。
+\end{thm}
+
+\begin{proof}
+我们使用 \cref{thm:ac-epis-split} 给出的选择公理等价形式。
+取一个纯命题 $A$。
+定义函数 $f:\bool\to\susp(A)$ 为
+$f(\bfalse) \defeq \north$ 且 $f(\btrue) \defeq \south$，
+它是满射。
+确实，我们有
+$\pairr{\bfalse,\refl{\north}} : \hfiber{f}{\north}$
+与 $\pairr{\btrue,\refl{\south}} :\hfiber{f}{\south}$。
+由于 $\bbrck{\hfiber{f}{x}}$ 是纯命题，由归纳即可得出所宣称的满射性。
+
+由 \cref{prop:trunc_of_prop_is_set}，悬挂 $\susp(A)$
+是集合，因此由选择公理，存在一个
+截面 $g: \susp(A) \to \bool$（仅仅存在）。
+由于 $\bool$ 上相等可判定，得到
+\begin{equation*}
+ (g(f(\bfalse))= g(f(\btrue))) +
+ \lnot (g(f(\bfalse))= g(f(\btrue))),
+\end{equation*}
+并且，由于 $g$ 是 $f$ 的截面，故 $f$ 单射，
+\begin{equation*}
+(f(\bfalse) = f(\btrue)) +
+\lnot (f(\bfalse) = f(\btrue)).
+\end{equation*}
+最后，由 \cref{prop:trunc_of_prop_is_set}，$(f(\bfalse)=f(\btrue)) = (\north=\south) = A$，因此得到 $A+\neg A$。
+\end{proof}
+
+% This conclusion needs only \LEM{}, see \cref{ex:lemnm}.
+
+% \begin{cor}\label{cor:ACtoLEM0}
+%   If the axiom of choice \choice{} holds then $\brck{A + \neg A}$ for every set $A$.
+% \end{cor}
+
+% \begin{proof}
+%   There is a surjection
+%   \[
+%   A + \neg A \epi \brck{A} + \brck{\neg A} \epi
+%   \brck{(\brck{A} + \brck{\neg A})} = \brck{A} \vee \brck{\neg A} = \brck{A} \vee \neg \brck{A} = \unit,
+%   \]
+%   %
+%   where in the last step excluded middle is available as a consequence of the axiom of choice.
+%   Again by the axiom of choice there merely exists a section of the surjection, but this
+%   is none other than an inhabitant of $A + \neg A$. Therefore $\brck{A+\neg A}$.
+% \end{proof}
+
+\index{denial}
+\begin{thm}\label{thm:ETCS}
+  \index{Elementary Theory of the Category of Sets}%
+  \index{category!well-pointed}%
+  若选择公理成立，则范畴 $\uset$ 是一个良点的布尔\index{topos!boolean}\index{boolean!topos}且带选择的初等拓扑斯\index{topos}。
+\end{thm}
+
+\begin{proof}
+  由于 \choice{} 蕴含 \LEM{}，结合 \cref{thm:settopos} 及其后的注记，我们得到一个带选择的布尔初等拓扑斯。至于良点性证明，
+留作读者练习（\cref{ex:well-pointed}）。
+\end{proof}
+
+\begin{rmk}
+  定理中提到的这些范畴条件即 Lawvere\index{Lawvere}
+  的\emph{集合范畴初等理论}公理~\cite{lawvere:etcs-long}。
+\end{rmk}
+\section{基数}
+\label{sec:cardinals}
+
+\begin{defn}\label{defn:card}
+  \define{基数类型}
+  \indexdef{type!of cardinal numbers}%
+  \indexdef{cardinal number}%
+  \indexsee{number!cardinal}{cardinal number}%
+  定义为集合类型 \set 的 0-截断：
+  \[ \card \defeq \pizero{\set} \]
+  因此，一个\define{基数}（或\define{cardinal}）是 $\card\jdeq \pizero\set$ 的一个元素。
+  当然，严格说来，对每个宇宙 \type 都有一个对应的类型 $\card_\UU$。
+\end{defn}
+
+%\begin{rmk}
+
+  % , but with these conventions we can state theorems beginning with ``for all cardinal numbers\dots''\ and give them exactly the same sort of meaning as those beginning ``for all types\dots''.
+%\end{rmk}
+
+与截断的通常记法一样，若 $A$ 是集合，则 $\cd{A}$ 表示它在典范投影 $\set \to \trunc0\set \jdeq \card$ 下的像；我们称 $\cd{A}$ 为 $A$ 的\define{势}\indexdef{cardinality}。
+按定义，\card 是一个集合。
+它也从 \set 继承了一个半环结构。
+
+\begin{defn}
+  \define{基数加法}
+  \indexdef{addition!of cardinal numbers}%
+  \index{cardinal number!addition of}%
+  运算
+  \[ (\blank+\blank) : \card \to \card \to \card \]
+  由截断归纳定义：
+  \[ \cd{A} + \cd{B} \defeq \cd{A+B}.\]
+\end{defn}
+\begin{proof}
+  因为 $\card\to\card$ 是集合，要对所有 $\alpha:\card$ 定义 $(\alpha+\blank):\card\to\card$，由归纳可只需设 $\alpha$ 形如某个 $A:\set$ 的 $\cd{A}$。
+  现在我们要定义 $(\cd{A}+\blank) :\card\to\card$，也即对所有 $\beta:\card$ 定义 $\cd{A}+\beta :\card$。
+  然而由于 $\card$ 是集合，再次归纳可只需设 $\beta$ 形如某个 $B:\set$ 的 $\cd{B}$。
+  此时定义 $\cd{A}+\cd{B}$ 为 $\cd{A+B}$ 即可。
+\end{proof}
+
+\begin{defn}
+  同理，\define{基数乘法}
+  \indexdef{multiplication!of cardinal numbers}%
+  \index{cardinal number!multiplication of}%
+  运算
+  \[ (\blank\cdot\blank) : \card \to \card \to \card \]
+  由截断归纳定义：
+  \[ \cd{A} \cdot \cd{B} \defeq \cd{A\times B} \]
+\end{defn}
+
+\begin{lem}\label{card:semiring}
+  \card 是交换半环\index{semiring}，即对 $\alpha,\beta,\gamma:\card$ 有：
+  \begin{align*}
+    (\alpha+\beta)+\gamma &= \alpha+(\beta+\gamma)\\
+    \alpha+0 &= \alpha\\
+    \alpha + \beta &= \beta + \alpha\\
+    (\alpha \cdot \beta) \cdot \gamma &= \alpha \cdot (\beta\cdot\gamma)\\
+    \alpha \cdot 1 &= \alpha\\
+    \alpha\cdot\beta &= \beta\cdot\alpha\\
+    \alpha\cdot(\beta+\gamma) &= \alpha\cdot\beta + \alpha\cdot\gamma
+  \end{align*}
+  其中 $0 \defeq \cd{\emptyt}$，$1\defeq\cd{\unit}$。
+\end{lem}
+\begin{proof}
+  我们证明乘法交换律 $\alpha\cdot\beta = \beta\cdot\alpha$；其余各条完全类似。
+  因为 \card 是集合，类型 $\alpha\cdot\beta = \beta\cdot\alpha$ 是纯命题，特别地也是集合。
+  因此由归纳，只需设 $\alpha,\beta$ 分别形如某些 $A,B:\set$ 的 $\cd{A},\cd{B}$。
+  此时 $\cd{A}\cdot \cd{B} \jdeq \cd{A\times B}$，$\cd{B}\cdot\cd{A} \jdeq \cd{B\times A}$，故只需证明 $A\times B = B\times A$。
+  最后由泛等，只需给出等价 $A\times B \eqvsym B\times A$。
+  这很容易：取 $(a,b) \mapsto (b,a)$ 及其显然逆即可。
+\end{proof}
+
+\begin{defn}
+  \define{基数幂运算}同样由截断归纳定义：
+  \indexdef{exponentiation, of cardinal numbers}%
+  \index{cardinal number!exponentiation of}%
+  \[ \cd{A}^{\cd{B}} \defeq \cd{B\to A}. \]
+\end{defn}
+
+\begin{lem}\label{card:exp}
+  对 $\alpha,\beta,\gamma:\card$，有
+  \begin{align*}
+    \alpha^0 &= 1\\
+    1^\alpha &= 1\\
+    \alpha^1 &= \alpha\\
+    \alpha^{\beta+\gamma} &= \alpha^\beta \cdot \alpha^\gamma\\
+    \alpha^{\beta\cdot \gamma} &= (\alpha^{\beta})^\gamma\\
+    (\alpha\cdot\beta)^\gamma &= \alpha^\gamma \cdot \beta^\gamma
+  \end{align*}
+\end{lem}
+\begin{proof}
+  与 \cref{card:semiring} 完全相同。
+\end{proof}
+
+\begin{defn}
+  \define{基数不等关系}
+  \index{order!non-strict}%
+  \index{cardinal number!inequality of}%
+  \[ (\blank\le\blank) : \card\to\card\to\prop \]
+  由截断归纳定义：
+  \symlabel{inj}
+  \[ \cd{A} \le \cd{B} \defeq \brck{\inj(A,B)} \]
+  其中 $\inj(A,B)$ 是从 $A$ 到 $B$ 的单射类型。
+  \index{function!injective}%
+  换言之，$\cd{A} \le \cd{B}$ 的意思是：仅仅存在从 $A$ 到 $B$ 的单射。
+\end{defn}
+
+\begin{lem}
+  基数不等关系构成一个预序，即对 $\alpha,\beta:\card$ 有
+  \index{preorder!of cardinal numbers}%
+  \begin{gather*}
+    \alpha \le \alpha\\
+    (\alpha \le \beta) \to (\beta\le\gamma) \to (\alpha\le\gamma)
+  \end{gather*}
+\end{lem}
+\begin{proof}
+  与前面一样，用截断归纳。
+  例如，因为 $(\alpha \le \beta) \to (\beta\le\gamma) \to (\alpha\le\gamma)$ 是纯命题，按 0-截断归纳可设 $\alpha,\beta,\gamma$ 分别为 $\cd{A},\cd{B},\cd{C}$。
+  现在由于 $\cd{A} \le \cd{C}$ 是纯命题，再按 $(-1)$-截断归纳可设给定单射 $f:A\to B$ 与 $g:B\to C$。
+  但此时 $g\circ f$ 是从 $A$ 到 $C$ 的单射，故 $\cd{A} \le \cd{C}$ 成立。
+  自反性更容易。
+\end{proof}
+
+同样可证明，基数不等关系与半环运算相容。
+
+\begin{lem}\label{thm:injsurj}
+  \index{function!injective}%
+  \index{function!surjective}%
+  考虑下列命题：
+  \begin{enumerate}
+  \item 存在单射 $A\to B$。\label{item:cle-inj}
+  \item 存在满射 $B\to A$。\label{item:cle-surj}
+  \end{enumerate}
+  则在假设排中律下：
+  \index{excluded middle}%
+  \index{axiom!of choice}%
+  \begin{itemize}
+  \item 给定 $a_0:A$，有~\ref{item:cle-inj}$\to$\ref{item:cle-surj}。
+  \item 因而若 $A$ 仅仅可居留，则有~\ref{item:cle-inj} $\to$ merely \ref{item:cle-surj}。
+  \item 若再假设选择公理，则有~\ref{item:cle-surj} $\to$ merely \ref{item:cle-inj}。
+  \end{itemize}
+\end{lem}
+\begin{proof}
+  若 $f:A\to B$ 是单射，则按如下方式定义 $g:B\to A$。
+  因 $f$ 单射，$f$ 在 $b$ 处的纤维是纯命题。
+  于是由排中律，要么存在某个 $a:A$ 使 $f(a)=b$，要么不存在。
+  前一种情形定义 $g(b)\defeq a$；否则设 $g(b)\defeq a_0$。
+  则对任意 $a:A$，有 $a = g(f(a))$，故 $g$ 满射。
+
+  第二条由此并结合截断归纳得到。
+  第三条中，若 $g:B\to A$ 满射，则由选择公理，仅仅存在函数 $f:A\to B$ 满足对所有 $a$ 都有 $g(f(a)) = a$。
+  但此时 $f$ 必为单射。
+\end{proof}
+
+\begin{thm}[Schroeder--Bernstein]
+  \index{theorem!Schroeder--Bernstein}%
+  \index{Schroeder--Bernstein theorem}%
+  在假设排中律下，对集合 $A,B$ 有
+  \[ \inj(A,B) \to \inj(B,A) \to (A\cong B) \]
+\end{thm}
+\begin{proof}
+  通常的“来回构造”论证可在几乎不作修改的情况下应用。
+  注意它实际上构造出一个同构 $A\cong B$（需假设排中律，以判定给定元素属于环、无限链、从 $A$ 开始的链，还是从 $B$ 开始的链）。
+\end{proof}
+
+\begin{cor}
+  在假设排中律下，基数不等关系是偏序，即对 $\alpha,\beta:\card$ 有
+  \[ (\alpha\le\beta) \to (\beta\le\alpha) \to (\alpha=\beta). \]
+\end{cor}
+\begin{proof}
+  因为 $\alpha=\beta$ 是纯命题，按截断归纳可设 $\alpha,\beta$ 分别为 $\cd{A},\cd{B}$，并且给定单射 $f:A\to B$ 与 $g:B\to A$。
+  由 Schroeder--Bernstein 定理得到同构 $A\cong B$，进而得到相等 $\cd{A}=\cd{B}$。
+\end{proof}
+
+最后，我们可重现 Cantor 定理，说明每个基数之上都有更大的基数。
+
+\begin{thm}[Cantor]
+  \index{Cantor's theorem}%
+  \index{theorem!Cantor's}%
+  对 $A:\set$，不存在满射 $A \to (A\to \bool)$。
+\end{thm}
+\begin{proof}
+  设 $f:A \to (A\to \bool)$ 是任意函数，定义 $g:A\to \bool$ 为 $g(a) \defeq \neg f(a)(a)$。
+  若 $g = f(a_0)$，则有 $g(a_0) = f(a_0)(a_0)$，但同时 $g(a_0) = \neg f(a_0)(a_0)$，矛盾。
+  因此 $f$ 不是满射。
+\end{proof}
+
+\begin{cor}
+  在假设排中律下，对任意 $\alpha:\card$，存在基数 $\beta$ 使得 $\alpha\le\beta$ 且 $\alpha\neq\beta$。
+\end{cor}
+\begin{proof}
+  取 $\beta = 2^\alpha$。
+  现在我们要证明一个纯命题，所以可由归纳设 $\alpha$ 形如 $\cd{A}$，从而 $\beta\jdeq \cd{A\to \bool}$。
+  借助排中律，定义函数 $f:A\to (A\to \bool)$：
+  \[f(a)(a') \defeq
+  \begin{cases}
+    \btrue &\quad a=a'\\
+    \bfalse &\quad a\neq a'.
+  \end{cases}
+  \]
+  若 $f(a)=f(a')$，则 $f(a')(a) = f(a)(a) = \btrue$，故 $a=a'$；因此 $f$ 是单射。
+  从而 $\alpha \jdeq \cd{A} \le \cd{A\to \bool} \jdeq 2^\alpha$。
+
+  另一方面，若 $2^\alpha \le \alpha$，则会有一个单射 $(A\to\bool)\to A$。
+  由 \cref{thm:injsurj}，并利用我们有 $(\lam{x} \bfalse):A\to \bool$ 且假设排中律，便会得到一个满射 $A \to (A\to \bool)$，与 Cantor 定理矛盾。
+\end{proof}
+\section{序数}
+\label{sec:ordinals}
+
+\index{ordinal|(}%
+
+\begin{defn}\label{defn:accessibility}
+  设 $A$ 是一个集合，且
+  \[(\blank<\blank):A\to A\to \prop\]
+  是 $A$ 上的一个二元关系。
+  我们按归纳方式定义元素 $a:A$ 关于 $<$ 是\define{可达的}
+  \indexdef{accessibility}%
+  \indexsee{accessible}{accessibility}%
+  ：
+  \begin{itemize}
+  \item 若每个满足 $b<a$ 的 $b$ 都可达，则 $a$ 可达。
+  \end{itemize}
+  记 $\acc(a)$ 表示 $a$ 可达。
+\end{defn}
+
+看起来这种归纳定义似乎永远无法启动；但当然，若 $a$ 具有如下性质：不存在任何 $b$ 使 $b<a$，则 $a$ 平凡可达。
+
+注意，这是一个类型族的归纳定义，类似 \cref{sec:generalizations} 中讨论的向量类型。
+更精确地说，它有一个构造子（记作 $\acc_<$），其类型为
+\[ \acc_< : \prd{a:A} \Parens{\prd{b:A} (b<a) \to \acc(b)} \to \acc(a). \]
+\index{induction principle!for accessibility}%
+$\acc$ 的归纳原理断言：对任意 $P:\prd{a:A} \acc(a) \to \type$，若有
+\[f:\prd{a:A}{h:\prd{b:A} (b<a) \to \acc(b)}
+\Parens{\prd{b:A}{l:b<a} P(b,h(b,l))} \to
+P(a,\acc_<(a,h)),
+\]
+则可归纳定义出 $g:\prd{a:A}{c:\acc(a)} P(a,c)$，并满足
+\[g(a,\acc_<(a,h)) \jdeq f(a,\,h,\,\lam{b}{l} g(b,h(b,l))).\]
+这句话很拗口，但通常我们只在更简单的情形中使用它，即 $P:A\to\type$ 只依赖于 $A$。
+此时 $f$ 的第二、第三个参数可合并，所以我们需要证明的是
+\[f:\prd{a:A} \Parens{\prd{b:A} (b<a) \to \acc(b) \times P(b)}
+\to P(a).
+\]
+也就是说，假设每个 $b<a$ 都可达且 $g(b):P(b)$ 已定义，据此定义 $g(a):P(a)$。
+
+省略 $P$ 的第二个参数由下述引理保证；其证明是我们唯一一次使用归纳原理一般形式的地方。
+
+\begin{lem}
+  可达性\index{accessibility}是一个纯性质。
+\end{lem}
+\begin{proof}
+  我们需证明：对任意 $a:A$ 与 $s_1,s_2:\acc(a)$，有 $s_1=s_2$。
+  通过对 $s_1$ 归纳来证，令
+  \[P_1(a,s_1) \defeq \prd{s_2:\acc(a)} (s_1=s_2). \]
+  因而，我们要证明：对任意 $a:A$、${h_1:\prd{b:A} (b<a) \to \acc(b)}$ 以及
+  \[ k_1:{\prd{b:A}{l:b<a}{t:\acc(b)} h_1(b,l) = t},\]
+  对任意 $s_2:\acc(a)$，有 $\acc_<(a,h) = s_2$。
+  把该命题视为 $\prd{a:A}{s_2:\acc(a)} P_2(a,s_2)$，其中
+  \[P_2(a,s_2) \defeq
+  \prd{h_1 : \cdots } %{h_1:\prd{b:A} (b<a) \to \acc(b)}
+  {k_1 : \cdots} % \Parens{\prd{b:A}{l:b<a}{t:\acc(b)} h_1(b,l) = t} \to
+  (\acc_<(a,h_1) = s_2);
+  \]
+  因此可对 $s_2$ 归纳来证。
+  于是设 $h_2 : \prd{b:A} (b<a) \to \acc(b)$，以及一个类型庞杂但无关紧要的 $k_2$，
+  % \begin{narrowmultline*}
+  %   k_2:\prd{b:A}{l:b<a}
+  %   \prd{h_1:\prd{b':A} (b'<b) \to \acc(b')}
+  %   \narrowbreak
+  %   \Parens{\prd{b':A}{l':b'<b}{t':\acc(b')} h_1(b',l') = t'} \to
+  %   (\acc_<(b,h_1) = h_2(b,l)).
+  % \end{narrowmultline*}
+  并需证明：对任意满足上述类型的 $h_1,k_1$，有
+  $\acc_<(a,h_1) = \acc_<(a,h_2)$。
+  由函数外延性，只需证明对所有 $b:A$ 与 $l:b<a$，有 $h_1(b,l) = h_2(b,l)$。
+  这由 $k_1$ 给出。
+\end{proof}
+
+\begin{defn}
+  集合 $A$ 上的二元关系 $<$ 称为\define{良基的}
+  \indexdef{relation!well-founded}%
+  \indexdef{well-founded!relation}%
+  ，若 $A$ 的每个元素都可达。
+\end{defn}
+
+良基性的意义在于：对 $P:A\to \type$，可由 $\acc$ 的归纳原理得到 $\prd{a:A} \acc(a) \to P(a)$，再由良基性推出 $\prd{a:A} P(a)$。
+换言之，若能由 $\fall{b:A} (b<a) \to P(b)$ 推出 $P(a)$，就能得到 $\fall{a:A} P(a)$。
+这称为\define{良基归纳}\indexdef{well-founded!induction}。
+
+\begin{lem}
+  良基性是一个纯性质。
+\end{lem}
+\begin{proof}
+  $<$ 的良基性是类型 $\prd{a:A} \acc(a)$；每个 $\acc(a)$ 都是纯命题，因此它也是纯命题。
+\end{proof}
+
+\begin{eg}\label{thm:nat-wf}
+  最熟悉的良基关系大概是 \nat 上通常的严格序。
+  要证明其良基性，需证明每个 $n:\nat$ 都可达。
+  \index{strong!induction}%
+  这正是由 \nat 上普通归纳证明“强归纳”的标准证明。
+
+  具体地，对 $n:\nat$ 归纳，证明所有满足 $k\le n$ 的 $k$ 都可达。
+  基础步是 $0$ 可达；这是平凡成立的，因为没有元素严格小于 $0$。
+  对归纳步，设所有 $k\le n$ 的 $k$ 都可达，也即所有 $k<n+1$ 都可达；于是按定义 $n+1$ 也可达。
+
+  \nat 上另一个同样良基的关系由仅设定对所有 $n:\nat$ 有 $n < \suc(n)$ 得到。
+  该关系的良基性几乎就是 \nat 的普通归纳原理本身。
+\end{eg}
+
+\begin{eg}\label{thm:wtype-wf}
+  设 $A:\set$，且 $B : A \to \set$ 是一个集合族。
+  回忆 \cref{sec:w-types}，$W$-类型 $\wtype{a:A} B(a)$ 由唯一构造子归纳生成：
+  \begin{itemize}
+  \item $\supp : \prd{a:A} (B(a) \to \wtype{x:A} B(x)) \to \wtype{x:A} B(x)$
+  \end{itemize}
+  我们通过对第二参数递归，在 $\wtype{x:A} B(x)$ 上定义关系 $<$：
+  \begin{itemize}
+  \item 对任意 $a:A$ 与 $f:B(a) \to \wtype{x:A} B(x)$，定义 $w<\supp(a,f)$ 表示仅仅存在某个 $b:B(a)$ 使得 $w = f(b)$。
+  \end{itemize}
+  现在用 $\wtype{x:A}B(x)$ 的普通归纳原理证明：每个 $w:\wtype{x:A} B(x)$ 对此关系都可达。
+  这意味着我们设给定 $a:A$、$f:B(a) \to \wtype{x:A} B(x)$，以及提升 $f' : \prd{b:B(a)} \acc(f(b))$。
+  但按 $<$ 的定义，对所有 $w<\supp(a,f)$ 都有 $\acc(w)$；故 $\supp(a,f)$ 可达。
+\end{eg}
+
+良基性允许我们通过递归定义函数并通过归纳证明命题，例如下述结论。
+回忆 \cref{subsec:prop-subsets}：$\power B$ 表示\emph{幂集}\index{power set} $\power B \defeq (B\to\prop)$。
+
+\begin{lem}\label{thm:wfrec}
+  设 $B$ 是集合，并给定函数
+  \[ g : \power B \to B \]
+  若 $<$ 是 $A$ 上的良基关系，则存在函数 $f:A\to B$，使得对所有 $a:A$ 有
+  \begin{equation*}
+    f(a) = g\Big(\setof{ f(a') | a'<a }\Big).
+  \end{equation*}
+\end{lem}
+\noindent
+（这里使用 \cref{sec:image} 中对子集像的记号。）
+\begin{proof}
+  首先对每个 $a:A$ 与 $s:\acc(a)$ 定义元素 $\bar f(a,s):B$。
+  由归纳，只需设 $s$ 是一个函数，它给每个 $a'<a$ 分配见证 $s(a'):\acc(a')$，并且对每个这样的 $a'$ 已有元素 $\bar f(a',s(a')):B$。
+  在此情形下，定义
+  \begin{equation*}
+    \bar f(a,s) \defeq g\Big(\setof{ \bar f(a',s(a')) | a'<a }\Big).
+  \end{equation*}
+
+  由于 $<$ 良基，存在函数 $w:\prd{a:A} \acc(a)$。
+  因此可定义 $f(a)\defeq \bar f (a,w(a))$。
+\end{proof}
+
+在经典\index{mathematics!classical}逻辑中，良基性有一个更常见的重述。
+下文中，称子集 $B: \power A$ 为\define{非空}
+\indexdef{nonempty subset}
+若它不等于空子集 $(\lam{x}\bot) : \power X$。
+我们把“在排中律下这等价于仅仅可居留，即条件 $\exis{x:A} x\in B$”留给读者验证。
+
+\begin{lem}\label{thm:wfmin}
+  \index{excluded middle}%
+  假设排中律，$<$ 良基当且仅当每个非空子集 $B: \power A$ 仅仅有一个极小元。
+\end{lem}
+\begin{proof}
+  先设 $<$ 良基，且设 $B\subseteq A$ 没有极小元。
+  也就是说，对任意满足 $a\in B$ 的 $a:A$，仅仅存在某个 $b:A$ 使得 $b<a$ 且 $b\in B$。
+
+  我们断言：对任意 $a:A$ 与 $s:\acc(a)$，有 $a\notin B$。
+  由归纳，可设 $s$ 给每个 $a'<a$ 分配证明 $s(a'):\acc(a')$，并且对每个这样的 $a'$ 有 $a'\notin B$。
+  若 $a\in B$，则按假设会仅仅存在某个 $b<a$ 且 $b\in B$，与此假设矛盾。
+  因而 $a\notin B$，归纳完成。
+  由于 $<$ 良基，对所有 $a:A$ 都有 $a\notin B$，即 $B$ 为空。
+
+  反过来，设每个非空子集仅仅有一个极小元。
+  令 $B = \setof{ a:A | \neg \acc(a) }$。
+  若 $B$ 非空，则它仅仅有极小元。
+  因而仅仅存在某个 $a:A$，满足 $a\in B$ 且对所有 $b<a$ 都有 $\acc(b)$。
+  但按定义（并对截断归纳）可得 $a$ 仅仅可达，进而可达，这与 $a\in B$ 矛盾。
+  故 $B$ 为空，于是 $<$ 良基。
+\end{proof}
+
+\begin{defn}
+  集合 $A$ 上的良基关系 $<$ 称为\define{外延的}
+  \indexdef{relation!extensional}%
+  \indexdef{extensional!relation}%
+  ，若对任意 $a,b:A$，有
+  \[ \Parens{\fall{c:A} (c<a) \Leftrightarrow (c<b)} \to (a=b). \]
+\end{defn}
+
+注意，由于 $A$ 是集合，外延性是纯命题。
+这里的“外延性”既不同于函数外延性，也不同于恒等类型的外延性。
+\index{axiom!of extensionality}%
+它更像是经典集合论外延公理的一种“局部”对应。
+
+\begin{thm}
+  外延良基关系的类型是集合。
+\end{thm}
+\begin{proof}
+  由泛等公理，只需证明：若 $(A,<)$ 外延且良基，且 $f:(A,<) \cong (A,<)$，则 $f=\idfunc[A]$。
+  \index{automorphism!of extensional well-founded relations}%
+  我们对 $<$ 归纳证明：对所有 $a:A$，有 $f(a)=a$。
+  归纳假设是：对所有 $a'<a$，有 $f(a')=a'$。
+
+  由于 $A$ 外延，要推出 $f(a)=a$，只需证明
+  \[\fall{c:A}(c<f(a)) \Leftrightarrow (c<a).\]
+  但因 $f$ 是自同构，有 $(c<a) \Leftrightarrow (f(c)<f(a))$。
+  又由归纳假设，$c<a$ 蕴含 $f(c)=c$，故 $(c<a) \to (c<f(a))$。
+  另一方面，若 $c<f(a)$，则 $f^{-1}(c)<a$，再由归纳假设得 $c = f(f^{-1}(c)) = f^{-1}(c)$；因此 $c<a$。
+  所以对任意 $c:A$ 都有 $(c<a) \Leftrightarrow (c<f(a))$，从而 $f(a)=a$。
+\end{proof}
+
+\begin{defn}\label{def:simulation}
+  若 $(A,<)$ 与 $(B,<)$ 都是外延且良基的，则\define{模拟}
+  \indexdef{simulation}%
+  \indexsee{function!simulation}{simulation}%
+  是满足下列条件的函数 $f:A\to B$：
+  \begin{enumerate}
+  \item 若 $a<a'$，则 $f(a)<f(a')$，且\label{item:sim1}
+  \item 对所有 $a:A$ 与 $b:B$，若 $b<f(a)$，则仅仅存在某个 $a'<a$ 使得 $f(a')=b$。\label{item:sim2}
+  \end{enumerate}
+\end{defn}
+
+\begin{lem}
+  任意模拟都是单射。
+\end{lem}
+\begin{proof}
+  我们通过双重良基归纳证明：对任意 $a,b:A$，若 $f(a)=f(b)$ 则 $a=b$。
+  关于 $a:A$ 的归纳假设是：对任意 $a'<a$ 及任意 $b:B$，若 $f(a')=f(b)$ 则 $a=b$。
+  内层关于 $b:A$ 的归纳假设是：对任意 $b'<b$，若 $f(a)=f(b')$ 则 $a=b'$。
+
+  设 $f(a)=f(b)$；我们需证 $a=b$。
+  由外延性，只需证明对任意 $c:A$，有 $(c<a)\Leftrightarrow (c<b)$。
+  若 $c<a$，则由 \cref{def:simulation}\ref{item:sim1} 得 $f(c)<f(a)$。
+  因而 $f(c)<f(b)$，所以由 \cref{def:simulation}\ref{item:sim2}，仅仅存在 $c':A$ 使得 $c'<b$ 且 $f(c)=f(c')$。
+  由关于 $a$ 的归纳假设得 $c=c'$，故 $c<b$。
+  对偶方向完全对称。
+\end{proof}
+
+特别地，这意味着在 \cref{def:simulation}\ref{item:sim2} 中，“merely”一词可去掉而不改变含义。
+
+\begin{cor}
+  若 $f:A\to B$ 是模拟，则对所有 $a:A$ 与 $b:B$，若 $b<f(a)$，则\emph{纯粹地}存在某个 $a'<a$ 使 $f(a')=b$。
+\end{cor}
+\begin{proof}
+  因为 $f$ 是单射，$\sm{a:A} (f(a)=b)$ 是纯命题。
+\end{proof}
+
+我们称子集 $C :\power B$ 为\define{初始段}
+\indexdef{initial!segment}%
+\indexsee{segment, initial}{initial segment}%
+，若 $c\in C$ 且 $b<c$ 蕴含 $b\in C$。
+模拟的像必是初始段，而任意初始段的包含映射都是模拟。
+因此由泛等，每个模拟 $A\to B$ 都\emph{等于} $B$ 某个初始段的包含映射。
+
+\begin{thm}
+  对集合 $A$，令 $P(A)$ 表示 $A$ 上外延良基关系的类型。
+  若 $\mathord{<_A} : P(A)$、$\mathord{<_B} : P(B)$ 且 $f:A\to B$，令 $H_{\mathord{<_A}\mathord{<_B}}(f)$ 表示“$f$ 是模拟”这一纯命题。
+  则 $(P,H)$ 是 \cref{sec:sip} 意义下 \uset 上的标准结构概念。
+\end{thm}
+\begin{proof}
+  恒等映射是模拟、模拟的复合仍是模拟，留待读者验证。
+  因而我们有一个结构概念。
+  为证明标准性，需证明：若 $<$ 与 $\prec$ 是 $A$ 上两个外延良基关系，且 $\idfunc[A]$ 在双向上都是模拟，则 $<$ 与 $\prec$ 相等。
+  由于外延性与良基性都是纯命题，为此只需有 $\fall{a,b:A} (a<b) \Leftrightarrow (a\prec b)$。
+  这由 \cref{def:simulation}\ref{item:sim1} 对 $\idfunc[A]$ 直接推出。
+\end{proof}
+
+\begin{cor}\label{thm:wfcat}
+  存在一个范畴，其对象是配备外延良基关系的集合，其态射是模拟。
+\end{cor}
+
+事实上，这个范畴是一个偏序。
+
+\begin{lem}
+  对外延良基的 $(A,<)$ 与 $(B,<)$，至多存在一个模拟 $f:A\to B$。
+\end{lem}
+\begin{proof}
+  设 $f,g:A\to B$ 都是模拟。
+  由于“是模拟”是纯性质，只需证明 $\fall{a:A}(f(a)=g(a))$。
+  对 $<$ 归纳，可设对所有 $a'<a$ 都有 $f(a')=g(a')$。
+  又由 $B$ 的外延性，要证明 $f(a)=g(a)$，只需证明 $\fall{b:B}(b<f(a)) \Leftrightarrow (b<g(a))$。
+
+  但因 $f$ 是模拟，若 $b<f(a)$，则有 $a'<a$ 使得 $f(a')=b$。
+  由归纳假设也有 $g(a')=b$，故 $b<g(a)$。
+  对偶方向同理。
+\end{proof}
+
+因此，若 $A,B$ 都配备外延良基关系，我们可写 $A\le B$ 表示存在模拟 $f:A\to B$。
+\cref{thm:wfcat} 蕴含：若 $A\le B$ 且 $B\le A$，则 $A=B$。
+
+\begin{defn}
+  \define{序数}
+  \indexdef{ordinal}%
+  \indexsee{number!ordinal}{ordinal}%
+  是一个配备外延良基关系且该关系\emph{传递}的集合 $A$，即满足 $\fall{a,b,c:A}(a<b)\to (b<c) \to (a<c)$。
+\end{defn}
+
+\begin{eg}
+  当然，\nat 上通常的严格序是传递的。
+  容易看出它也是外延的；因此它是一个序数。
+  和往常一样，我们将此序数记作 $\omega$。
+\end{eg}
+
+\symlabel{ord}
+令 \ord 表示序数类型。
+由前述结果，\ord 是集合，并带有自然偏序。
+现在我们说明 \ord 还可赋予一个良基关系。
+
+\symlabel{initial-segment}
+若 $A$ 是序数且 $a:A$，令 $\ordsl A a \defeq \setof{ b:A | b<a}$ 表示初始段。
+\index{initial!segment}%
+注意，若 $\ordsl A a = \ordsl A b$ 作为序数相等，则该同构必须保持它们到 $A$ 的包含映射（因为模拟构成偏序），故它们作为 $A$ 的子集也相等。
+因此由 $A$ 的外延性可得 $a=b$。
+于是函数 $a\mapsto \ordsl A a$ 是一个单射 $A\to \ord$。
+
+\begin{defn}
+  对序数 $A,B$，若模拟 $f:A\to B$ 满足存在 $b:B$ 使得 $A = \ordsl B b$，则称 $f$ 是\define{有界的}
+  \indexdef{simulation!bounded}%
+  \indexdef{bounded!simulation}%
+  。
+\end{defn}
+
+上述讨论蕴含：这样的 $b$ 若存在则唯一，因此有界性是纯性质。
+
+若存在从 $A$ 到 $B$ 的有界模拟，记作 $A<B$。
+由于模拟唯一，$A<B$ 也是纯命题。
+
+\begin{thm}\label{thm:ordord}
+  $(\ord,<)$ 是一个序数。
+\end{thm}
+
+\noindent
+更精确地说，这个定理断言：某一宇宙中的序数类型 $\ord_{\UU_i}$\index{universe level} 本身在下一更高宇宙中也是一个序数，即 $(\ord_{\UU_i},<):\ord_{\UU_{i+1}}$。
+
+\begin{proof}
+  设 $A$ 是一个序数；先证明对每个 $a:A$，$\ordsl A a$（在 \ord 中）都是可达的。
+  对 $A$ 做良基归纳，设对所有 $b<a$，$\ordsl A b$ 都可达。
+  按可达性的定义，我们需证明对所有 $B<\ordsl A a$，$B$ 在 \ord 中可达。
+  但若 $B<\ordsl A a$，则存在某个 $b<a$ 使得 $B = \ordsl{(\ordsl A a)}{b} = \ordsl A b$，它由归纳假设可达。
+  因而对所有 $a:A$，$\ordsl A a$ 都可达。
+
+  现在要证明 $A$ 在 \ord 中可达，按定义需证明对所有 $B<A$，$B$ 都可达。
+  但与前面一样，$B<A$ 意味着对某个 $a:A$ 有 $B=\ordsl A a$，而这刚刚已证明可达。
+  因此，\ord 是良基的。
+
+  对外延性，设 $A,B$ 是序数，且
+  \narrowequation{\prd{C:\ord} (C<A) \Leftrightarrow (C<B).}
+  则对每个 $a:A$，由于 $\ordsl A a<A$，有 $\ordsl A a<B$，故存在 $b:B$ 使得 $\ordsl A a = \ordsl B b$。
+  定义 $f:A\to B$ 把每个 $a$ 送到对应的 $b$；可直接验证 $f$ 是同构。
+  因而 $A\cong B$，由泛等得 $A=B$。
+
+  最后，容易看出 $<$ 具有传递性。
+\end{proof}
+
+把 \ord 当作序数通常非常方便，但也有潜在陷阱。
+例如考虑下面的引理，其中我们留意宇宙的使用方式。
+
+\begin{lem}\label{thm:ordsucc}
+  设 \bbU 是一个宇宙。
+  对任意 $A:\ord_\bbU$，存在 $B:\ord_\bbU$ 使得 $A<B$。
+\end{lem}
+\begin{proof}
+  令 $B=A+\unit$，其中元素 $\ttt:\unit$ 大于 $A$ 的所有元素。
+  则 $B$ 是序数，且易见 $A\cong \ordsl B \ttt$。
+\end{proof}
+
+在 \cref{thm:ordsucc} 的证明中构造的序数 $B$ 称为 $A$ 的\define{后继}\indexdef{successor!of an ordinal}。
+
+这个引理展示了用 \UU 表示任意未指明宇宙时“通常含混”\index{typical ambiguity}风格的一个潜在陷阱。
+考虑其下述另一种证明。
+
+\begin{proof}[\cref{thm:ordsucc} 的另一种候选证明]
+  注意 $C<A$ 当且仅当对某个 $a:A$ 有 $C=\ordsl A a$。
+  这给出同构 $A \cong \ordsl \ord A$，从而 $A<\ord$。
+  因此可取 $B\defeq\ord$。
+\end{proof}
+
+若我们以通常含混风格陈述 \cref{thm:ordsucc}，则第二个证明将是有效的。
+但那样得到的引理可用性更差，因为第二个证明会迫使引理陈述中的第二个“\ord”比第一个处在更高宇宙层级。
+第一个证明则允许两个宇宙相同。
+
+类似评论也适用于下一个引理；它也可通过观察任意 $A:\ord$ 都满足 $A\le \ord$ 来得到一种可用性较差的证明。
+
+\begin{lem}\label{thm:ordunion}
+  设 \bbU 是一个宇宙。
+  对任意 $X:\type$ 与 $F:X\to \ord_\bbU$，存在 $B:\ord_\bbU$ 使得对所有 $x:X$ 都有 $Fx\le B$。
+\end{lem}
+\begin{proof}
+  令 $B$ 为 $\sm{x:X} Fx$ 上如下等价关系 $\eqr$ 的集合商（见 \cref{rmk:quotient-of-non-set}）：
+  \[ (x,y) \eqr (x',y')
+  \;\defeq\;
+  \Big(\ordsl{(Fx)}{y} \cong \ordsl{(Fx')}{y'}\Big).
+  \]
+  定义 $(x,y)<(x',y')$ 当且仅当 $\ordsl{(Fx)}{y} < \ordsl{(Fx')}{y'}$。
+  这显然可下降到商上，并可见其使 $B$ 成为一个序数。
+  另外，对每个 $x:X$，诱导映射 $Fx\to B$ 是一个模拟。
+\end{proof}
+
+
+
+\section{经典良序}
+\label{sec:wellorderings}
+
+\index{denial|(}%
+我们现在说明，我们的序数与更熟悉的经典\index{mathematics!classical}良序之间是等价的。
+
+\begin{lem}
+  \index{excluded middle}%
+  假设排中律，每个序数都满足三歧律：
+  \index{trichotomy of ordinals}%
+  \index{ordinal!trichotomy of}%
+  \[ \fall{a,b:A} (a<b) \vee (a=b) \vee (b<a). \]
+\end{lem}
+\begin{proof}
+  对 $a$ 归纳，可设对每个 $a'<a$ 和每个 $b':A$，有 $(a'<b') \vee (a'=b') \vee (b'<a')$。
+  再对 $b$ 归纳，可设对每个 $b'<b$，有 $(a<b') \vee (a=b') \vee (b'<a)$。
+
+  由排中律，要么仅仅存在某个 $b'<b$ 使得 $a<b'$，要么仅仅存在某个 $b'<b$ 使得 $a=b'$，要么对每个 $b'<b$ 都有 $b'<a$。
+  在第一种情形下，由传递性仅仅有 $a<b$，因此由于其为纯命题，故有 $a<b$。
+  类似地，在第二种情形下，由传送可得 $a<b$。
+  因而可设 $\fall{b':A}(b'<b)\to (b'<a)$。
+
+  现在同理，要么仅仅存在某个 $a'<a$ 使得 $b<a'$，要么仅仅存在某个 $a'<a$ 使得 $a'=b$，要么对每个 $a'<a$ 都有 $a'<b$。
+  在前两种情形中都可得 $b<a$，故可设 $\fall{a':A}(a'<a)\to (a'<b)$。
+  然而由外延性，这两个假设现在推出 $a=b$。
+\end{proof}
+
+\begin{lem}
+  良基关系不包含环，即
+  \[ \fall{n:\mathbb{N}}{a:\mathbb{N}_n\to A} \neg\Big((a_0<a_1) \wedge \dots \wedge (a_{n-1}<a_n)\wedge (a_n<a_0)\Big). \]
+\end{lem}
+\begin{proof}
+  我们对 $a:A$ 归纳证明：不存在包含 $a$ 的环。
+  因而归纳地设：对所有 $a'<a$，都不存在包含 $a'$ 的环。
+  但在任何包含 $a$ 的环里，都有某个元素既小于 $a$，又同处于该环中。
+\end{proof}
+
+\indexdef{relation!irreflexive}%
+\index{irreflexivity!of well-founded relation}%
+特别地，良基关系必是\define{反自反的}，即对所有 $a$ 都有 $\neg(a<a)$。
+
+\begin{thm}\label{thm:wellorder}
+  假设排中律，$(A,<)$ 是序数当且仅当每个非空子集 $B\subseteq A$ 都有最小元。
+\end{thm}
+\begin{proof}
+  若 $A$ 是序数，则由 \cref{thm:wfmin}，每个非空子集仅仅有一个极小元。
+  但三歧律蕴含任一极小元都是最小元。
+  另外，最小元一旦存在便唯一，所以“仅仅存在一个”与“给定一个”效果相同。
+
+  反之，若每个非空子集都有最小元，则由 \cref{thm:wfmin}，$A$ 是良基的。
+  也有三歧律，因为对任意 $a,b$，子集
+  $ \setof{a,b} \defeq \setof{x:A | x=a \lor x=b} $
+  仅仅有一个最小元，而它必为 $a$ 或 $b$。
+  这推出传递性：若 $a<b$ 且 $b<c$，则 $a=c$ 或 $c<a$ 都会产生一个环。
+  同样也推出外延性：若 $\fall{c:A}(c<a)\Leftrightarrow (c<b)$，则 $a<b$ 会推出（令 $c$ 为 $a$）$a<a$，形成环；若 $b<a$ 亦同理；故 $a=b$。
+\end{proof}
+
+在经典\index{mathematics!classical}数学中，\cref{thm:wellorder} 的刻画被作为\emph{良序}的定义，而\emph{序数}则被看作良序同构类的一组典范代表。
+在我们的语境下，结构恒等原理意味着无须寻找此类代表：任何良序都与任何其他良序一样好。
+
+现在转向讨论选择公理的推论。
+对任意集合 $X$，令 $\powerp X$ 表示 $X$ 的仅仅可居留子集所成类型：
+\symlabel{inhabited-powerset}
+\[ \powerp X \defeq \setof{ Y : \power X | \exis{x:X} x\in Y}. \]
+在排中律下，这等价于 $X$ 的\emph{非空}\index{nonempty subset}子集类型，并且有 $\power X \eqvsym (\powerp X) + \unit$。
+
+\begin{thm}\label{thm:wop}
+  \index{axiom!of choice}%
+  \index{excluded middle}%
+  假设排中律，下列命题等价。
+  \begin{enumerate}
+  \item 对每个集合 $X$，仅仅存在函数
+    $ f: \powerp X \to X $
+    使得对所有 $Y:\powerp X$ 都有 $f(Y)\in Y$。\label{item:wop1}
+  \item 每个集合仅仅可赋予一个序数结构。\label{item:wop2}
+  \end{enumerate}
+\end{thm}
+
+\noindent
+当然，~\ref{item:wop1} 是选择公理的标准经典\index{mathematics!classical}版本；见 \cref{ex:choice-function}。
+
+\begin{proof}
+  一个方向很容易：设~\ref{item:wop2}。
+  由于我们要证明纯命题~\ref{item:wop1}，可设 $A$ 是一个序数。
+  此时可定义 $f(B)$ 为 $B$ 的最小元。
+
+  现设~\ref{item:wop1}。
+  与前面一样，由于~\ref{item:wop2} 是纯命题，可设给定了这样的 $f$。
+  我们以显然方式把 $f$ 扩展为函数
+  \[ \bar f:\power X \eqvsym (\powerp X) + \unit \longrightarrow X+\unit
+  \]
+  对任意序数 $A$，可用良基递归定义 $g_A:A\to X+\unit$：
+  \[ g_A(a) \defeq
+    \bar f\Big(X \setminus \setof{ g_A(b) | \strut (b<a) \wedge (g_A(b) \in X) }\Big)
+  \]
+  （这里把 $X$ 以显然方式看作 $X+\unit$ 的子集）。
+
+  令 $A'\defeq \setof{a:A | g_A(a) \in X}$ 为 $X\subseteq X+\unit$ 的原像；我们断言限制映射 $g_A':A' \to X$ 是单射。
+  因为若 $a,a':A$ 且 $a\neq a'$，由三歧律且不失一般性可设 $a'<a$。
+  于是 $g_A(a') \in \setof{ g_A(b) | b<a }$，因此由对所有 $Y$ 有 $f(Y)\in Y$，可得 $g_A(a) \neq g_A(a')$。
+
+  此外，$A'$ 是 $A$ 的一个初始段。
+  因为 $g_A(a)$ 落在 \unit 中，当且仅当 $\setof{g_A(b)|b<a} = X$；而此事若对 $a$ 成立，则对任意 $a'>a$ 也成立。
+  因而 $A'$ 本身是一个序数。
+
+  最后，由于 \ord 是序数，可取 $A\defeq\ord$。
+  令 $X'$ 是 $g_\ord':\ord' \to X$ 的像；则 $g_\ord'$ 的逆给出一个单射 $H:X'\to \ord$。
+  由 \cref{thm:ordunion}，存在序数 $C$ 使得对所有 $x:X'$ 有 $Hx\le C$。
+  再由 \cref{thm:ordsucc}，存在更大的序数 $D$ 使得 $C<D$，从而对所有 $x:X'$ 有 $Hx<D$。
+  现在有
+  \begin{align*}
+    g_{\ord}(D) &= \bar f\Big( X \setminus \setof{ g_\ord(B) | \rule{0pt}{1em} B<D \wedge (g_\ord(B) \in X)} \Big)\\
+    &=\bar f\Big( X \setminus \setof{ g_\ord(B) | \rule{0pt}{1em} g_\ord(B) \in X} \Big)
+  \end{align*}
+  因为若 $B:\ord$ 且 $(g_\ord(B) \in X)$，则对某个 $x:X'$ 有 $B = Hx$，故 $B<D$。
+  现在若
+  \[\setof{ g_\ord(B) | \rule{0pt}{1em} g_\ord(B) \in X}\]
+  不是整个 $X$，则 $g_\ord(D)$ 会落在 $X$ 中但不在该子集中；由于 $D$ 本身就是 $B$ 的一个可能取值，这将导致矛盾。
+  故该集合必为整个 $X$，于是 $g_\ord'$ 既满又单。
+  因而可将 $\ord'$ 上的序数结构传送到 $X$ 上。
+\end{proof}
+
+\begin{rmk}
+  若我们给出了 \cref{thm:ordsucc} 或 \cref{thm:ordunion} 的错误证明，则由此得到的 \cref{thm:wop} 的证明将无效：将无法一致地分配宇宙层级\index{universe level}。
+  如今的做法中，我们需要命题缩放（它由 \LEM{} 推出）以确保 $X'$（在等价意义下）与 $X$ 落在同一宇宙中。
+\end{rmk}
+
+\begin{cor}
+  假设选择公理，函数 $\ord\to\set$（即遗忘序结构）是满射。
+\end{cor}
+
+注意 \ord 是集合，而 \set 是一个 1-类型。
+一般而言，并无理由要求任意 1-类型都可由某个集合满射到它。
+即使在选择公理下，似乎也不能推出\emph{每个} 1-类型都如此（不过见 \cref{ex:acnm-surjset}）；但对由 \set 构造出的 1-类型，例如 \cref{sec:sip} 中结构范畴的对象类型，它确实可直接推出该结论。
+下一个推论也适用于此类范畴。
+
+\begin{cor}
+  \index{weak equivalence!of precategories}%
+  假设 \choice{}，\uset 接受来自某个严格范畴的弱等价函子。
+\end{cor}
+\begin{proof}
+  令 $X_0\defeq \ord$，并对 $A,B:X_0$ 定义 $\hom_X(A,B) \defeq (A\to B)$。
+  则 $X$ 是严格范畴，因为 \ord 是集合；并且上面的满射 $X_0 \to \set$ 可扩展为弱等价函子 $X\to \uset$。
+\end{proof}
+
+现在回忆 \cref{sec:cardinals}：我们还有一个满射 $\cd{\blank}:\set\to\card$，因而得到复合满射 $\ord\to\card$，它把每个序数送到其基数。
+
+\begin{thm}
+  假设 \choice{}，满射 $\ord\to\card$ 有一个截面。
+\end{thm}
+\begin{proof}
+  这里有一个简单但错误的证明：由于 \ord 与 \card 都是集合，\choice{} 蕴含它们之间任意满射\emph{仅仅}有一个截面。
+  但实际上我们有一个规范且\emph{指定}的截面：因为 \ord 是序数，它的每个非空子集都有唯一指定的最小元。
+  因而可把每个基数映到对应纤维中的最小元素。
+\end{proof}
+
+在集合论中，传统上把基数认同为其在 \ord 中的像：即具有该基数的最小序数。
+
+由此 \card 也自然可赋予序数结构；事实上，它与 \ord 同构。
+具体地，利用良基递归定义函数 $\aleph:\ord\to\ord$，使得 $\aleph(A)$ 是满足其基数大于所有 $a:A$ 的 $\aleph({\ordsl A a})$ 的最小序数。
+于是（在假设 \choice{} 下）$\aleph$ 的像恰好就是 \card 的像。
+
+\index{denial|)}%
+
+\index{ordinal|)}%
+\section{累积层级}
+\label{sec:cumulative-hierarchy}
+
+\index{bargaining|(}%
+我们可以把给定宇宙 $\UU$ 中所有集合的累积层级 $V$ 定义为一个高阶归纳类型，使得 $V$ 仍是一个集合（位于更大的宇宙 $\UU'$ 中），并配备一个二元“成员关系” $x\in y$，且满足集合论通常的规律。
+
+\begin{defn}\label{defn:V}
+  相对于类型宇宙 $\UU$ 的\define{累积层级}
+  \indexdef{cumulative!hierarchy, set-theoretic}%
+  \indexdef{hierarchy!cumulative, set-theoretic}%
+  $V$ 是由以下构造子生成的
+  高阶归纳类型。
+  %
+  \begin{enumerate}
+  \item 对每个 $A : \UU$ 和 $f : A \to V$，有元素 $\vset(A, f) : V$。
+  \item 对所有 $A, B : \UU$、$f : A \to V$ 与 $g : B \to V$，若
+    %
+    \begin{narrowmultline} \label{eq:V-path}
+      \big(\fall{a:A} \exis{b:B} \id[V]{f(a)}{g(b)}\big) \land \narrowbreak
+      \big(\fall{b:B} \exis{a:A} \id[V]{f(a)}{g(b)}\big)
+    \end{narrowmultline}
+    %
+    则有路径 $\id[V]{\vset(A,f)}{\vset(B,g)}$。
+  \item 0-截断构造子：对所有 $x,y:V$ 与 $p,q:x=y$，有 $p=q$。
+  \end{enumerate}
+\end{defn}
+
+用集合论语言说，$\vset(A,f)$ 可理解为（经典集合论意义下）$A$ 在 $f$ 下的像，即 $\setof{ f(a) | a \in A }$。
+但我们将避免这种记号，因为它会与我们的子类型记号冲突（不过见下文~\eqref{eq:class-notation} 与 \cref{def:TypeOfElements}）。
+
+层级 $V$ 是
+从空映射 $\rec\emptyt(V) : \emptyt \to V$ 起步构造的，它给出空集 $\emptyset = \vset(\emptyt,\rec\emptyt(V))$。
+随后单元集 $\{\emptyset\}$ 通过 $\unit \to V$（定义为 $\ttt \mapsto \emptyset$）进入 $V$，依此类推。
+（该定义也可通过额外增加一个点构造子，改造为包含任意一组“atoms”或“urelements”。）
+类型 $V$ 与其底层宇宙 $\UU$ 处于同一宇宙中。
+
+$V$ 的第二个构造子有一种我们此前未见过的形式：它不仅涉及 $V$ 中的路径（我们在 \cref{sec:hittruncations} 中说过这有些可疑），还涉及这些路径之和类型的截断。
+它显然不符合 \cref{sec:naturality} 描述的一般框架，因此其归纳原理是什么并不明显。
+幸运的是，和我们在 \cref{sec:hittruncations} 里对 0-截断的第一个定义一样，它可以借助辅助高阶归纳类型来重述。
+细节留给读者完成（见 \cref{ex:cumhierhit}）。
+
+\index{induction principle!for cumulative hierarchy}%
+归根结底，$V$ 的归纳原理（用模式匹配语言写）是：给定 $P:V\to \set$，要构造 $h:\prd{x:V} P(x)$，给出下列数据即可。
+\begin{enumerate}
+\item 对任意 $f:A\to V$，在已给出所有 $a:A$ 的 $h(f(a))$ 时，构造 $h(\vset(A,f))$。
+\item 验证：若 $f : A \to V$ 与 $g : B \to V$ 满足~\eqref{eq:V-path}，则 $\dpath{P}{q}{h(\vset(A,f))}{h(\vset(B,g))}$，其中 $q$ 是由 $V$ 的第二构造子与~\eqref{eq:V-path} 产生的路径；并归纳地假设对所有 $a:A$ 与 $b:B$，$h(f(a))$ 与 $h(g(b))$ 已定义，且满足下列条件：
+\begin{eqnarray*}
+    &       & \big(\fall{a:A} \exis{b:B} \exis{p:f(a)=g(b)} \dpath{P}{p}{h(f(a))}{h(g(b))}\big) \\
+    & \land & \big(\fall{b:B} \exis{a:A} \exis{p:f(a)=g(b)} \dpath{P}{p}{h(f(a))}{h(g(b))}\big)
+\end{eqnarray*}
+\end{enumerate}
+第二条是在检查：所定义的映射必须尊重 \eqref{eq:V-path} 中引入的路径。
+和我们用模式匹配陈述高阶归纳原理时常见的情形一样，这看上去似乎同义反复，其实不是。
+关键在于“$h(f(a))$”本质上是一个我们无法窥视内部的形式符号，而 $h(\vset(A,f))$ 必须以它为基础来定义。
+因此在第二条中，我们在适当处假设这些形式符号相等，并验证由第一条构造得到的元素也相等。
+当然，若 $P$ 是纯命题族，则第二条自动成立。
+
+注意，由归纳可知，对每个 $v:V$，仅仅存在 $A:\UU$ 与 $f:A\to V$ 使得 $v=\vset(A,f)$。
+因此，在 $V$ 上按下式定义\define{成员关系}
+\indexdef{membership, for cumulative hierarchy}%
+$x\in v$ 是合理的：
+%
+% Note: "membership" rather than "elementhood", because "element" is taken.
+%
+\symlabel{V-membership}
+\begin{equation*}
+  (x \in \vset(A,f)) \defeq (\exis{a : A} x = f(a)).
+\end{equation*}
+%
+要看此定义有效，必须使用 $V$ 的递归原理。
+因此，设有通过~\eqref{eq:V-path} 构造出的路径 $\vset(A, f) = \vset(B, g)$。
+若 $x \in \vset(A,f)$，则仅仅存在 $a : A$ 使得 $x = f(a)$；而由~\eqref{eq:V-path}，又仅仅存在 $b : B$ 使得 $f(a) = g(b)$，故
+$x = g(b)$ 且 $x \in \vset(B,g)$。反向同理。
+
+\define{子集关系}
+\indexdef{subset!relation on the cumulative hierarchy}%
+$x\subseteq y$ 在 $V$ 上照常定义为
+%
+\begin{equation*}
+  (x \subseteq y) \defeq \fall{z : V} z \in x \Rightarrow z \in y.
+\end{equation*}
+
+\define{类}
+\indexdef{class}%
+可视为 $V$ 上的一个纯谓词。我们说类 $C : V \to \prop$ 是一个
+\define{$V$-集合}
+\indexdef{set!in the cumulative hierarchy}%
+若仅仅存在 $v:V$ 使得
+%
+\begin{equation*}
+  \fall{x : V} C(x) \Leftrightarrow x \in v.
+\end{equation*}
+我们也可用类的常规记号，它与我们对子类型的标准记号一致：
+\begin{equation}
+  \setof{ x | C(x) } \defeq \lam{x}C(x).\label{eq:class-notation}
+\end{equation}
+%
+若类 $C: V\to \prop$ 的所有取值 $C(x)$ 都落在 $\UU$ 中，即 $C: V\to \prop_{\UU}$，
+则称其为\define{$\UU$-小的}
+\indexdef{class!small}%
+\indexdef{small!class}%
+。
+由于 $V$ 与构造它的底层宇宙 $\UU$ 同处宇宙 $\UU'$，对任意 $v,w:V$ 的恒等类型 $v=_V w$ 也同样如此。
+因此，为了在没有命题缩放
+\index{propositional!resizing}%
+\index{resizing}%
+时得到表现良好的理论，引入恒等关系的一个 $\UU$-小“缩放版”会更方便，可按如下方式归纳定义。
+
+\begin{defn}\label{def:bisimulation}
+  通过关系
+  \define{互模拟}
+  \indexdef{bisimulation}%
+  
+  \begin{equation*}
+    \mathord\bisim : V \times V \longrightarrow \prop_{\UU}
+  \end{equation*}
+  
+  在 $V$ 上做双重归纳定义：对 $\vset(A,f)$ 与 $\vset(B,g)$，令
+  \begin{narrowmultline*}
+    \vset(A,f)  \bisim \vset(B,g) \defeq \narrowbreak
+    \big(\fall{a:A}\exis{b:B} f(a)  \bisim g(b)\big) \land
+    \big(\fall{b:B}\exis{a:A} f(a) \bisim g(b)\big).
+  \end{narrowmultline*}
+\end{defn}
+%
+要验证定义正确，只需检查它尊重通过~\eqref{eq:V-path} 构造的路径 $\vset(A, f) = \vset(B, g)$，这一点显然；并且 $\prop_{\UU}$ 是集合，确实如此。注意按构造 $u \bisim v$ 属于 $\propU$。
+
+\begin{lem}\label{lem:BisimEqualsId}
+对任意 $u,v:V$，有 $(u=_V v) = (u \bisim v)$。
+\end{lem}
+
+\begin{proof}
+一个简单归纳表明 $\bisim$ 是自反的，因此由传送得 $(u=_V v)\to (u \bisim v)$。
+所以只剩证明 $(u \bisim v)\to (u=_V v)$。
+对 $u,v$ 归纳，可设它们分别是 $\vset(A,f)$ 与 $\vset(B,g)$。
+（可忽略 $V$ 的路径构造子，因为 $(u \bisim v)\to (u=_V v)$ 是纯命题。）
+由定义，$\vset(A,f)\bisim\vset(B,g)$ 蕴含 $(\fall{a:A}\exis{b:B}f(a)  \bisim g(b))$ 及其反向。
+再由归纳假设得 $(\fall{a:A}\exis{b:B}f(a) = g(b))$ 及其反向。
+故由 $V$ 的路径构造子得到 $\vset(A,f) =_V \vset(B,g)$。
+\end{proof}
+
+有人也许会想：可以去掉 $V$ 的 0-截断构造子，并通过把 \cref{thm:h-set-refrel-in-paths-sets} 应用于互模拟来\emph{证明} $V$ 是 0-截断的。
+然而，在 \cref{lem:BisimEqualsId} 的证明中我们用了 $V$ 已是 0-截断这一事实，以推出 $(u \bisim v)\to (u=_V v)$ 是纯命题，从而归纳时只需假设 $u,v$ 形如 $\vset(A,f),\vset(B,g)$。
+
+现在可借助这个缩放后的恒等关系得到如下有用原理。
+
+\begin{lem}\label{lem:MonicSetPresent}
+对每个 $u:V$，都给定了某个 $A_u:\UU$ 与单态射 $m_u: A_u \mono V$，使得 $u = \vset(A_u, m_u)$。
+\end{lem}
+
+\begin{proof}
+  取任一表示 $u = \vset(A,f)$，并把 $f:A\to V$ 分解为一个满射后接一个单射：
+  %
+  \begin{equation*}
+    f = m_u\circ e_u : A \epi A_u \mono V.
+  \end{equation*}
+  %
+  显然，只要 $A_u$ 仍在 $\UU$ 中，就有 $u = \vset(A_u, m_u)$；而这在 $e_u : A \epi A_u$ 的核属于 $\UU$ 时成立。
+  但 $e_u : A \epi A_u$ 的核，是沿 $f : A\to V$ 对 $V$ 上恒等关系的拉回；而我们刚证明该恒等关系（在等价意义下）是 $\UU$-小的。
+  另外，由 $u:V$ 构造这对 $(A_u,m_u)$（其中 $m_u :A_u \mono V$ 且 $u = \vset(A_u, m_u)$）在 $V$ 上仅到等价唯一，故由泛等到恒等也唯一。
+  因此由唯一选择原理 \eqref{cor:UC}，存在映射 $c : V\to\sm{A:\UU}(A\to V)$ 使得 $c(u) = (A_u, m_u)$，且 $m_u :A_u \mono V$ 并有 $u = \vset(c(u))$，如所求。
+\end{proof}
+
+\begin{defn}\label{def:TypeOfElements}
+  对 $u:V$，刚构造出的单态表示 $m_u: A_u \mono V$（满足 $u = \vset(A_u, m_u)$）可称为 $u$ 的\define{成员类型}
+  \indexdef{type!of members}%
+  ，记作 $m_u : [u] \mono V$，或简写为 $[u] \mono V$。
+  可把 $[u]$ 理解为“由 $u$ 的成员组成的 $V$ 的子类”。
+\end{defn}
+
+\begin{thm}\label{thm:VisCST}
+  \index{axiom!of set theory, for the cumulative hierarchy}%
+  对 $(V, {\in})$，下列命题成立：
+  %
+  \begin{enumerate}
+  \item \emph{外延性：}
+    %
+    \begin{equation*}
+      \fall{x, y : V} x \subseteq y \land y \subseteq x \Leftrightarrow x = y.
+    \end{equation*}
+    %
+     \item \emph{空集：}对所有 $x:V$，有 $\neg (x\in \emptyset)$。
+    %
+    \item \emph{配对：}对所有 $u, v:V$，类 $\{u, v\} \defeq \setof{ x | x = u \vee x = v}$ 是一个 $V$-集合。
+      %
+    \item \emph{无穷：}\index{axiom!of infinity} 存在 $v:V$，使得 $\emptyset\in v$ 且 $x\in v$ 蕴含 $x\cup \{x\}\in v$。
+    %
+  \item \emph{并集：}对所有 $v:V$，类 $\cup v\defeq \setof{ x | \exis{u:V} x \in u \in v}$ 是一个 $V$-集合。
+    %
+    \item \emph{函数集：}对所有 $u, v:V$，类 $v^u \defeq \setof{ x | x : u\to v}$ 是一个 $V$-集合。%
+      \footnote{这里 $x:u\to v$ 表示：按集合论中编码函数的通常方式，$x$ 是一个合适的有序对集合。}
+    %
+   \item \emph{$\in$-归纳：}若 $C : V \to \prop$ 是一个类，且当对所有 $x\in a$ 有 $C(x)$ 时总有 $C(a)$，则对所有 $v:V$ 都有 $C(v)$。
+   %
+     \item \emph{替代：}\index{axiom!of replacement} 给定任意 $r : V \to V$ 与 $x : V$，类
+       %
+       \begin{equation*}
+         \setof{ y | \exis{z : V} z \in x \land y = r(z)}
+       \end{equation*}
+       %
+       是一个 $V$-集合。
+  %
+   \item \emph{分离：}\index{axiom!of separation} 给定任意 $a : V$ 与 $\UU$-小的 $C : V \to \propU$，类
+     %
+     \begin{equation*}
+       \setof{ x | x \in a \land C(x)}
+     \end{equation*}
+     %
+     是一个 $V$-集合。
+  \end{enumerate}
+\end{thm}
+
+
+\begin{proof}[证明提纲]
+  \mbox{}
+  %
+  \begin{enumerate}
+  \item 外延性：若 $\vset(A,f) \subseteq \vset(B, g)$，则对每个 $a : A$ 都有 $f(a) \in \vset(B, g)$，
+    因而对每个 $a : A$ 仅仅存在 $b : B$ 使得
+    $f(a) = g(b)$。假设 $\vset(B, g) \subseteq \vset(A, f)$ 给出~\eqref{eq:V-path}
+    的另一半，故 $\vset(A,f) = \vset(B,g)$。
+
+  \item 空集：设 $x\in \emptyset = \vset(\emptyt,\rec\emptyt(V))$。则有 $\exis{a:\emptyt}x=\, \rec\emptyt(V,a)$，矛盾。
+
+  \item 配对：给定 $u,v$，令 $w=\vset(\bool,\rec\bool(V,u,v))$。
+    \index{pair!unordered}
+
+  \item 无穷：取 $w = \vset(\nat,I)$，其中 $I: \nat \to V$ 由递归给出：$I(0) \defeq \emptyset$ 且 $I(n+1) \defeq I(n)\cup \{I(n)\}$。
+
+  \item 并集：任取 $v:V$ 及其表示 $f :A\to V$（$v=\vset(A,f)$）。令 $\tilde{A} \defeq \sm{a:A}[fa]$，其中 $m_{fa} : [fa] \mono V$ 是 \cref{def:TypeOfElements} 中的成员类型。$\tilde{A}$ 显然是 $\UU$-小的，并且有 $\cup v \defeq \vset(\tilde{A}, \lam{x} m_{f(\proj1(x))}(\proj2(x)))$。
+
+  \item 函数集：给定 $u,v:V$，取成员类型 $[u] \mono V$ 与 $[v] \mono V$，以及函数类型 $[u]\to [v]$。我们想定义映射
+  \[
+ r: ([u]\to [v])\ \longrightarrow\ V
+  \]
+   满足“$r(f) = \setof{ \pairr{x, f(x)} | x : [u] }$”。但要使其有意义，必须先定义有序对 $\pairr{x, y}$，然后取映射 $r': x \mapsto \pairr{x, f(x)}$，再令 $r(f)\defeq \vset([u], r')$。而有序对可照常由无序配对定义。
+
+  \item $\in$-归纳：设 $C : V \to \prop$ 是一类，且当对所有 $x\in a$ 有 $C(x)$ 时推出 $C(a)$，再任取 $v=\vset(B,g)$。要用归纳证明 $C(v)$，只需假设对所有 $b:B$ 有 $C(g(b))$。对每个 $x\in v$，仅仅存在某个 $b:B$ 使得 $x = g(b)$，故有 $C(x)$。于是 $C(v)$。
+
+  \item 替代：令 $C$ 表示所讨论的类。
+    命题“$C$ 是一个 $V$-集合”是纯命题，所以可按如下方式归纳。
+    设 $x$ 是 $\vset(A, f)$，我们断言 $w
+    \defeq \vset(A, r \circ f)$ 就是所求集合。若 $C(y)$，则仅仅存在
+    $z : V$ 与 $a : A$，使 $z = f(a)$ 且 $y = r(z)$，因此 $y \in w$。
+    反之，若 $y \in w$，则仅仅存在 $a : A$ 使 $y = r(f(a))$，因此
+    取 $z \defeq f(a)$ 即得 $C(y)$ 成立。
+
+  \item 称类 $C: V\to\prop$ 为\define{可分离的}
+    \indexdef{class!separable}%
+    \indexdef{separable class}%
+    ，若对任意 $a:V$，类
+  %
+  \symlabel{class-intersection}
+  \begin{equation*}
+    a \cap C \defeq\setof{x | x\in a \wedge C(x)}
+  \end{equation*}
+  %
+  是一个 $V$-集合。
+我们要证明任意 $\UU$-小的 $C: V \to \propU$ 都可分离。确实，给定 $a=\vset(A,f)$，令 $A' = \sm{x:A}C(fx)$，并取 $f' = f\circ i$，其中 $i : A' \to A$ 是显然的包含映射。然后取 $a' = \vset(A',f')$，即可得到 $x\in a\wedge C(x) \Leftrightarrow x\in a'$，如所需。我们需要假设 $C$ 取值落在 $\UU$ 中，才能保证 $A' = \sm{x:A}C(fx)$ 属于 $\UU$。\qedhere
+\end{enumerate}
+\end{proof}
+
+给出一个严格句法的可分离性判据也很方便，这样可以从一个类的表达式直接看出它产生一个 $V$-集合。
+一个熟悉的条件是“$\Delta_0$”：即表达式由等式 $x=_V y$ 与成员关系 $x\in y$ 构成，只使用纯命题联结词 $\neg$, $\land$, $\lor$, $\Rightarrow$ 以及对特定集合的量词 $\forall$, $\exists$，即形如 $\exists(x\in a)$ 与 $\forall(y\in b)$（称为\define{有界}量词\index{bounded!quantifier}\index{quantifier!bounded}）。\indexdef{separation!.Delta0@$\Delta_0$}%
+
+\begin{cor}\label{cor:Delta0sep}
+若类 $C: V \to \prop$ 在上述意义下是 $\Delta_0$ 的，则它是可分离的。
+\end{cor}
+\index{axiom!of $\Delta_0$-separation}%
+
+\begin{proof}
+回忆我们有恒等关系 $x = y$ 的一个 $\UU$-小缩放版 $x \bisim y$。由于 $x\in y$ 是由 $x=y$ 定义的，我们也有成员关系的一个 $\UU$-小缩放版
+%
+\symlabel{resized-membership}
+\begin{equation*}
+  x\bin\vset(A,f) \defeq \exis{a:A} x \bisim f(a).
+\end{equation*}
+%
+现在，设 $\Phi$ 是 $C$ 的一个 $\Delta_0$ 表达式，使得作为类有 $\Phi = C$（严格说我们应区分表达式与其意义，但这里略去此区别）。
+令 $\widetilde{\Phi}$ 为把所有 $=$ 与 $\in$ 替换为其缩放对应 $\bisim$ 与 $\bin$ 后得到的表达式。
+显然，$\widetilde{\Phi}$ 仍表达 $C$，即对所有 $x:V$，$\widetilde{\Phi}(x) \Leftrightarrow C(x)$，故由泛等得 $\widetilde{\Phi}=C$。
+于是只需证明 $\widetilde{\Phi}$ 是 $\UU$-小的；由定理即可推出它可分离。
+
+我们对表达式构造归纳地证明 $\widetilde{\Phi}$ 是 $\UU$-小的。
+基础情形是 $x \bisim y$ 与 $x\bin y$，它们已被缩放进 $\UU$。
+$\UU$ 在纯命题运算（及 $(-1)$-截断）下封闭也很清楚，因此只剩检查有界量词 $\exists(x\in a)$ 与 $\forall(y\in b)$。
+按定义，
+\begin{align*}
+\exists(x\in a) P(x) &\defeq \Brck {\sm{x:V}(x\bin a \land P(x))},\\
+\forall(y\in b) P(x) &\defeq  \prd{x:V}(x\bin a \to P(x)).
+\end{align*}
+考虑 $\brck {\sm{x:V}(x\bin a \land P(x))}$。
+虽然主体 $(x\bin a \land P(x))$ 因归纳假设而是 $\UU$-小的，但对 $V$ 的量化不一定仍留在 $\UU$ 内。
+不过在当前情形下，可把它替换为对 $a$ 的成员类型 $[a]\mono V$ 的量化，并易证
+\begin{equation*}
+  \sm{x:V}(x\bin a \land P(x)) = \sm{x:[a]} P(x).
+\end{equation*}
+右侧确实留在 $\UU$ 中，因为 $[a]$ 与 $P(x)$ 都在 $\UU$ 里。
+$\prd{x:V}(x\bin a \to P(x))$ 的情形同理，使用 $\prd{x:V}(x\bin a \to P(x)) = \prd{x:[a]}P(x)$。
+\end{proof}
+
+我们已经表明：在带有宇宙 $\UU$ 的类型论中，累积层级 $V$ 是一种“构造性集合论”
+\index{constructive!set theory}%
+模型，并满足许多标准公理。
+不过据我们所知，它缺少 \CZF{}~\cite{AczelCZF} 中包含的
+\emph{强收集}
+\index{axiom!strong collection}%
+\index{collection!strong}%
+\index{strong!collection}%
+与 \emph{子集收集}
+\index{axiom!subset collection}%
+\index{collection!subset}%
+\index{subset!collection}%
+公理。
+在把该集合论通常解释到类型论时，这两条公理来自类似 setoid 的相等定义；而在其他构造出的集合论模型中，强收集可能因别的原因成立。
+我们不知道这两条公理在模型 $(V,\in)$ 中是否成立，但看起来可能不成立。
+由于 $V$ 是系统\emph{内部}的高阶归纳类型，而非\emph{外部}构造，它与先前解释在某些方面不同并不令人意外。
+
+最后，考虑在我们的类型论中加入集合上的选择公理，形式为上文 \cref{subsec:emacinsets} 的 $\choice{}$。
+这会推出 $\LEM{}$ 也成立（由 \cref{thm:1surj_to_surj_to_pem}），从而由 \cref{thm:settopos} 得到 $\set$ 是一个以 $\bool$ 为子对象分类子的 topos\index{topos}。
+在这种情形下，$\prop = \bool:\UU$，因而\emph{所有类都可分离}。
+于是我们得到：
+
+\begin{lem}\label{lem:fullsep}
+  在带有 $\choice{}$ 的类型论中，$V$ 满足\define{（完全）分离}
+  \indexdef{separation!full}%
+  律：给定\emph{任意}类 $C : V \to \prop$ 与 $a : V$，类 $a \cap C$ 是一个 $V$-集合。
+\end{lem}
+
+\begin{thm}\label{thm:zfc}
+在带有 $\choice{}$ 和宇宙 $\UU$ 的类型论中，累积层级 $V$ 是带选择的 Zermelo--Fraenkel\index{set theory!Zermelo--Fraenkel} 集合论 ZFC 的一个模型。
+\end{thm}
+
+\begin{proof}
+我们已有 \cref{thm:VisCST} 列出的全部公理，再加上完全分离，因此只需说明对每个 $a:V$ 都存在幂集\index{power set} $\power a:V$。
+但由于有 $\LEM{}$，它们就是函数类型 $\power a = (a\to\bool)$。
+故 $V$ 是 Zermelo--Fraenkel 集合论 ZF 的一个模型。
+由 $\choice{}$ 推出集合论版选择公理的验证留作简单习题。
+\end{proof}
+
+\index{bargaining|)}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\sectionNotes
+
+人们对集合范畴所期待的基本性质，可以追溯到初等 topos 理论的早期。
+\cref{subsec:emacinsets} 中提到的\emph{集合范畴的初等理论}由 Lawvere\index{Lawvere} 在
+\cite{lawvere:etcs-long} 中提出，作为集合论的范畴论公理化。
+\index{Elementary Theory of the Category of Sets}%
+把 $\Pi W$-pretopos 视为初等 topos 的直谓版本这一概念，最早见于~\cite{MoerdijkPalmgren2002}；另见~\cite{palmgren:cetcs}。
+
+\cref{sec:piw-pretopos} 中对集合范畴的处理大体遵循~\cite{RijkeSpitters}。
+满态射即满射（\cref{epis-surj}）这一事实在经典数学中众所周知，但要\emph{直谓地}证明它并不像看上去那样平凡。
+\index{mathematics!predicative}%
+~\cite{Mines/R/R:1988} 的证明使用了幂集运算（它是非直谓的），不过也可将其视为对较弱命题的直谓证明：在宇宙 $\UU_i$ 中的映射若在下一个宇宙 $\UU_{i+1}$ 中是满态射，则它是满射。
+Wilander 在~\cite{Wilander2010} 中给出了 setoid 的直谓证明。
+我们的证明与 Wilander 的相似，但通过使用推出与泛等避免了 setoid。
+
+\cref{thm:1surj_to_surj_to_pem} 中由 $\choice{}$ 推出 $\LEM{}$，是把 Diaconescu 在 topos 理论中的定理~\cite{Diaconescu} 改写到同伦类型论中的结果；该问题早在 Bishop~\cite[Problem~2]{Bishop1967} 中就已提出。
+
+关于序数的直觉主义理论，可见~\cite{taylor:ordinals,Taylor99} 以及 \cite{JoyalMoerdijk1995}。
+类型论中通过归纳原理定义良基性（包括可达性的归纳谓词\index{accessibility}）的工作见~\cite{Huet80,Paulson86,Nordstrom88}；而这一思想可追溯到 Gentzen 对算术一致性\index{consistency!of arithmetic} 的证明~\cite{Gentzen36}。
+
+代数集合论的思想（它启发了我们在 \cref{sec:cumulative-hierarchy} 中对累积层级的展开）归功于~\cite{JoyalMoerdijk1995}，但其源头来自更早的~\cite{AczelCZF}。
+\index{algebraic set theory}%
+\index{set theory!algebraic}%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\sectionExercises
+
+\begin{ex}\label{ex:utype-ct}
+  依照 $\uset$ 的模式，我们希望构造一个范畴 $\utype$，其对象是所有类型、态射是它们之间的映射（在给定宇宙 $\UU$ 中）。
+  但要使它成为 \cref{sec:cats} 意义下的范畴，我们必须先声明 $\hom(X,Y) \defeq \pizero{X\to Y}$，并将复合由普通复合 $(Y\to Z) \to (X\to Y) \to (X\to Z)$ 经截断归纳定义。
+  这在 \cref{ct:hoprecat} 中被定义为\emph{类型的同伦前范畴}。
+  然而它仍不是范畴，只是前范畴（其对象类型 $\UU$ 甚至不是 0-类型）。
+  经 Rezk 完备化
+  \index{completion!Rezk}%
+  （见 \cref{ct:hocat}）后它才成为范畴，且其对象类型由 \cref{ct:ex:hocat} 可识别为 $\trunc1\type$。
+  证明所得范畴 $\utype$ 与 $\uset$ 不同，它不是 pretopos。
+\end{ex}
+
+\begin{ex}\label{ex:surjections-have-sections-impl-ac}
+  证明：若在范畴 $\uset$ 中每个满射都有截面，则选择公理成立。
+\end{ex}
+
+\begin{ex}\label{ex:well-pointed}
+  证明在 $\LEM{}$ 下，范畴 $\uset$ 是 well-pointed 的，
+  \indexdef{category!well-pointed}%
+  即下述命题成立：对任意 $f, g : A\to B$，若 $f \neq g$，则存在函数 $a : 1\to A$ 使得 $f(a) \neq g(a)$。
+  证明由函数 $A\to \bool$ 与交换三角构成的切片范畴
+  \index{category!slice}%
+  $\uset/\bool$ 不具备该性质。
+  （提示：$\uset/\bool$ 的终对象是恒等函数 $\bool \to \bool$，因此在该范畴中存在没有元素 $1\to X$ 的对象 $X$。）
+\end{ex}
+
+\begin{ex}\label{ex:add-ordinals}
+  \index{addition!of ordinal numbers}%
+  证明：若 $(A,<_A)$ 与 $(B,<_B)$ 分别是良基的、外延的，或是序数，则 $A+B$ 也同样如此，其中 $<$ 定义为
+  \begin{align*}
+    (a<a') &\defeq (a<_A a') & \text{for }& a,a':A\\
+    (b<b') &\defeq (b<_B b') & \text{for }& b,b':B\\
+    (a<b) &\defeq \unit      & \text{for }& (a:A),(b:B)\\
+    (b<a) &\defeq \emptyt    & \text{for }& (a:A),(b:B).
+  \end{align*}
+\end{ex}
+% \begin{proof}
+%   我们先对 $<_A$ 归纳，证明 $A$ 的每个元素在 $A+B$ 中都可达。
+%   这很容易，因为在 $A+B$ 中严格小于 $a:A$ 的元素只可能来自 $A$。
+%   再对 $<_B$ 归纳，证明 $B$ 的每个元素在 $A+B$ 中都可达。
+%   这也很容易，因为我们已经证明了 $A$ 的每个元素都可达。
+% \end{proof}
+
+\begin{ex}\label{ex:multiply-ordinals}
+  \index{multiplication!of ordinal numbers}%
+  证明：若 $(A,<_A)$ 与 $(B,<_B)$ 分别是良基的、外延的，或是序数，则 $A\times B$ 也同样如此，其中 $<$ 定义为
+  \[ ((a,b) <(a',b')) \defeq (a<_A a') \vee ((a=a') \wedge (b<_B b')). \]
+\end{ex}
+% \begin{proof}
+%   我们先对 $<_A$ 归纳，证明对每个 $a:A$，形如 $(a,b)$ 的元素在 $A\times B$ 中都可达。
+%   归纳假设是：对所有 $a'<_A a$，每个二元组 $(a',b)$ 都可达。
+%   在这层归纳内，再对 $<_B$ 归纳，证明对每个 $b:B$，元素 $(a,b)$ 可达。
+%   内层归纳假设是：对每个 $b'<_B b$，元素 $(a,b')$ 可达。
+%   现在若 $(a',b')< (a,b)$，则要么 $a<_A a'$，此时 $(a',b')$ 由第一层归纳假设可达；
+%   要么 $a=a'$ 且 $b'<_B b$，此时 $(a,b')$ 由第二层归纳假设可达。
+%   因而由可达性的定义，$(a,b)$ 可达。
+%   两层归纳均完成。
+% \end{proof}
+
+\begin{ex}\label{ex:algebraic-ordinals}
+  定义序数上的通常代数运算，并证明它们满足通常性质。
+\end{ex}
+
+\begin{ex}\label{ex:prop-ord}
+  注意在显然的关系 $<$（仅有 $\bfalse<\btrue$）下，$\bool$ 是一个序数。
+  \begin{enumerate}
+  \item 在 $\prop$ 上定义一个关系 $<$，使其成为序数。
+  \item 证明 $\id[\ord]\bool\prop$ 当且仅当 \LEM{} 成立。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:ninf-ord}
+  回忆当把 \nat 看作序数时记为 $\omega$；因此也有序数 $\omega+1$。
+  另一方面，定义
+  \[ \nat_\infty \defeq \setof{a:\nat\to\bool | \fall{n:\nat} (a_n \le a_{\suc(n)}) } \]
+  其中 $\le$ 表示 $\bool$ 上显然的偏序，满足 $\bfalse\le\btrue$。
+  \begin{enumerate}
+  \item 在 $\nat_\infty$ 上定义关系 $<$，使其成为序数。
+  \item 证明 $\id[\ord]{\omega+1}{\nat_\infty}$ 当且仅当有限全知原理~\eqref{eq:lpo} 成立。%
+    \index{limited principle of omniscience}%
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:well-founded-extensional-simulation}
+  证明：若 $(A,<)$ 良基且外延，且 $A:\UU$，则存在模拟 $A\to V$，其中 $(V,\in)$ 是由宇宙~\UU 构造的 \cref{sec:cumulative-hierarchy} 中的累积层级。
+\end{ex}
+
+\begin{ex}\label{ex:choice-function}
+  证明 \cref{thm:wop}\ref{item:wop1} 与选择公理~\eqref{eq:ac} 等价。
+\end{ex}
+
+\begin{ex}\label{ex:cumhierhit}
+  给定类型 $A$ 与 $B$，定义\define{双全关系}
+  \indexsee{bitotal relation}{relation, bitotal}%
+  \indexdef{relation!bitotal}%
+  为满足下式的 $R:A\to B\to \prop$：
+  \[ \Big(\fall{a:A}\exis{b:B} R(a,b) \Big) \land \Big(\fall{b:B}\exis{a:A} R(a,b) \Big). \]
+  对这类 $A,B,R$，令 $A\sqcup^R B$ 为由下列构造子生成的高阶归纳类型：
+  \begin{itemize}
+  \item $i:A\to A\sqcup^R B$
+  \item $j:B\to A\sqcup^R B$
+  \item 对每个满足 $R(a,b)$ 的 $a:A$ 与 $b:B$，给出路径 $i(a)=j(b)$。
+  \end{itemize}
+  证明累积层级 $V$ 可由下面这组更直接的构造子定义，且由此得到的归纳原理正是 \cref{sec:cumulative-hierarchy} 给出的那个。
+  \begin{itemize}
+  \item 对每个 $A : \UU$ 与 $f : A \to V$，有元素 $\vset(A, f) : V$。
+  \item 对任意 $A,B:\UU$ 与双全关系
+    \index{relation!bitotal}%
+    $R:A\to B\to \prop$，以及任意映射 $h:A\sqcup^R B \to V$，有路径 $\id{\vset(A,h\circ i)}{\vset(B,h\circ j)}$。
+  \item 0-截断构造子。
+  \end{itemize}
+\end{ex}
+
+\begin{ex}\label{ex:strong-collection}
+  在 \CZF 中，\define{强收集公理}
+  \indexdef{axiom!strong collection}%
+  \indexdef{collection!strong}%
+  \indexdef{strong!collection}%
+  的形式为：
+   \begin{multline*}
+   \Parens{\fall{x\in v}\exis{y} R(x,y)} \Rightarrow \\
+   \exis{w}\big[\big(\fall{x\in v}\exis{y\in w}R(x,y)\big)\land \big(\fall{y\in w}\exis{x\in v}R(x,y) \big)\big]
+   \end{multline*}
+   它在累积层级 $V$ 中成立吗？（我们不知道答案。）
+\end{ex}
+
+\begin{ex}\label{ex:choice-cumulative-hierarchy-choice}
+验证：若假设 $\choice{}$，则累积层级 $V$ 满足通常的集合论选择公理，可写成：
+  \[
+   \fall{x:V} \Parens{(\fall{y\in x}\exis{z:V} z\in y) \Rightarrow  \exis{c\in(\cup x)^x}\fall{y\in x} c(y)\in y}
+   \]
+\end{ex}
+
+\begin{ex}\label{ex:plump-ordinals}
+  假设命题缩放，证明存在纯谓词 $\mathsf{isPlump}:\ord\to\prop$，使得对任意 $A:\ord$ 有
+  \begin{multline*}\label{eq:plump}
+    \mathsf{isPlump}(A) = \Parens{\fall{B<A} \mathsf{isPlump}(B)} \wedge\narrowbreak
+    \Parens{\fall{C,B:\ord} C\le B < A \wedge \mathsf{isPlump}(C) \Rightarrow C < A}.
+  \end{multline*}
+  注意 $\mathsf{isPlump}$ 不能通过对 \ord 的简单良基归纳来定义；你必须使用另一个良基关系。
+  若 $\mathsf{isPlump}(A)$ 成立，我们称序数 $A$ 是\define{plump}~\cite{taylor:ordinals,Taylor99}。
+  \index{plump!ordinal}\index{ordinal!plump}%
+\end{ex}
+
+\begin{ex}\label{ex:not-plump}
+  证明 \LEM{} 等价于命题“所有序数都是 plump”。
+\end{ex}
+
+\begin{ex}\label{ex:plump-successor}
+  将序数 $A$ 的\define{plump 后继}\index{plump!successor}\indexdef{successor!plump}定义为
+  \[ t(A) \defeq \setof{ B:\ord | (B\le A) \wedge \mathsf{isPlump}(B) } \]
+  \begin{enumerate}
+  \item 按定义，$t(A)$ 属于下一层更高宇宙。
+    证明在假设命题缩放下，它等于与 $A$ 同一宇宙中的某个序数。
+  \item 仍在命题缩放假设下，证明若 $A$ 是 plump（\cref{ex:plump-ordinals}），则 $t(A)$ 也是 plump。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:ZF-algebras}
+  相对于宇宙 $\UU_i$，\define{ZF-代数}~\cite{JoyalMoerdijk1995}
+  \index{ZF-algebra}%
+  是一个偏序集（见 \cref{ct:orders}）$V:\UU_{i+1}$，它具有所有由 $\UU_i$ 中类型索引的上确界，并配备一个“后继”函数 $s:V\to V$（不要求以任何方式保持 $\le$）。
+  \begin{enumerate}
+  \item 证明累积层级 $(V_{\UU_i},\subseteq,s)$ 是始 ZF-代数，其中 $s(x)$ 是单元集 $\setof{x}$。
+  \item 证明 $(\ord_{\UU_i},\le,s)$ 是满足“对所有 $x$ 有 $x\le s(x)$”这一性质的始 ZF-代数，其中 $s(A)=A+\unit$ 是 \cref{thm:ordsucc} 中的后继\index{successor!of an ordinal}。
+  \item 假设命题缩放，证明 $\Parens{\setof{A:\ord_{\UU_i} | \mathsf{isPlump}(A) },\le,t}$ 是满足“对所有 $x,y$，$(x\le y) \Rightarrow (t(x)\le t(y))$”这一性质的始 ZF-代数，其中 $t$ 是 \cref{ex:plump-successor} 中的 plump 后继。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:monos-are-split-monos-iff-LEM-holds}
+  对范畴 $A$，若态射 $f: \hom_A(a,b)$ 存在态射 $g: \hom_A(b,a)$ 使得 $\id{g \circ f}{1_a}$，则称 $f$ 为\define{裂单态射}。（这样的 $g$ 称为 $f$ 的一个\define{回缩}。）
+  证明下列命题逻辑等价。
+  \begin{enumerate}
+  \item $\LEM{}$。
+  \item 对任意集合 $A,B$，若 $A$ 可居留，则在 $\uset$ 中每个单态射 $f: A \to B$ 也是一个裂单态射。
+  \end{enumerate}
+\end{ex}
+
+\index{set|)}%
+
+% Local Variables:
+% TeX-master: "hott-online"
+% End:

@@ -1,0 +1,1841 @@
+\chapter{范畴论}
+\label{cha:category-theory}
+
+在数学诸分支中，范畴论也许是最不易自然嵌入集合论基础的一门。
+其中一个问题是：范畴论的大部分内容在比相等更弱的“相同性”概念下保持不变，
+例如范畴中的同构或范畴之间的等价，而集合论无法刻画这一点。
+但这与泛等公理为类型所解决的问题是同一类：它将相等与等价识别起来。
+因此，在泛等基础中，考虑这样一种“范畴”概念是有意义的：对象的相等以类似方式与同构相识别。
+
+暂且忽略大小问题，在基于集合的数学中，一个范畴由对象的一个\emph{集合} $A_0$ 以及对每个 $x,y\in A_0$ 的态射\emph{集合} $\hom_A(x,y)$ 组成。
+在泛等基础下，一个“朴素”范畴定义只需仿照此做法：用对象的\emph{类型}与态射的\emph{类型}。
+如果允许这些类型包含任意高阶同伦，那么就应施加高阶相干条件，从而导向某种 $(\infty,1)$-范畴概念，
+\index{.infinity1-category@$(\infty,1)$-category}%
+但目前我们的目标更为谦逊。
+我们只考虑 1-范畴，因此要求类型 $\hom_A(x,y)$ 都是集合，即 0-类型。
+若不再施加其他条件，我们称此概念为\emph{预范畴}。
+
+如果再加上对象类型 $A_0$ 本身是集合这一要求，就得到一个行为与传统集合论定义非常相似的概念。
+沿用 Toby Bartels 的用语，我们称其为\emph{严格范畴}。
+\index{strict!category}%
+另一种选择是要求泛等公理的推广版本，即把 $(x=_{A_0} y)$ 与从 $x$ 到 $y$ 的同构类型 $\mathsf{iso}(x,y)$ 识别起来。
+由于我们通常认为后一种选择才是“正确”的定义，因此我们将其直接称作\emph{范畴}。
+
+说明这三种范畴概念差异的一个好例子是下述命题：“每个全忠实且本质满射函子都是范畴等价。”在经典集合论式范畴论中，它等价于选择公理。
+\index{mathematics!classical}%
+\index{axiom!of choice}%
+\index{classical!category theory}%
+\begin{enumerate}
+\item 对严格范畴而言，该命题仍与选择公理等价。
+\item 对预范畴而言，不存在任何相容的选择公理能够使其成立。
+\item 对范畴而言，不需任何选择公理即可\emph{证明}该命题。
+\end{enumerate}
+本章将证明第三条结论，并证明范畴的其他良好性质，例如等价范畴在范畴类型中相等（即作为该类型的元素相等）。
+我们还将描述一种把预范畴 $A$ “饱和化”为范畴 $\widehat A$ 的泛化方式，称为它的\emph{Rezk 完备化}，
+\index{completion!Rezk}%
+不过合理地讲也可称为\emph{栈完备化}（见注记）。
+
+Rezk 完备化也进一步阐明了范畴等价的概念。
+例如，函子 $A \to \widehat{A}$ 总是全忠实且本质满射，因此是一个“弱等价”。
+由此可见，当且仅当一个预范畴把所有全忠实且本质满射函子都“看作”等价时，它才是范畴；
+因此我们对“范畴”的概念，已内在地包含在“全忠实且本质满射函子”的概念之中。
+
+我们假定读者对经典范畴论有一些基本熟悉。\index{classical!category theory}
+回忆：每当我们写 \type 时，它都表示某个类型宇宙，但在不同位置可能是不同宇宙；对宇宙层级的任意一致选择\index{universe level}，我们所述内容都成立。
+我们会使用 \cref{cha:typetheory,cha:basics} 中同伦类型论的基本概念，以及 \cref{cha:logic} 中的命题截断；除此之外几乎不依赖 \cref{part:foundations} 的内容，不过我们对 Rezk 完备化的第二种构造会用到一个高阶归纳类型。
+
+\section{范畴与预范畴}
+\label{sec:cats}
+
+在经典数学中，范畴有许多彼此等价的定义。
+在我们的语境里，由于有依值类型，把箭头取为由对象索引的类型族是自然的。
+这与范畴论中 hom-类型的实际用法一致：除非已知两个箭头的定义域与陪域一致，我们甚至不会考虑比较它们。
+此外，对 1-范畴理论来说，所有 hom-类型都应是集合，这一点也很清楚。
+由此得到下述定义。
+
+\begin{defn}\label{ct:precategory}
+  一个\define{预范畴}
+  \indexdef{precategory}
+  $A$ 由以下数据组成。
+  \begin{enumerate}
+  \item 一个类型 $A_0$，其元素称为\define{对象}。%
+    \indexdef{object!in a (pre)category}
+    我们把 $a:A_0$ 也写作 $a:A$。
+  \item 对每个 $a,b:A$，给定一个集合 $\hom_A(a,b)$，其元素称为\define{箭头}或\define{态射}。%
+    \indexsee{arrow}{morphism}%
+    \indexdef{morphism!in a (pre)category}%
+    \indexdef{hom-set}%
+  \item 对每个 $a:A$，给定一个态射 $1_a:\hom_A(a,a)$，称为\define{恒等态射}。%
+    \indexdef{identity!morphism in a (pre)category}
+  \item 对每个 $a,b,c:A$，给定一个函数%
+    \indexdef{composition!of morphisms in a (pre)category}
+    \[  \hom_A(b,c) \to \hom_A(a,b) \to \hom_A(a,c) \]
+    称为\define{复合}，并以中缀记作 $g\mapsto f\mapsto g\circ f$，有时也简写为 $gf$。
+  \item 对每个 $a,b:A$ 及 $f:\hom_A(a,b)$，有 $\id f {1_b\circ f}$ 与 $\id f {f\circ 1_a}$。
+  \item 对每个 $a,b,c,d:A$ 及
+    \begin{equation*}
+      f:\hom_A(a,b), \qquad
+      g:\hom_A(b,c), \qquad
+      h:\hom_A(c,d),
+    \end{equation*}
+    有 $\id {h\circ (g\circ f)}{(h\circ g)\circ f}$。
+  \end{enumerate}
+\end{defn}
+
+预范畴概念的问题在于：对对象 $a,b:A$，我们有两种可能不同的“相同性”概念。
+一方面有类型 $(\id[A_0]{a}{b})$。
+另一方面则有标准的范畴论概念，即\emph{同构}。
+
+\begin{defn}\label{ct:isomorphism}
+  态射 $f:\hom_A(a,b)$ 若满足下述条件，则称为\define{同构}
+  \indexdef{isomorphism!in a (pre)category}%
+  ：存在态射 $g:\hom_A(b,a)$，使得 $\id{g\circ f}{1_a}$ 与 $\id{f\circ g}{1_b}$。
+  我们用 $a\cong b$ 表示这类同构所成的类型。
+\end{defn}
+
+\begin{lem}\label{ct:isoprop}
+  对任意 $f:\hom_A(a,b)$，类型“$f$ 是同构”是纯命题。
+  因而对任意 $a,b:A$，类型 $a\cong b$ 是集合。
+\end{lem}
+\begin{proof}
+  设给定 $g:\hom_A(b,a)$、$\eta:(\id{1_a}{g\circ f})$ 与 $\epsilon:(\id{f\circ g}{1_b})$，以及同样的 $g'$、$\eta'$、$\epsilon'$。
+我们须证明 $\id{(g,\eta,\epsilon)}{(g',\eta',\epsilon')}$。
+  但由于所有 hom-集都是集合，它们的恒等类型都是纯命题，所以只需证明 $\id g {g'}$。
+  为此有
+  \[g' = 1_a\circ g' = (g\circ f)\circ g' = g\circ (f\circ g') = g\circ 1_b = g\]
+  其中使用了 $\eta$ 与 $\epsilon'$。
+\end{proof}
+
+\symlabel{ct:inv}
+\index{inverse!in a (pre)category}%
+若 $f:a\cong b$，则记 $\inv f$ 为其逆；由 \cref{ct:isoprop}，该逆唯一确定。
+
+在预范畴中，这两种相同性之间我们仅有如下关系。
+
+\begin{lem}[\textsf{idtoiso}]\label{ct:idtoiso}
+  若 $A$ 是预范畴且 $a,b:A$，则
+  \[(\id a b)\to (a \cong b).\]
+\end{lem}
+\begin{proof}
+  由恒等归纳，可设 $a$ 与 $b$ 相同。
+  此时有 $1_a:\hom_A(a,a)$，显然它是同构。
+\end{proof}
+
+显然，这一情形与促使我们引入泛等公理的问题是类似的。
+事实上，我们有：
+
+\begin{eg}\label{ct:precatset}
+  \index{set}%
+  存在一个预范畴 \uset，其对象类型是 \set，并且 $\hom_{\uset}(A,B) \defeq (A\to B)$。
+  恒等态射是恒等函数，复合是函数复合。
+  对该预范畴，\cref{ct:idtoiso} 就等于 \cref{sec:compute-universe} 中映射 $\idtoeqv$（限制在集合上的版本）。
+
+  当然，更精确地说应将此范畴记作 $\uset_\UU$，因为它的对象仅是相对于宇宙 \UU 的\emph{小集合}。
+  \index{small!set}%
+\end{eg}
+
+因此，作如下定义是自然的。
+
+\begin{defn}\label{ct:category}
+  一个\define{范畴}
+  \indexdef{category}
+  是满足下述条件的预范畴：对所有 $a,b:A$，\cref{ct:idtoiso} 中的函数 $\idtoiso_{a,b}$ 是等价。
+\end{defn}
+
+特别地，在范畴中，若 $a\cong b$，则 $a=b$。
+
+\begin{eg}\label{ct:eg:set}
+  \index{univalence axiom}%
+  泛等公理立即蕴含 \uset 是一个范畴。
+  也可以证明（使用泛等）：任何由集合层级结构（如群、环、拓扑空间等）组成的预范畴都是范畴；见 \cref{sec:sip}。
+\end{eg}
+
+我们还注意到如下事实。
+
+\begin{lem}\label{ct:obj-1type}
+  在范畴中，对象类型是 1-类型。
+\end{lem}
+\begin{proof}
+  只需证明对任意 $a,b:A$，类型 $\id a b$ 是集合。
+  但 $\id a b$ 与 $a \cong b$ 等价，而后者是集合。
+\end{proof}
+
+\symlabel{isotoid}
+我们记 $\isotoid$ 为 \cref{ct:idtoiso} 中映射 $\idtoiso$ 的逆 $(a\cong b) \to (\id a b)$。
+下述二者之间的关系很重要。
+
+\begin{lem}\label{ct:idtoiso-trans}
+  对 $p:\id a a'$、$q:\id b b'$ 与 $f:\hom_A(a,b)$，有
+  \begin{equation}\label{ct:idtoisocompute}
+    \id{\trans{(p,q)}{f}}
+    {\idtoiso(q)\circ f \circ \inv{\idtoiso(p)}}.
+  \end{equation}
+\end{lem}
+\begin{proof}
+  由归纳，可设 $p$ 与 $q$ 分别为 $\refl a$ 与 $\refl b$。
+此时~\eqref{ct:idtoisocompute} 左边就是 $f$。
+  按定义，$\idtoiso(\refl a)$ 是 $1_a$，$\idtoiso(\refl b)$ 是 $1_b$，故~\eqref{ct:idtoisocompute} 右边是 $1_b\circ f\circ 1_a$，它等于 $f$。
+\end{proof}
+
+类似地，可证明
+\begin{gather}
+  \id{\idtoiso(\rev p)}{\inv {(\idtoiso(p))}}\\
+  \id{\idtoiso(p\ct q)}{\idtoiso(q)\circ \idtoiso(p)}\\
+  \id{\isotoid(f\circ e)}{\isotoid(e)\ct \isotoid(f)}
+\end{gather}
+等等。
+
+\begin{eg}\label{ct:orders}
+  若某预范畴中每个集合 $\hom_A(a,b)$ 都是纯命题，则它等价于：
+  一个类型 $A_0$ 配上一条纯关系“$\le$”，该关系满足自反（$a\le a$）与传递（若 $a\le b$ 且 $b\le c$，则 $a\le c$）。
+  我们称其为\define{预序}。
+  \indexdef{preorder}
+
+  在预序中，见证 $f: a\le b$ 是同构当且仅当存在某个见证 $g: b\le a$。
+  因此，$a\cong b$ 就是“$a\le b$ 且 $b\le a$”这个纯命题。
+  所以，预序 $A$ 是范畴当且仅当 (1) 每个类型 $a=b$ 都是纯命题，且 (2) 对任意 $a,b:A_0$，存在函数 $(a\cong b) \to (a=b)$。
+  换言之，$A_0$ 必须是集合，且 $\le$ 必须是反对称的\index{relation!antisymmetric}（若 $a\le b$ 且 $b\le a$，则 $a=b$）。
+  我们称其为\define{（偏）序}或\define{偏序集（poset）}。
+  \indexdef{partial order}%
+  \indexdef{poset}%
+\end{eg}
+
+\begin{eg}\label{ct:gaunt}
+  若 $A$ 是范畴，则 $A_0$ 是集合当且仅当对任意 $a,b:A_0$，类型 $a\cong b$ 是纯命题。
+  在 $A$ 为范畴的前提下，这等价于说 $A$ 中每个自同构都是恒等箭头。另一方面，若 $A$ 是对象类型 $A_0$ 为集合的预范畴，则 $A$ 成为范畴当且仅当它是 skeletal\index{mathematics!classical}（任意同构对象都相等）\emph{且}每个自同构都是恒等箭头。
+  这类范畴有时称为\define{gaunt 范畴}~\cite{bsp12infncats}。
+  \indexdef{category!gaunt}%
+  \indexdef{gaunt category}%
+  \index{skeletal category}%
+  \index{category!skeletal}%
+  对我们这里的范畴而言，除非把 \cref{ct:category} 本身视作这种概念，否则实际上并没有真正意义上的“skeletality”概念。
+\end{eg}
+
+\begin{eg}\label{ct:discrete}
+  对任意 1-类型 $X$，都存在一个以 $X$ 为对象类型且 $\hom(x,y) \defeq (x=y)$ 的范畴。
+  若 $X$ 是集合，我们称其为 $X$ 上的\define{离散}
+  \indexdef{category!discrete}%
+  \indexdef{discrete!category}%
+  范畴。
+  一般地，我们称其为\define{群胚}
+  \indexdef{groupoid}
+  （见 \cref{ct:groupoids}）。
+\end{eg}
+
+\begin{eg}\label{ct:fundgpd}
+  对\emph{任意}类型 $X$，存在一个以 $X$ 为对象类型、且 $\hom(x,y) \defeq \pizero{x=y}$ 的预范畴。
+  其复合运算
+  \[ \pizero{y=z} \to \pizero{x=y} \to \pizero{x=z} \]
+  由截断归纳从连接 $(y=z)\to(x=y)\to(x=z)$ 定义。
+  我们称之为 $X$ 的\define{基本预群胚}
+  \indexdef{fundamental!pregroupoid}%
+  \indexsee{pregroupoid, fundamental}{fundamental pregroupoid}%
+  。
+  （事实上我们已在 \cref{sec:van-kampen} 遇到过它；另见 \cref{ex:rezk-vankampen}。）
+\end{eg}
+
+\begin{eg}\label{ct:hoprecat}
+  存在一个预范畴，其对象类型是 \type，且 $\hom(X,Y) \defeq \pizero{X\to Y}$，复合则由截断归纳从通常复合 $(Y\to Z) \to (X\to Y) \to (X\to Z)$ 定义。
+  我们称其为\define{类型的同伦预范畴}。
+  \indexdef{precategory!of types}%
+  \index{homotopy!category of types@(pre)category of types}%
+\end{eg}
+
+\begin{eg}\label{ct:rel}
+  设 \urel 为如下预范畴：
+  \begin{itemize}
+  \item 其对象是集合。
+  \item $\hom_{\urel}(X,Y) = X\to Y\to \prop$。
+  \item 对集合 $X$，有 $1_X(x,x') \defeq (x=x')$。
+  \item 对 $R:\hom_{\urel}(X,Y)$ 与 $S:\hom_{\urel}(Y,Z)$，其复合定义为
+    \[ (S\circ R)(x,z) \defeq \Brck{\sm{y:Y} R(x,y) \times S(y,z)}.\]
+  \end{itemize}
+  假设 $R:\hom_{\urel}(X,Y)$ 是同构，逆记为 $S$。
+  我们观察到以下事实。
+  \begin{enumerate}
+  \item 若有 $R(x,y)$ 与 $S(y',x)$，则 $(R\circ S)(y',y)$，故 $y'=y$。
+    同理，若有 $R(x,y)$ 与 $S(y,x')$，则 $x=x'$。\label{item:rel1}
+  \item 对任意 $x$，有 $x=x$，故 $(S\circ R)(x,x)$。
+    因而仅仅存在某个 $y:Y$ 使得 $R(x,y)$ 与 $S(y,x)$。\label{item:rel2}
+  \item 设 $R(x,y)$。
+    由~\ref{item:rel2}，仅仅存在某个 $y'$ 使得 $R(x,y')$ 与 $S(y',x)$。
+    但由~\ref{item:rel1}，仅仅有 $y'=y$，而由于 $Y$ 是集合，故有 $y'=y$。
+    因此，把 $S(y',x)$ 沿该相等传送，可得 $S(y,x)$。
+    结论是，$R(x,y)\to S(y,x)$。
+    同理，$S(y,x) \to R(x,y)$。\label{item:rel3}
+  \item 若有 $R(x,y)$ 与 $R(x,y')$，则由~\ref{item:rel3} 得 $S(y',x)$，再由~\ref{item:rel1} 得 $y=y'$。
+    因此，对任意 $x$，至多有一个 $y$ 使 $R(x,y)$ 成立。
+    又由~\ref{item:rel2}，仅仅存在这样的 $y$，故存在这样的 $y$。
+  \end{enumerate}
+  综上，若 $R:\hom_{\urel}(X,Y)$ 是同构，则对每个 $x:X$ 恰有一个 $y:Y$ 使得 $R(x,y)$，对偶地反之亦然。
+  因而存在函数 $f:X\to Y$ 把每个 $x$ 送到这个 $y$，且它是等价；于是 $X=Y$。
+  再做一点额外工作即可得出 \urel 是一个范畴。
+\end{eg}
+
+现在我们本可以只考虑范畴而不考虑预范畴。
+但我们将同时为预范畴与范畴发展许多概念，以强调与预范畴以及经典\index{mathematics!classical}数学中的普通范畴相比，范畴这一概念的行为要好得多。
+
+我们还将在 \crefrange{sec:strict-categories}{sec:dagger-categories} 中看到：在稍微更“异质”的语境里，除范畴外，一些特定类型的预范畴也有用途，它们分别以不同方式“修正”对象相等。
+这也凸显了预范畴的“预”性质：它们是可定义多种重要范畴结构的原始材料。
+
+\section{函子与变换}
+\label{sec:transfors}
+
+下述定义相当显然，无需修改。
+
+\begin{defn}\label{ct:functor}
+  设 $A$ 与 $B$ 为预范畴。
+  一个\define{函子}
+  \indexdef{functor}%
+  $F:A\to B$ 由以下数据组成：
+  \begin{enumerate}
+  \item 一个函数 $F_0:A_0\to B_0$，通常也记作 $F$。
+  \item 对每个 $a,b:A$，一个函数 $F_{a,b}:\hom_A(a,b) \to \hom_B(Fa,Fb)$，通常也记作 $F$。
+  \item 对每个 $a:A$，有 $\id{F(1_a)}{1_{Fa}}$。
+  \item 对每个 $a,b,c:A$ 与 $f:\hom_A(a,b)$ 及 $g:\hom_A(b,c)$，有
+    \[\id{F(g\circ f)}{Fg\circ Ff}.\]\label{ct:functor:comp}
+  \end{enumerate}
+\end{defn}
+
+注意，由恒等归纳可知，函子也保持 \idtoiso。
+
+\begin{defn}\label{ct:nattrans}
+  对函子 $F,G:A\to B$，一个\define{自然变换}
+  \indexdef{natural!transformation}%
+  \indexsee{transformation!natural}{natural transformation}%
+  $\gamma:F\to G$ 由以下数据组成：
+  \begin{enumerate}
+  \item 对每个 $a:A$，一个态射 $\gamma_a:\hom_B(Fa,Ga)$（“分量”）。
+  \item 对每个 $a,b:A$ 及 $f:\hom_A(a,b)$，有 $\id{Gf\circ \gamma_a}{\gamma_b\circ Ff}$（“自然性公理”）。
+  \end{enumerate}
+\end{defn}
+
+由于每个类型 $\hom_B(Fa,Gb)$ 都是集合，其恒等类型是纯命题。
+因此，自然性公理是纯命题，所以自然变换的相等由其分量的相等决定。
+特别地，对任意 $F$ 与 $G$，从 $F$ 到 $G$ 的自然变换类型仍是集合。
+
+类似地，函子的相等由函数 $A_0\to B_0$ 的相等，以及（沿此相等传送后）对应 hom-集上函数的相等所决定。
+
+\begin{defn}\label{ct:functor-precat}
+  \indexdef{precategory!of functors}%
+  对预范畴 $A,B$，存在一个预范畴 $B^A$，称为\define{函子预范畴}，定义如下：
+  \begin{itemize}
+  \item $(B^A)_0$ 是从 $A$ 到 $B$ 的函子类型。
+  \item $\hom_{B^A}(F,G)$ 是从 $F$ 到 $G$ 的自然变换类型。
+  \end{itemize}
+\end{defn}
+\begin{proof}
+  定义 $(1_F)_a\defeq 1_{Fa}$。
+  自然性由预范畴的单位公理得到。
+  对 $\gamma:F\to G$ 与 $\delta:G\to H$，定义 $(\delta\circ\gamma)_a\defeq \delta_a\circ \gamma_a$。
+  自然性由结合律得到。
+  类似地，$B^A$ 的单位律与结合律由 $B$ 的对应公理推出。
+\end{proof}
+
+\begin{lem}\label{ct:natiso}
+  \index{natural!isomorphism}%
+  \index{isomorphism!natural}%
+  自然变换 $\gamma:F\to G$ 在 $B^A$ 中是同构，当且仅当每个 $\gamma_a$ 在 $B$ 中是同构。
+\end{lem}
+\begin{proof}
+  若 $\gamma$ 是同构，则有其逆 $\delta:G\to F$。
+  按 $B^A$ 中复合的定义，$(\delta\gamma)_a\jdeq \delta_a\gamma_a$，同理 $(\gamma\delta)_a\jdeq \gamma_a\delta_a$。
+  因此，$\id{\delta\gamma}{1_F}$ 与 $\id{\gamma\delta}{1_G}$ 蕴含 $\id{\delta_a\gamma_a}{1_{Fa}}$ 与 $\id{\gamma_a\delta_a}{1_{Ga}}$，故 $\gamma_a$ 是同构。
+
+  反之，设每个 $\gamma_a$ 都是同构，逆记作 $\delta_a$。
+我们定义自然变换 $\delta:G\to F$，其分量为 $\delta_a$；对自然性公理，有
+  \[ Ff\circ \delta_a = \delta_b\circ \gamma_b\circ Ff \circ \delta_a = \delta_b\circ Gf\circ \gamma_a\circ \delta_a = \delta_b\circ Gf. \]
+  现由于自然变换的复合与恒等由分量确定，故有 $\id{\gamma\delta}{1_G}$ 与 $\id{\delta\gamma}{1_F}$。
+\end{proof}
+
+下述结果是基础性的。
+
+\begin{thm}\label{ct:functor-cat}
+  \indexdef{category!of functors}%
+  \indexdef{functor!category of}%
+  若 $A$ 是预范畴且 $B$ 是范畴，则 $B^A$ 是范畴。
+\end{thm}
+\begin{proof}
+  设 $F,G:A\to B$；我们须证明 $\idtoiso:(\id{F}{G}) \to (F\cong G)$ 是等价。
+
+  为给出其逆，设 $\gamma:F\cong G$ 是自然同构。
+  则对任意 $a:A$，有同构 $\gamma_a:Fa \cong Ga$，故有恒等 $\isotoid(\gamma_a):\id{Fa}{Ga}$。
+  由函数外延性，得到恒等 $\bar{\gamma}:\id[(A_0\to B_0)]{F_0}{G_0}$。
+
+  现在由于函子的后两条公理是纯命题，要证明 $\id{F}{G}$，只需证明对任意 $a,b:A$，函数
+  \begin{align*}
+    F_{a,b}&:\hom_A(a,b) \to \hom_B(Fa,Fb)\mathrlap{\qquad\text{与}}\\
+    G_{a,b}&:\hom_A(a,b) \to \hom_B(Ga,Gb)
+  \end{align*}
+  在沿 $\bar\gamma$ 传送后变得相等。
+  由函数外延性的计算规则，$\bar\gamma$ 作用在 $a$ 上后等于 $\isotoid(\gamma_a)$。
+  但由 \cref{ct:idtoiso-trans}，把 $Ff:\hom_B(Fa,Fb)$ 沿 $\isotoid(\gamma_a)$ 与 $\isotoid(\gamma_b)$ 传送，等于复合 $\gamma_b\circ Ff\circ \inv{(\gamma_a)}$，而由 $\gamma$ 的自然性，该复合等于 $Gf$。
+
+  由此完成函数 $(F\cong G) \to (\id F G)$ 的定义。
+  现在考虑复合
+  \[ (\id F G) \to (F\cong G) \to (\id F G). \]
+  由于 hom-集是集合，其恒等类型为纯命题，所以要证明两个恒等 $p,q:\id F G$ 相等，只需证明 $\id[\id{F_0}{G_0}]{p}{q}$。
+  但在 $\bar\gamma$ 的定义中，若 $\gamma$ 形如 $\idtoiso(p)$，则 $\gamma_a$ 等于 $\idtoiso(p_a)$（这可由对 $p$ 归纳轻松证明）。
+  因而 $\isotoid(\gamma_a)$ 等于 $p_a$，于是由函数外延性可得 $\id{\bar\gamma}{p}$，这正是所需。
+
+  最后考虑复合
+  \[(F\cong G)\to  (\id F G) \to (F\cong G). \]
+  由于自然变换的恒等可按分量检验，只需证明对每个 $a$ 有 $\id{\idtoiso(\bar\gamma)_a}{\gamma_a}$。
+  但如上所述，有 $\id{\idtoiso(\bar\gamma)_a}{\idtoiso((\bar\gamma)_a)}$，而由函数外延性的计算规则，$\id{(\bar\gamma)_a}{\isotoid(\gamma_a)}$。
+  由于 $\isotoid$ 与 $\idtoiso$ 互为逆，便得 $\id{\idtoiso(\bar\gamma)_a}{\gamma_a}$，如愿。
+\end{proof}
+
+特别地，范畴（而非仅预范畴）之间自然同构的函子是相等的。
+
+\mentalpause
+
+现在我们定义函子与自然变换的所有通常复合方式。
+
+\begin{defn}\label{ct:functor-composition}
+  对函子 $F:A\to B$ 与 $G:B\to C$，其复合 $G\circ F:A\to C$ 定义为
+  \begin{itemize}
+  \item 对象上的复合 $(G_0\circ F_0) : A_0 \to C_0$
+  \item 对每个 $a,b:A$，复合
+    \[(G_{Fa,Fb}\circ F_{a,b}):\hom_A(a,b) \to \hom_C(GFa,GFb).\]
+  \end{itemize}
+  各公理易于检验。
+\end{defn}
+
+\begin{defn}\label{ct:whisker}
+  对函子 $F:A\to B$、$G,H:B\to C$ 与自然变换 $\gamma:G\to H$，复合 $(\gamma F):GF\to HF$ 定义为
+  \begin{itemize}
+  \item 对每个 $a:A$，取分量 $\gamma_{Fa}$。
+  \end{itemize}
+  自然性易于检验。
+  类似地，对上述 $\gamma$ 与 $K:C\to D$，复合 $(K\gamma):KG\to KH$ 定义为
+  \begin{itemize}
+  \item 对每个 $b:B$，取分量 $K(\gamma_b)$。
+  \end{itemize}
+\end{defn}
+
+\begin{lem}\label{ct:interchange}
+  \index{interchange law}%
+  对函子 $F,G:A\to B$、$H,K:B\to C$ 以及自然变换 $\gamma:F\to G$ 与 $\delta:H\to K$，有
+  \[\id{(\delta G)(H\gamma)}{(K\gamma)(\delta F)}.\]
+\end{lem}
+\begin{proof}
+  只需按分量检验：在 $a:A$ 处有
+  \begin{align*}
+    ((\delta G)(H\gamma))_a
+    &\jdeq (\delta G)_{a}(H\gamma)_a\\
+    &\jdeq \delta_{Ga}\circ H(\gamma_a)\\
+    &= K(\gamma_a) \circ \delta_{Fa} \tag{由 $\delta$ 的自然性}\\
+    &\jdeq (K \gamma)_a\circ (\delta F)_a\\
+    &\jdeq ((K \gamma)(\delta F))_a.\qedhere
+  \end{align*}
+\end{proof}
+
+\index{horizontal composition!of natural transformations}%
+\index{classical!category theory}%
+经典上，人们把 $\gamma:F\to G$ 与 $\delta:H\to K$ 的“水平复合”定义为 ${ (\delta G)(H\gamma)}$ 与 ${(K\gamma)(\delta F)}$ 的共同值。
+我们不这样做，因为虽然二者相等，却并非\emph{定义上}相等。
+这也带来一个结果：我们可以无歧义地把符号 $\circ$（或并置）用于所有复合，因为两个自然变换之间只有一种复合方式（不同于自然变换与函子在左右两侧的复合）。
+
+\begin{lem}\label{ct:functor-assoc}
+  \index{associativity!of functor composition}
+  函子复合满足结合律：$\id{H(GF)}{(HG)F}$。
+\end{lem}
+\begin{proof}
+  由于函数复合满足结合律，这对对象与 hom 上的作用立即成立。
+  又因 hom-集是集合，其余数据自动成立。
+\end{proof}
+
+\cref{ct:functor-assoc} 中的相等同样不是定义相等。
+（函数复合在定义上是结合的，但构成函子的公理也必须被复合，而这破坏了定义上的结合性。）因此，我们还需知道关于结合律的\emph{相干性}\index{coherence}。
+
+\begin{lem}\label{ct:pentagon}
+  \index{associativity!of functor composition!coherence of}%
+  \cref{ct:functor-assoc} 是相干的，即下列等式五边形\index{pentagon, Mac Lane} 交换：
+  \[ \xymatrix{ & K(H(GF)) \ar@{=}[dl] \ar@{=}[dr]\\
+    (KH)(GF) \ar@{=}[d] && K((HG)F) \ar@{=}[d]\\
+    ((KH)G)F && (K(HG))F \ar@{=}[ll].}
+  \]
+\end{lem}
+\begin{proof}
+  与 \cref{ct:functor-assoc} 一样，这在对象上的作用显然成立，其余部分自动成立。
+\end{proof}
+
+下文我们将滥用记号，把 $H\circ G\circ F$ 或 $HGF$ 同时表示 $H(GF)$ 或 $(HG)F$，必要时沿 \cref{ct:functor-assoc} 传送。
+对单位元也有类似的相干结果。
+
+\begin{lem}\label{ct:units}
+  对函子 $F:A\to B$，有等式 $\id{(1_B\circ F)}{F}$ 与 $\id{(F\circ 1_A)}{F}$；并且若再给定 $G:B\to C$，则下列等式三角交换：
+  \[ \xymatrix{
+    G\circ (1_B \circ F) \ar@{=}[rr] \ar@{=}[dr] &&
+    (G\circ 1_B)\circ F \ar@{=}[dl] \\
+    & G \circ F.}
+  \]
+\end{lem}
+
+关于这些思想的进一步发展，见 \cref{ct:pre2cat,ct:2cat}。
+
+\section{伴随}
+\label{sec:adjunctions}
+
+伴随函子的定义是直接的；其主要有趣之处来自证明相关性（proof-relevance）。
+
+\begin{defn}\label{ct:adjoints}
+  若函子 $F:A\to B$ 满足下列数据存在，则称其为\define{左伴随}
+  \indexdef{left!adjoint}%
+  \indexdef{adjoint!functor}%
+  \indexdef{right!adjoint}%
+  \indexdef{adjoint!functor}%
+  \index{functor!adjoint}%
+  ：
+  \begin{itemize}
+  \item 一个函子 $G:B\to A$。
+  \item 一个自然变换 $\eta:1_A \to GF$（称为\define{单位}\indexdef{unit!of an adjunction}）。
+  \item 一个自然变换 $\epsilon:FG\to 1_B$（称为\define{余单位}\indexdef{counit of an adjunction}）。
+  \item $\id{(\epsilon F)(F\eta)}{1_F}$。
+  \item $\id{(G\epsilon)(\eta G)}{1_G}$。
+  \end{itemize}
+\end{defn}
+
+最后两条等式称为\define{三角恒等式}\indexdef{triangle!identity}，也称\define{折返恒等式}\indexdef{zigzag identity}。
+\indexdef{identity!triangle}\indexdef{identity!zigzag}
+右伴随的定义完全类似，留给读者。
+
+\begin{lem}\label{ct:adjprop}
+  若 $A$ 是范畴（但 $B$ 可仅为预范畴），则“$F$ 是左伴随”这一类型是纯命题。
+\end{lem}
+\begin{proof}
+  设给定满足三角恒等式的 $(G,\eta,\epsilon)$，以及另一组 $(G',\eta',\epsilon')$。
+  定义 $\gamma:G\to G'$ 为 $(G'\epsilon)(\eta' G)$，定义 $\delta:G'\to G$ 为 $(G\epsilon')(\eta G')$。
+  则
+  \begin{align*}
+    \delta\gamma &=
+    (G\epsilon')(\eta G')(G'\epsilon)(\eta'G)\\
+    &= (G\epsilon')(G F G'\epsilon)(\eta G' F G)(\eta'G)\\
+    &= (G\epsilon)(G\epsilon'FG)(G F \eta' G)(\eta G)\\
+    &= (G\epsilon)(\eta G)\\
+    &= 1_G
+  \end{align*}
+  这里用了 \cref{ct:interchange} 以及三角恒等式。
+  同理可证 $\id{\gamma\delta}{1_{G'}}$，故 $\gamma$ 是自然同构 $G\cong G'$。
+  由 \cref{ct:functor-cat}，得到恒等 $\id G {G'}$。
+
+  现在还需知道：把 $\eta,\epsilon$ 沿该恒等传送后，会分别变为 $\eta',\epsilon'$。
+  由 \cref{ct:idtoiso-trans}，该传送由按需与 $\gamma$ 或 $\delta$ 复合给出。
+  对 $\eta$，得到
+  \begin{equation*}
+    (G'\epsilon F)(\eta'GF)\eta
+    = (G'\epsilon F)(G'F\eta)\eta'
+    = \eta'
+  \end{equation*}
+  这里用了 \cref{ct:interchange} 与三角恒等式。
+  $\epsilon$ 的情形类似。
+  最后，三角恒等式本身的传送自动正确，因为 hom-集是集合。
+\end{proof}
+
+在 \cref{sec:yoneda} 中我们会给出 \cref{ct:adjprop} 的另一种证明。
+
+\section{等价}
+\label{sec:equivalences}
+
+在范畴论中，通常把\emph{范畴等价}定义为一个函子 $F:A\to B$，使得存在函子 $G:B\to A$ 与自然同构 $F G \cong 1_B$、$G F \cong 1_A$。
+然而，不同于“是一个伴随”这一性质，若不做截断，这个定义一般不是纯命题；其原因与拟逆类型行为不佳的原因相同（见 \cref{sec:quasi-inverses}）。
+并且如 \cref{sec:hae} 所示，我们可通过通常的\emph{伴随}等价概念来避免这个问题。
+\indexdef{adjoint!equivalence!of (pre)categories}
+
+\begin{defn}\label{ct:equiv}
+  称函子 $F:A\to B$ 是\define{（预）范畴的等价}
+  \indexdef{equivalence!of (pre)categories}%
+  \indexdef{category!equivalence of}%
+  \indexdef{precategory!equivalence of}%
+  \index{functor!equivalence}%
+  ，若它是一个左伴随，且其中 $\eta$ 与 $\epsilon$ 都是同构。
+  记 $\cteqv A B$ 为从 $A$ 到 $B$ 的（预）范畴等价类型。
+\end{defn}
+
+由 \cref{ct:adjprop,ct:isoprop}，若 $A$ 是范畴，则“$F$ 是预范畴等价”这一类型是纯命题。
+
+\begin{lem}\label{ct:adjointification}
+  对 $F:A\to B$，若存在 $G:B\to A$ 以及同构 $GF\cong 1_A$、$FG\cong 1_B$，则 $F$ 是预范畴等价。
+\end{lem}
+\begin{proof}
+  与类型等价的 \cref{thm:equiv-iso-adj} 的证明完全类似。
+\end{proof}
+
+\begin{defn}\label{ct:full-faithful}
+  称函子 $F:A\to B$ 为\define{忠实}
+  \indexdef{functor!faithful}%
+  \index{faithful functor}%a
+  ，若对所有 $a,b:A$，函数
+  \[F_{a,b}:\hom_A(a,b) \to \hom_B(Fa,Fb)\]
+  是单射；称其为\define{满}
+  \indexdef{functor!full}%
+  \indexdef{full functor}%
+  ，若对所有 $a,b:A$ 该函数是满射。
+  若两者都成立（因此每个 $F_{a,b}$ 都是等价），则称 $F$ 为\define{完全忠实}。
+  \indexdef{functor!fully faithful}%
+  \indexdef{fully faithful functor}%
+\end{defn}
+
+\begin{defn}\label{ct:split-essentially-surjective}
+  称函子 $F:A\to B$ 为\define{可分裂本质满}
+  \indexdef{functor!split essentially surjective}%
+  \indexdef{split!essentially surjective functor}%
+  ，若对所有 $b:B$，存在某个 $a:A$ 使得 $Fa\cong b$。
+\end{defn}
+
+\begin{lem}\label{ct:ffeso}
+  对任意预范畴 $A,B$ 与函子 $F:A\to B$，以下类型等价。
+  \begin{enumerate}
+  \item $F$ 是预范畴等价。\label{item:ct:ffeso1}
+  \item $F$ 完全忠实且可分裂本质满。\label{item:ct:ffeso2}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  设 $F$ 是预范畴等价，给定 $G,\eta,\epsilon$。
+  则有函数
+  \begin{align*}
+      \hom_B(Fa,Fb) &\to \hom_A(a,b),\\
+      g &\mapsto \inv{\eta_b}\circ G(g)\circ \eta_a.
+  \end{align*}
+  对 $f:\hom_A(a,b)$，有
+  \[ \inv{\eta_{b}}\circ G(F(f))\circ \eta_{a}  =
+  \inv{\eta_{b}} \circ \eta_{b} \circ f=
+  f
+  \]
+  而对 $g:\hom_B(Fa,Fb)$，有
+  \begin{align*}
+    F(\inv{\eta_b} \circ G(g)\circ\eta_a)
+    &= F(\inv{\eta_b})\circ F(G(g))\circ F(\eta_a)\\
+    &= \epsilon_{Fb}\circ F(G(g))\circ F(\eta_a)\\
+    &= g\circ\epsilon_{Fa}\circ F(\eta_a)\\
+    &= g
+  \end{align*}
+  这里用了 $\epsilon$ 的自然性以及两次三角恒等式。
+  因而 $F_{a,b}$ 是等价，故 $F$ 完全忠实。
+  最后，对任意 $b:B$，有 $Gb:A$ 与 $\epsilon_b:FGb\cong b$。
+
+  另一方面，设 $F$ 完全忠实且可分裂本质满。
+  定义 $G_0:B_0\to A_0$：把 $b:B$ 送到由给定本质分裂选出的 $a:A$，并记 $\epsilon_b$ 为同样给定的同构 $FGb\cong b$。
+
+  现在对任意 $g:\hom_B(b,b')$，定义 $G(g):\hom_A(Gb,Gb')$ 为满足
+  $\id{F(G(g))}{\inv{(\epsilon_{b'})}\circ g \circ \epsilon_b }$
+  的唯一态射（其存在由 $F$ 完全忠实保证）。
+  最后，对 $a:A$ 定义 $\eta_a:\hom_A(a,GFa)$ 为满足
+  $\id{F\eta_a}{\inv{\epsilon_{Fa}}}$
+  的唯一态射。
+  易验证 $G$ 是函子，且 $(G,\eta,\epsilon)$ 使 $F$ 成为预范畴等价。
+
+  现在考虑复合~\ref{item:ct:ffeso1}$\to$\ref{item:ct:ffeso2}$\to$\ref{item:ct:ffeso1}。
+  显然我们恢复同一个函数 $G_0:B_0 \to A_0$。
+  对 $G$ 在 hom-集上的作用，需要证明：对 $g:\hom_B(b,b')$，$G(g)$ 是满足 $F(G(g)) = \inv{(\epsilon_{b'})}\circ g \circ \epsilon_b$ 的（必然唯一的）态射。
+  但该等式由假设的 $\epsilon$ 的自然性可得。
+  我们也显然恢复 $\epsilon$；而 $\eta$ 由条件 $\id{F\eta_a}{\inv{\epsilon_{Fa}}}$ 唯一刻画（这是预范畴等价结构中假设成立的三角恒等式之一）。
+  因此此复合等于恒等。
+
+  最后考虑另一方向复合~\ref{item:ct:ffeso2}$\to$\ref{item:ct:ffeso1}$\to$\ref{item:ct:ffeso2}。
+  由于“完全忠实”是纯命题，只需注意对每个 $b:B$，我们恢复的是同一个 $a:A$ 与同构 $F a \cong b$。
+  这很明显，因为正是用这个函数与同构来定义~\ref{item:ct:ffeso1} 中的 $G_0$ 与 $\epsilon$，而它们又正是我们恢复~\ref{item:ct:ffeso2} 时使用的数据。
+  因而双向复合都等于恒等，于是得到等价 \eqv{\text{\ref{item:ct:ffeso1}}}{\text{\ref{item:ct:ffeso2}}}。
+\end{proof}
+
+然而，若 $A$ 不是范畴，则 \cref{ct:ffeso} 中两类类型都未必是纯命题。
+这提示我们还应考虑如下概念。
+
+\begin{defn}\label{ct:essentially-surjective}
+  称函子 $F:A\to B$ 为\define{本质满}
+  \indexdef{functor!essentially surjective}%
+  \indexdef{essentially surjective functor}%
+  ，若对所有 $b:B$，\emph{仅存在}某个 $a:A$ 使得 $Fa\cong b$。
+  称 $F$ 为\define{弱等价}
+  \indexsee{equivalence!of (pre)categories!weak}{weak equivalence}%
+  \indexdef{weak equivalence!of precategories}%
+  \indexsee{functor!weak equivalence}{weak equivalence}%
+  ，若它完全忠实且本质满。
+\end{defn}
+
+“是弱等价”\emph{总是}纯命题。
+但对范畴而言，等价与弱等价没有差别。
+
+\index{acceptance}
+\begin{lem}\label{ct:catweq}
+  若 $F:A\to B$ 完全忠实且 $A$ 是范畴，则对任意 $b:B$，类型 $\sm{a:A} (Fa\cong b)$ 是纯命题。
+  因而范畴之间的函子是等价当且仅当它是弱等价。
+\end{lem}
+\begin{proof}
+  设给定 $(a,f)$ 与 $(a',f')$，都在 $\sm{a:A} (Fa\cong b)$ 中。
+  则 $\inv{f'}\circ f$ 是同构 $Fa \cong Fa'$。
+  由于 $F$ 完全忠实，存在 $g:a\cong a'$ 使得 $Fg = \inv{f'}\circ f$。
+  又因 $A$ 是范畴，存在 $p:a=a'$ 使 $\idtoiso(p)=g$。
+  由 $Fg = \inv{f'}\circ f$ 推得 $\trans{(\map{(F_0)}{p})}{f} = f'$，故（由依值对类型中等式的刻画）$(a,f)=(a',f')$。
+
+  因而，对定义域为范畴且完全忠实的函子，本质满等价于可分裂本质满，所以“是弱等价”等价于“是等价”。
+\end{proof}
+
+这正是我们这套范畴论相较于基于集合的方法的一项重要优势。
+在纯集合论定义的范畴论中，命题“每个完全忠实且本质满的函子都是范畴等价”与选择公理 \choice{} 等价。
+而在这里，该结论是免费得到的，可视为唯一选择原理（\cref{sec:unique-choice}）在范畴论中的版本。
+（事实上，这一性质刻画了预范畴中的“范畴”；见 \cref{sec:rezk}。）
+
+另一方面，下述对范畴等价的刻画可能更有用。
+
+\begin{defn}\label{ct:isocat}
+  若函子 $F:A\to B$ 完全忠实，且 $F_0:A_0\to B_0$ 是类型等价，则称 $F$ 是\define{（预）范畴同构}
+  \indexdef{isomorphism!of (pre)categories}%
+  \indexdef{category!isomorphism of}%
+  \indexdef{precategory!isomorphism of}%
+  。
+\end{defn}
+
+这个定义是我们一般规则（见 \cref{sec:basics-equivalences}）的一个例外：通常我们只对集合及类集合对象使用“同构”一词。
+不过在这里它确实带有合适含义，因为对一般预范畴而言，同构比等价更强。
+
+注意“是预范畴同构”总是纯性质。
+记 $A\cong B$ 为从 $A$ 到 $B$ 的（预）范畴同构类型。
+
+\begin{lem}\label{ct:isoprecat}
+  对预范畴 $A,B$ 与 $F:A\to B$，下列条件等价。
+  \begin{enumerate}
+  \item $F$ 是预范畴同构。\label{item:ct:ipc1}
+  \item 存在 $G:B\to A$ 与 $\eta:1_A = GF$、$\epsilon:FG=1_B$，并满足\label{item:ct:ipc2}
+    \begin{equation}
+      \apfunc{(\lam{H} F H)}({\eta}) = \apfunc{(\lam{K} K F)}({\opp\epsilon}).\label{eq:ct:isoprecattri}
+    \end{equation}
+  \item 仅存在 $G:B\to A$ 与 $\eta:1_A = GF$、$\epsilon:FG=1_B$。\label{item:ct:ipc3}
+  \end{enumerate}
+\end{lem}
+
+注意若 $B_0$ 不是 1-类型，则~\eqref{eq:ct:isoprecattri} 可能不是纯命题。
+
+\begin{proof}
+  首先注意：由于 hom-集是集合，函子等式之间的等式由其对象部分唯一决定。
+  因此由函数外延性，~\eqref{eq:ct:isoprecattri} 等价于
+  \begin{equation}
+    \map{(F_0)}{\eta_0}_a = \opp{(\epsilon_0)}_{F_0 a}.\label{eq:ct:ipctri}
+  \end{equation}
+  对所有 $a:A_0$ 成立。
+  注意这正是 $G_0,\eta_0,\epsilon_0$ 使 $F_0$ 成为类型上的半伴随等价所需的三角恒等式。
+
+  现在设~\ref{item:ct:ipc1} 成立。
+  令 $G_0:B_0 \to A_0$ 为 $F_0$ 的逆，并给定满足三角恒等式的 $\eta_0: \idfunc[A_0] = G_0 F_0$ 与 $\epsilon_0:F_0G_0 = \idfunc[B_0]$，它正是~\eqref{eq:ct:ipctri}。
+  现在定义 $G_{b,b'}:\hom_B(b,b') \to \hom_A(G_0b,G_0b')$ 为
+  \[ G_{b,b'}(g) \defeq
+  \inv{(F_{G_0b,G_0b'})}\Big(\idtoiso(\opp{(\epsilon_0)}_{b'}) \circ g \circ \idtoiso((\epsilon_0)_b)\Big)
+  \]
+  （这里用了 $F$ 完全忠实的假设）。
+  由于 \idtoiso 把逆送到逆、把连接送到复合，且 $F$ 是函子，故 $G$ 是函子。
+
+  按定义有 $(GF)_0 \jdeq G_0 F_0$，而它由 $\eta_0$ 等于 $\idfunc[A_0]$。
+  要得到 $1_A = GF$，需证明：沿 $\eta_0$ 传送后，$\hom_A(a,a')$ 的恒等函数变为复合 $G_{Fa,Fa'} \circ F_{a,a'}$。
+  换言之，对任意 $f:\hom_A(a,a')$ 必须有
+  \begin{multline*}
+    \idtoiso((\eta_0)_{a'}) \circ f \circ \idtoiso(\opp{(\eta_0)}_a)\\
+    = \inv{(F_{GFa,GFa'})}\Big(\idtoiso(\opp{(\epsilon_0)}_{Fa'})
+    \circ F_{a,a'}(f) \circ \idtoiso((\epsilon_0)_{Fa})\Big).
+  \end{multline*}
+  但这等价于
+  \begin{multline*}
+    (F_{GFa,GFa'})\Big(\idtoiso((\eta_0)_{a'}) \circ f \circ \idtoiso(\opp{(\eta_0)}_a)\Big)\\
+    = \idtoiso(\opp{(\epsilon_0)}_{Fa'})
+    \circ F_{a,a'}(f) \circ \idtoiso((\epsilon_0)_{Fa}).
+  \end{multline*}
+  它由 $F$ 的函子性、$F$ 保持 \idtoiso 以及~\eqref{eq:ct:ipctri} 得到。
+  因而得到 $\eta:1_A = GF$。
+
+  另一方面，$(FG)_0\jdeq F_0 G_0$，它由 $\epsilon_0$ 等于 $\idfunc[B_0]$。
+  要得到 $FG=1_B$，需证明：沿 $\epsilon_0$ 传送后，$\hom_B(b,b')$ 的恒等函数变为复合 $F_{Gb,Gb'} \circ G_{b,b'}$。
+  即对任意 $g:\hom_B(b,b')$，必须有
+  \begin{multline*}
+    F_{Gb,Gb'}\Big(\inv{(F_{Gb,Gb'})}\Big(\idtoiso(\opp{(\epsilon_0)}_{b'}) \circ g \circ \idtoiso((\epsilon_0)_b)\Big)\Big)\\
+    = \idtoiso((\opp{\epsilon_0})_{b'}) \circ g \circ \idtoiso((\epsilon_0)_b).
+  \end{multline*}
+  但这只是 $\inv{(F_{Gb,Gb'})}$ 是 $F_{Gb,Gb'}$ 的逆这一事实。
+  且我们已指出~\eqref{eq:ct:isoprecattri} 与~\eqref{eq:ct:ipctri} 等价，所以~\ref{item:ct:ipc2} 成立。
+
+  反之，设给定~\ref{item:ct:ipc2}；则 $G,\eta,\epsilon$ 的对象部分连同~\eqref{eq:ct:ipctri} 表明 $F_0$ 是类型等价。
+  对 $a,a':A_0$，定义 $\overline{G}_{a,a'}: \hom_B(Fa,Fa') \to \hom_A(a,a')$ 为
+  \begin{equation}
+    \overline{G}_{a,a'}(g) \defeq \idtoiso(\opp{\eta})_{a'} \circ G(g) \circ \idtoiso(\eta)_a.\label{eq:ct:gbar}
+  \end{equation}
+  由 $\idtoiso(\eta)$ 的自然性，对任意 $f:\hom_A(a,a')$ 有
+  \begin{align*}
+    \overline{G}_{a,a'}(F_{a,a'}(f))
+    &= \idtoiso(\opp{\eta})_{a'} \circ G(F(f)) \circ \idtoiso(\eta)_a\\
+    &= \idtoiso(\opp{\eta})_{a'} \circ \idtoiso(\eta)_{a'} \circ f \\
+    &= f.
+  \end{align*}
+  另一方面，对 $g:\hom_B(Fa,Fa')$ 有
+  \begin{align*}
+    F_{a,a'}(\overline{G}_{a,a'}(g))
+    &= F(\idtoiso(\opp{\eta})_{a'}) \circ F(G(g)) \circ F(\idtoiso(\eta)_a)\\
+    &= \idtoiso(\epsilon)_{Fa'}
+    \circ F(G(g))
+    \circ \idtoiso(\opp{\epsilon})_{Fa}\\
+    &= \idtoiso(\epsilon)_{Fa'}
+    \circ \idtoiso(\opp{\epsilon})_{Fa'}
+    \circ g\\
+    &= g.
+  \end{align*}
+  （这里需要一些关于 \idtoiso 与 whiskering 相容性的引理，留给读者陈述并证明。）
+  因而 $F_{a,a'}$ 是等价，故 $F$ 完全忠实；即~\ref{item:ct:ipc1} 成立。
+
+  现在复合~\ref{item:ct:ipc1}$\to$\ref{item:ct:ipc2}$\to$\ref{item:ct:ipc1} 等于恒等，因为~\ref{item:ct:ipc1} 是纯命题。
+  另一边，追踪上述构造可见，复合~\ref{item:ct:ipc2}$\to$\ref{item:ct:ipc1}$\to$\ref{item:ct:ipc2} 本质上保持对象部分 $G_0,\eta_0,\epsilon_0$，以及~\eqref{eq:ct:isoprecattri} 的对象部分。
+  而后三者中，对象部分已是全部信息，因为 hom-集是集合。
+
+  因此只需证明我们恢复了 $G$ 在 hom-集上的作用。
+  换言之，需要证明若 $g:\hom_B(b,b')$，则
+  \[ G_{b,b'}(g) =
+  \overline{G}_{G_0b,G_0b'}\Big(\idtoiso(\opp{(\epsilon_0)}_{b'}) \circ g \circ \idtoiso((\epsilon_0)_b)\Big)
+  \]
+  其中 $\overline{G}$ 按~\eqref{eq:ct:gbar} 定义。
+  但这由 $G$ 的函子性与\emph{另一条}三角恒等式得到；而我们在 \cref{cha:equivalences} 中已经看到，该恒等式等价于~\eqref{eq:ct:ipctri}。
+
+  现在由于~\ref{item:ct:ipc1} 是纯命题，~\ref{item:ct:ipc2} 亦是纯命题，所以只需证明它们与~\ref{item:ct:ipc3} 逻辑等价。
+  当然有~\ref{item:ct:ipc2}$\to$\ref{item:ct:ipc3}，故设~\ref{item:ct:ipc3} 成立。
+  由于~\ref{item:ct:ipc1} 是纯命题，可设给定 $G,\eta,\epsilon$。
+  则 $G_0$ 连同 $\eta,\epsilon$ 蕴含 $F_0$ 是类型等价。
+  另外我们也有自然同构 $\idtoiso(\eta):1_A\cong GF$ 与 $\idtoiso(\epsilon):FG\cong 1_B$，故由 \cref{ct:adjointification}，$F$ 是预范畴等价，尤其是完全忠实。
+\end{proof}
+
+由 \cref{ct:isoprecat}\ref{item:ct:ipc2} 与函子范畴中的 $\idtoiso$，可立刻得出：任意预范畴同构都是等价。
+对预范畴而言，反向结论可能失败。
+
+\begin{eg}\label{ct:chaotic}
+  设 $X$ 为类型且 $x_0:X$ 为一点，令 $X_{\mathrm{ch}}$ 表示 $X$ 上的\emph{混沌}\indexdef{chaotic precategory}或\emph{离散满射}\indexdef{indiscrete precategory}预范畴。
+  按定义，$(X_{\mathrm{ch}})_0\defeq X$，且对所有 $x,x'$ 有 $\hom_{X_{\mathrm{ch}}}(x,x') \defeq \unit$。
+  则唯一函子 $X_{\mathrm{ch}}\to \unit$ 是预范畴等价，但除非 $X$ 可缩，否则它不是同构。
+
+  此例也表明：一个预范畴可以等价于某个范畴，但其自身并不一定是范畴。
+  当然，若一个预范畴与某范畴\emph{同构}，则它本身必须是范畴。
+\end{eg}
+
+然而，对范畴而言这两个概念一致。
+
+\begin{lem}\label{ct:eqv-levelwise}
+  对范畴 $A,B$，函子 $F:A\to B$ 是范畴等价当且仅当它是范畴同构。
+\end{lem}
+\begin{proof}
+  由于两者都是纯性质，只需证明它们逻辑等价。
+  先设 $F$ 是范畴等价，给定 $(G,\eta,\epsilon)$。
+  我们已知 $F$ 完全忠实。
+  由 \cref{ct:functor-cat}，自然同构 $\eta,\epsilon$ 给出恒等 $\id{1_A}{GF}$ 与 $\id{FG}{1_B}$，特别地给出恒等 $\id{\idfunc[A]}{G_0\circ F_0}$ 与 $\id{F_0\circ G_0}{\idfunc[B]}$。
+因此，$F_0$ 是类型等价。
+
+  反之，设 $F$ 完全忠实且 $F_0$ 是类型等价，其逆记为 $G_0$。
+  则对每个 $b:B$，有 $G_0 b:A$ 与恒等 $\id{FGb}{b}$，从而有同构 $FGb\cong b$。
+  因而由 \cref{ct:ffeso}，$F$ 是范畴等价。
+\end{proof}
+
+当然，（预）范畴的“相同”还有第三种概念：相等。
+而单价公理蕴含它与同构一致。
+
+\begin{lem}\label{ct:cat-eq-iso}
+  若 $A,B$ 是预范畴，则函数
+  \[(\id A B) \to (A\cong B)\]
+  （由恒等函子的归纳定义得到）是类型等价。
+\end{lem}
+\begin{proof}
+  按依值和类型的常规方式，给出 $\id A B$ 的元素等价于给出
+  \begin{itemize}
+  \item 一个恒等 $P_0:\id{A_0}{B_0}$，
+  \item 对每个 $a,b:A_0$，一个恒等
+    \[P_{a,b}:\id{\hom_A(a,b)}{\hom_B(\trans {P_0} a,\trans {P_0} b)},\]
+  \item 恒等 $\id{\trans {(P_{a,a})} {1_a}}{1_{\trans {P_0} a}}$ 与
+    \narrowequation{\id{\trans {(P_{a,c})} {gf}}{\trans {(P_{b,c})} g \circ \trans {(P_{a,b})} f}.}
+  \end{itemize}
+  （同样地，我们用了 hom-集的恒等类型是纯命题这一事实。）
+  但由单价性，这等价于给出
+  \begin{itemize}
+  \item 一个类型等价 $F_0:\eqv{A_0}{B_0}$，
+  \item 对每个 $a,b:A_0$，一个类型等价
+    \[F_{a,b}:\eqv{\hom_A(a,b)}{\hom_B(F_0 (a),F_0 (b))},\]
+  \item 以及恒等 $\id{F_{a,a}(1_a)}{1_{F_0 (a)}}$ 与 $\id{F_{a,c}(gf)}{F_{b,c} (g)\circ F_{a,b} (f)}$。
+  \end{itemize}
+  这恰好就是一个函子 $F:A\to B$ 且它是范畴同构。
+  且由恒等归纳可知，该等价 $\eqv{(\id A B)}{(A\cong B)}$ 与通过归纳得到的那个等价相同。
+\end{proof}
+
+因此，对范畴而言，相等也与等价一致。
+可将其解释为：范畴、函子与自然变换不仅形成一个 pre-2-category，而是形成一个 2-category（见 \cref{ct:pre2cat}）。
+
+\begin{thm}\label{ct:cat-2cat}
+  若 $A,B$ 是范畴，则函数
+  \[(\id A B) \to (\cteqv A B)\]
+  （由恒等函子的归纳定义得到）是类型等价。
+\end{thm}
+\begin{proof}
+  由 \cref{ct:cat-eq-iso,ct:eqv-levelwise}。
+\end{proof}
+
+推论是：范畴类型是一个 2-类型。
+因为 $\cteqv A B$ 是从 $A$ 到 $B$ 的函子类型的一个子类型，而这些函子是某个范畴的对象，所以它是 1-类型；因此恒等类型 $\id A B$ 也都是 1-类型。
+\section{Yoneda 引理}
+\label{sec:yoneda}
+\index{Yoneda!lemma|(}
+
+回忆我们有一个范畴 \uset，其对象是集合、态射是函数。
+现在我们说明每个预范畴都有一个取值于 \uset 的 hom-函子。
+首先需要定义（预）范畴的对偶与积。
+
+\begin{defn}\label{ct:opposite-category}
+  对预范畴 $A$，其\define{对偶}
+  \indexdef{opposite of a (pre)category}%
+  \indexdef{precategory!opposite}%
+  \indexdef{category!opposite}%
+  $A\op$ 是一个预范畴：对象类型与 $A$ 相同，$\hom_{A\op}(a,b) \defeq \hom_A(b,a)$，恒等与复合继承自 $A$。
+\end{defn}
+
+\begin{defn}\label{ct:prod-cat}
+  对预范畴 $A,B$，其\define{积}
+  \index{precategory!product of}%
+  \index{category!product of}%
+  \index{product!of (pre)categories}%
+  $A\times B$ 是预范畴，其中 $(A\times B)_0 \defeq A_0 \times B_0$，且
+  \[\hom_{A\times B}((a,b),(a',b')) \defeq \hom_A(a,a') \times \hom_B(b,b').\]
+  恒等定义为 $1_{(a,b)}\defeq (1_a,1_b)$，复合定义为
+  \narrowequation{(g,g')(f,f') \defeq ((gf),(g'f')).}
+\end{defn}
+
+\begin{lem}\label{ct:functorexpadj}
+  对预范畴 $A,B,C$，下列类型等价。
+  \begin{enumerate}
+  \item 函子 $A\times B\to C$。
+  \item 函子 $A\to C^B$。
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  给定 $F:A\times B\to C$，对任意 $a:A$ 显然有函子 $F_a : B\to C$。
+  由此得到函数 $A_0 \to (C^B)_0$。
+  接着，对任意 $f:\hom_A(a,a')$，对任意 $b:B$ 都有态射
+  $F_{(a,b),(a',b)}(f,1_b):F_a(b) \to F_{a'}(b)$。
+  这些是自然变换 $F_a \to F_{a'}$ 的分量。
+  关于 $a$ 的函子性易检验，因此得到函子 $\hat{F}:A\to C^B$。
+
+  反之，设给定 $G:A\to C^B$。
+  则对任意 $a:A$、$b:B$，有对象 $G(a)(b):C$，从而得到函数 $A_0 \times B_0 \to C_0$。
+  对 $f:\hom_A(a,a')$ 与 $g:\hom_B(b,b')$，有态射
+  \begin{equation*}
+     G(a')_{b,b'}(g)\circ G_{a,a'}(f)_b = G_{a,a'}(f)_{b'} \circ  G(a)_{b,b'}(g)
+  \end{equation*}
+  属于 $\hom_C(G(a)(b), G(a')(b'))$。
+  函子性同样易检验，因此得到函子 $\check{G}:A\times B \to C$。
+
+  最后，这两个构造互为逆也很清楚。
+\end{proof}
+
+现在对任意预范畴 $A$，有 hom-函子
+\indexdef{hom-functor}%
+\[\hom_A : A\op \times A \to \uset.\]
+它把一对 $(a,b): (A\op)_0 \times A_0 \jdeq A_0 \times A_0$ 送到集合 $\hom_A(a,b)$。
+对态射 $(f,f') : \hom_{A\op\times A}((a,b),(a',b'))$，按定义有 $f:\hom_A(a',a)$ 与 $f':\hom_A(b,b')$，因此可定义
+\begin{align*}
+  (\hom_A)_{(a,b),(a',b')}(f,f')
+  &\defeq (g \mapsto (f'gf))\\
+  &: \hom_A(a,b) \to \hom_A(a',b').
+\end{align*}
+函子性易检验。
+
+由 \cref{ct:functorexpadj}，因此诱导出函子 $\y:A\to \uset^{A\op}$，称为\define{Yoneda 嵌入}。
+\indexdef{Yoneda!embedding}%
+\indexdef{embedding!Yoneda}%
+
+\begin{thm}[Yoneda 引理]\label{ct:yoneda}
+  \indexdef{Yoneda!lemma}
+  对任意预范畴 $A$、任意 $a:A$ 与任意函子 $F:\uset^{A\op}$，有同构
+  \begin{equation}\label{eq:yoneda}
+    \hom_{\uset^{A\op}}(\y a, F) \cong Fa.
+  \end{equation}
+  且该同构关于 $a$ 与 $F$ 都自然。
+\end{thm}
+\begin{proof}
+  给定自然变换 $\alpha:\y a \to F$，可考察分量 $\alpha_a : \y a(a) \to F a$。
+  由于 $\y a(a)\jdeq \hom_A(a,a)$，有 $1_a : \y a(a)$，故 $\alpha_a(1_a) : F a$。
+  这给出~\eqref{eq:yoneda} 从左到右的函数 $(\alpha \mapsto \alpha_a(1_a))$。
+
+  反向地，给定 $x:F a$，定义 $\alpha:\y a \to F$ 为
+  \[\alpha_{a'}(f) \defeq F_{a,a'}(f)(x). \]
+  自然性易检验，因此得到~\eqref{eq:yoneda} 从右到左的函数。
+
+  要说明二者互逆，先设给定 $x:F a$。
+  对上面定义的 $\alpha$，有 $\alpha_a(1_a) = F_{a,a}(1_a)(x) = 1_{F a}(x) = x$。
+  另一方面，若给定 $\alpha:\y a \to F$ 并按上法定义 $x$，则对任意 $f:\hom_A(a',a)$ 有
+  \begin{align*}
+    \alpha_{a'}(f)
+    &= \alpha_{a'} (\y a_{a,a'}(f)(1_a))\\
+    &= (\alpha_{a'}\circ \y a_{a,a'}(f))(1_a)\\
+    &= (F_{a,a'}(f)\circ \alpha_a)(1_a)\\
+    &= F_{a,a'}(f)(\alpha_a(1_a))\\
+    &= F_{a,a'}(f)(x).
+  \end{align*}
+  因此两个复合都等于恒等。
+  关于自然性的证明留给读者。
+\end{proof}
+
+\begin{cor}\label{ct:yoneda-embedding}
+  Yoneda 嵌入 $\y :A\to \uset^{A\op}$ 是完全忠实的。
+\end{cor}
+\begin{proof}
+  由 \cref{ct:yoneda}，有
+  \[ \hom_{\uset^{A\op}}(\y a, \y b) \cong \y b(a) \jdeq \hom_A(a,b). \]
+  易检验该同构事实上就是 \y 在 hom-集上的作用。
+\end{proof}
+
+\begin{cor}\label{ct:yoneda-mono}
+  若 $A$ 是范畴，则 $\y_0 : A_0 \to (\uset^{A\op})_0$ 是嵌入。
+  特别地，若 $\y a = \y b$，则 $a=b$。
+\end{cor}
+\begin{proof}
+  由 \cref{ct:yoneda-embedding}，\y 在同构集合上诱导同构。
+  但由于 $A$ 与 $\uset^{A\op}$ 都是范畴，且 \y 是函子，这等价于在恒等类型上诱导同构，而这正是“嵌入”的定义。
+\end{proof}
+
+\begin{defn}\label{ct:representable}
+  称函子 $F:\uset^{A\op}$ 为\define{可表}
+  \indexdef{functor!representable}%
+  \indexdef{representable functor}%
+  ，若存在 $a:A$ 与同构 $\y a \cong F$。
+\end{defn}
+
+\begin{thm}\label{ct:representable-prop}
+  若 $A$ 是范畴，则“$F$ 可表”这一类型是纯命题。
+\end{thm}
+\begin{proof}
+  按定义，“$F$ 可表”正是 $\y_0$ 在 $F$ 处的纤维。
+  由 \cref{ct:yoneda-mono}，$\y_0$ 是嵌入，故该纤维是纯命题。
+\end{proof}
+
+特别地，在范畴中，同一函子的任意两个表示相等。
+我们可用这一点给出 \cref{ct:adjprop} 的另一种证明。
+先给出以可表性刻画伴随的结果。
+
+\begin{lem}\label{ct:adj-repr}
+  对任意预范畴 $A,B$ 与函子 $F:A\to B$，下列类型等价。
+  \begin{enumerate}
+  \item $F$ 是左伴随\index{adjoint!functor}。\label{item:ct:ar1}
+  \item 对每个 $b:B$，函子 $(a \mapsto \hom_B(Fa,b))$（从 $A\op$ 到 \uset）是可表的\index{representable functor}。\label{item:ct:ar2}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  类型~\ref{item:ct:ar2} 的一个元素由如下数据组成：函数 $G_0:B_0 \to A_0$，以及对每个 $a:A$、$b:B$ 的同构
+  \[ \gamma_{a,b}:\hom_B(Fa,b) \cong \hom_A(a,G_0 b) \]
+  且满足对 $f:\hom_{A}(a,a')$ 有 $\gamma_{a,b}(g \circ Ff) = \gamma_{a',b}(g)\circ f$。
+
+  给定这些数据，对 $a:A$ 定义 $\eta_a \defeq \gamma_{a,Fa}(1_{Fa})$，对 $b:B$ 定义 $\epsilon_b \defeq \inv{(\gamma_{Gb,b})}(1_{Gb})$。
+  现在对 $g:\hom_B(b,b')$ 定义
+  \[ G_{b,b'}(g) \defeq \gamma_{G b, b'}(g \circ \epsilon_b) \]
+  验证 $G$ 是函子、$\eta,\epsilon$ 是自然变换并满足三角恒等式，与经典情形完全相同；且这些都属于纯命题，我们不关心其具体值。
+  因而得到函数~\ref{item:ct:ar2}$\to$\ref{item:ct:ar1}。
+
+  反向地，若 $F$ 是左伴随，当然给定了 $G_0$，并可取 $\gamma_{a,b}$ 为复合
+  \[ \hom_B(Fa,b)
+  \xrightarrow{G_{Fa,b}} \hom_A(GFa,Gb)
+  \xrightarrow{(\blank\circ \eta_a)} \hom_A(a,Gb).
+  \]
+  这显然是自然的，因为 $\eta$ 自然；其逆由
+  \[ \hom_A(a,Gb)
+  \xrightarrow{F_{a,Gb}} \hom_B(Fa,FGb)
+  \xrightarrow{(\epsilon_b \circ \blank )} \hom_A(Fa,b)
+  \]
+  给出（由三角恒等式）。
+  因而也有~\ref{item:ct:ar1}$\to$~\ref{item:ct:ar2}。
+
+  对复合~\ref{item:ct:ar2}$\to$\ref{item:ct:ar1}$\to$~\ref{item:ct:ar2}，显然函数 $G_0$ 保持不变，因此只需检查恢复了 $\gamma$。
+  但新的 $\gamma$ 把 $f:\hom_B(Fa,b)$ 送到
+  \begin{align*}
+    G(f) \circ \eta_a
+    &\jdeq \gamma_{G Fa, b}(f \circ \epsilon_{Fa}) \circ \eta_a\\
+    &= \gamma_{G Fa, b}(f \circ \epsilon_{Fa} \circ F\eta_a)\\
+    &= \gamma_{G Fa, b}(f)
+  \end{align*}
+  因此与旧的相同。
+
+  最后，对~\ref{item:ct:ar1}$\to$\ref{item:ct:ar2}$\to$~\ref{item:ct:ar1}，我们当然在对象上恢复同一个函子 $G$。
+  新的 $G_{b,b'}:\hom_B(b,b') \to \hom_A(Gb,Gb')$ 把 $g$ 送到
+  \begin{align*}
+    \gamma_{G b, b'}(g \circ \epsilon_b)
+    &\jdeq G(g \circ \epsilon_b) \circ \eta_{Gb}\\
+    &= G(g) \circ G\epsilon_b \circ \eta_{Gb}\\
+    &= G(g)
+  \end{align*}
+  因而与旧的相同。
+  新的 $\eta_a$ 定义为 $\gamma_{a,Fa}(1_{Fa}) \jdeq G(1_{Fa}) \circ \eta_a$，故等于旧的 $\eta_a$。
+  最后，新的 $\epsilon_b$ 定义为 $\inv{(\gamma_{Gb,b})}(1_{Gb}) \jdeq \epsilon_b \circ F(1_{Gb})$，也等于旧的 $\epsilon_b$。
+\end{proof}
+
+\begin{cor}\label{ct:adjprop2}[\cref{ct:adjprop}]
+  若 $A$ 是范畴且 $F:A\to B$，则“$F$ 是左伴随”这一类型是纯命题。
+\end{cor}
+\begin{proof}
+  由 \cref{ct:representable-prop}，若 $A$ 是范畴，则 \cref{ct:adj-repr}\ref{item:ct:ar2} 中的类型是纯命题。
+\end{proof}
+\index{Yoneda!lemma|)}
+
+\section{严格范畴}
+\label{sec:strict-categories}
+
+\index{bargaining|(}%
+
+\begin{defn}\label{ct:strict-category}
+  一个\define{严格范畴}
+  \indexdef{category!strict}%
+  \indexdef{strict!category}%
+  是指对象类型为集合的预范畴。
+\end{defn}
+
+依照数学红鲱鱼原理\index{red herring principle}，严格范畴不一定是范畴。
+事实上，一个范畴是严格范畴当且仅当它是 gaunt 的（\cref{ct:gaunt}）。
+\index{gaunt category}%
+\index{category!gaunt}%
+大多数时候，范畴论研究的是范畴而不是严格范畴，但有时也需要考虑严格范畴。
+其主要优势是：严格范畴具有比“等价”更严格的“相同性”概念，即同构（或等价地，由 \cref{ct:cat-eq-iso} 可知即相等）。
+
+下面给出严格范畴的一个来源。
+
+\begin{eg}\label{ct:mono-cat}
+  设 $A$ 是预范畴，$x:A$ 是一个对象。
+  则可定义一个预范畴 $\mathsf{mono}(A,x)$ 如下：
+  \index{monomorphism}
+  \indexsee{mono}{monomorphism}
+  \indexsee{monic}{monomorphism}
+  \begin{itemize}
+  \item 其对象由一个对象 $y:A$ 与一个单态射 $m:\hom_A(y,x)$ 组成。
+    （照常，若 $m:\hom_A(y,x)$ 满足 $(m\circ f = m\circ g) \Rightarrow (f=g)$，则称 $m$ 是\define{单态射}（或称为\define{monic}）。）
+  \item 从 $(y,m)$ 到 $(z,n)$ 的态射是 $A$ 中从 $y$ 到 $z$ 的任意态射（不要求与 $m,n$ 相容）。
+  \end{itemize}
+  在 $\mathsf{mono}(A,x)$ 中，对象等式 $(y,m)=(z,n)$ 由一个等式 $p:y=z$ 与一个等式 $\trans{p}{m}=n$ 组成；而后者由 \cref{ct:idtoiso-trans} 等价于等式 $m=n\circ \idtoiso(p)$。
+  由于 hom-集是集合，这类等式类型是纯命题。
+  另一方面，由于 $m,n$ 都是单态射，满足 $m = n\circ f$ 的态射 $f$ 的类型也是纯命题。
+  因此若 $A$ 是范畴，则 $(y,m)=(z,n)$ 是纯命题，从而 $\mathsf{mono}(A,x)$ 是严格范畴。
+\end{eg}
+
+该例子可对偶化并作多种推广。
+下面给出严格范畴的一个有趣应用。
+
+\begin{eg}\label{ct:galois}
+  设 $E/F$ 是一个有限 Galois 扩张
+  \index{Galois!extension}%
+  ，$G$ 是其 Galois 群。
+  \index{Galois!group}%
+  则存在一个严格范畴，其对象是中间域 $F\subseteq K\subseteq E$，其态射是逐点固定 $F$ 的域同态\index{homomorphism!field}（但不必与到 $E$ 的包含映射交换）。
+  还存在另一个严格范畴，其对象是子群 $H\subseteq G$，其态射是 $G$-集态射 $G/H \to G/K$。
+  Galois 理论基本定理
+  \index{fundamental!theorem of Galois theory}%
+  断言这两个预范畴是同构的（而非仅等价）。
+\end{eg}
+
+\index{bargaining|)}%
+
+\section{\texorpdfstring{$\dagger$}{†}-范畴}
+\label{sec:dagger-categories}
+
+还值得一提的是一种有用的预范畴：它的对象类型不是集合，但它也不是范畴。
+
+\begin{defn}\label{ct:dagger-precategory}
+  一个\define{$\dagger$-预范畴}
+  \indexdef{.dagger-precategory@$\dagger$-precategory}%
+  \indexdef{precategory!.dagger-@$\dagger$-}%
+  是指一个预范畴 $A$ 以及如下数据。
+  \begin{enumerate}
+  \item 对每个 $x,y:A$，一个函数 $\dgr{(-)}:\hom_A(x,y) \to \hom_A(y,x)$。
+  \item 对所有 $x:A$，有 $\dgr{(1_x)} = 1_x$。
+  \item 对所有 $f,g$，有 $\dgr{(g\circ f)} = \dgr f \circ \dgr g$。
+  \item 对所有 $f$，有 $\dgr{(\dgr f)} = f$。
+  \end{enumerate}
+\end{defn}
+
+\begin{defn}\label{ct:unitary}
+  在 $\dagger$-预范畴中，态射 $f:\hom_A(x,y)$ 称为\define{酉的}
+  \indexdef{.dagger-precategory@$\dagger$-precategory!unitary morphism in}%
+  \indexdef{unitary morphism}%
+  \indexdef{morphism!unitary}%
+  \indexdef{isomorphism!unitary}%
+  ，若 $\dgr f \circ f = 1_x$ 且 $f\circ \dgr f = 1_y$。
+\end{defn}
+
+当然，每个酉态射都是同构，而“是酉的”是纯命题。
+因此对每个 $x,y:A$，我们有从 $x$ 到 $y$ 的酉同构集合，记为 $(x\unitaryiso y)$。
+
+\begin{lem}\label{ct:idtounitary}
+  若 $p:(x=y)$，则 $\idtoiso(p)$ 是酉的。
+\end{lem}
+\begin{proof}
+  由归纳可设 $p$ 是 $\refl x$。
+  此时 $\dgr{(1_x)} \circ 1_x = 1_x\circ 1_x = 1_x$，另一侧同理。
+\end{proof}
+
+\begin{defn}\label{ct:dagger-category}
+  一个\define{$\dagger$-范畴}
+  \indexdef{.dagger-category@$\dagger$-category}%
+  是指一个 $\dagger$-预范畴，满足对所有 $x,y:A$，函数
+  \[ (x=y) \to (x \unitaryiso y) \]
+  （见 \cref{ct:idtounitary}）是等价。
+\end{defn}
+
+\begin{eg}\label{ct:rel-dagger-cat}
+  若定义 $(\dgr R)(y,x) \defeq R(x,y)$，则 \cref{ct:rel} 中的范畴 \urel 成为一个 $\dagger$-预范畴。
+  对 \urel 是范畴的证明实际上表明每个同构都是酉的；因此 \urel 也是 $\dagger$-范畴。
+\end{eg}
+
+\begin{eg}\label{ct:groupoid-dagger-cat}
+  任意群胚若定义 $\dgr f \defeq \inv{f}$，就成为一个 $\dagger$-范畴。
+\end{eg}
+
+\begin{eg}\label{ct:hilb}
+  令 \uhilb 为如下预范畴。
+  \begin{itemize}
+  \item 其对象是配备内积 $\langle \blank,\blank\rangle$ 的有限维\index{finite!-dimensional vector space}向量空间\index{vector!space}。
+  \item 其态射是任意线性映射。
+    \index{function!linear}%
+    \indexsee{linear map}{function, linear}%
+  \end{itemize}
+  按标准线性代数，有限维内积空间之间任意线性映射 $f:V\to W$ 都有唯一确定的伴随\index{adjoint!linear map} $\dgr f:W\to V$，由 $\langle f v,w\rangle = \langle v,\dgr f w\rangle$ 刻画。
+  因而 \uhilb 成为一个 $\dagger$-预范畴。
+  此外，线性同构是酉的当且仅当它是\define{等距同构}，
+  \indexdef{isometry}%
+  即满足 $\langle fv,fw\rangle = \langle v,w\rangle$。
+  由此可知 \uhilb 是 $\dagger$-范畴，不过它不是范畴（并非每个线性同构都是酉的）。
+\end{eg}
+
+在经典\index{mathematics!classical}\index{classical!category theory}基础下，已经发展出大量关于 $\dagger$-范畴的一般理论。
+人们很早就观察到：在 $\dagger$-范畴中，对象的“相同性”应当由酉同构而非任意同构来刻画，这曾令一些范畴论学者感到困惑。
+同伦类型论通过将 $\dagger$-范畴与严格范畴一样识别为另一类预范畴，解决了这个问题。
+
+\section{结构同一性原理}
+\label{sec:sip}
+ \index{structure!identity principle|(}
+
+\emph{结构同一性原理}是一个非形式化原则，表达“同构结构即同一”。我们希望证明一个一般抽象结果，可应用于广泛的结构概念：结构可以是多排序、甚至依值排序、无穷元，乃至高阶的。
+
+最简单的单排序结构就是一个不带附加结构的类型。单价公理以强形式表达了这种结构概念下的结构同一性原理：对类型 $A,B$，典范函数 $(A=B)\to (\eqv A B)$ 是等价。
+
+我们从一个预范畴 $X$ 出发。在应用到单排序一阶结构时，$X$ 将是 %\uset%
+$\bbU$-小集合范畴，其中 $\bbU$ 是一个单价类型宇宙。
+
+\begin{defn}\label{ct:sig}
+  一个定义在 $X$ 上的\define{结构概念}
+  \indexdef{structure!notion of}%
+  $(P,H)$ 由以下数据组成。
+  \begin{enumerate}
+  \item 一个类型族 $P:X_0 \to \type$。
+    对每个 $x:X_0$，$Px$ 的元素称为 $x$ 上的\define{$(P,H)$-结构}
+    \indexsee{PH-structure@$(P,H)$-structure}{structure}%
+    \indexdef{structure!PH@$(P,H)$-}%
+    。
+  \item 对 $x,y:X_0$、$f:\hom_X(x,y)$ 以及 $\alpha:Px$、$\;\beta:Py$，给定一个纯命题
+  \[ H_{\alpha\beta}(f).\]
+    若 $H_{\alpha\beta}(f)$ 为真，就说 $f$ 是从 $\alpha$ 到 $\beta$ 的\define{$(P,H)$-同态}
+    \indexdef{homomorphism!of structures}%
+    \indexdef{structure!homomorphism of}%
+    。
+  \item 对 $x:X_0$ 与 $\alpha:Px$，有 $H_{\alpha\alpha}(1_x)$。\label{item:sigid}
+  \item 对 $x,y,z:X_0$ 与 $\alpha:Px$、$\;\beta:Py$、$\;\gamma:Pz$，若
+$f:\hom_X(x,y)$ 与 $g:\hom_X(y,z)$，则有\label{item:sigcmp}
+  \[ H_{\alpha\beta}(f)\to H_{\beta\gamma}(g)\to H_{\alpha\gamma}(g\circ   f).\]
+   \end{enumerate}
+  当 $(P,H)$ 是一种结构概念时，对 $\alpha,\beta:Px$ 定义
+  \[ (\alpha\leq_x\beta) \defeq H_{\alpha\beta}(1_x).\]
+  由~\ref{item:sigid} 与~\ref{item:sigcmp}，这给出一个预序（\cref{ct:orders}），其对象类型为 $Px$。
+  若对所有 $x:X$ 该预序事实上都是偏序，则称 $(P,H)$ 是\define{标准结构概念}
+  \indexdef{structure!standard notion of}%
+  。
+\end{defn}
+
+注意：对标准结构概念，每个类型 $Px$ 实际上都必须是集合。
+现在对任意结构概念 $(P,H)$，定义其\define{$(P,H)$-结构预范畴}，
+\indexdef{precategory!of PH-structures@of $(P,H)$-structures}%
+\indexdef{structure!precategory of PH@precategory of $(P,H)$-}%
+记作 $A = \mathsf{Str}_{(P,H)}(X)$。
+\begin{itemize}
+\item $A$ 的对象类型是 $A_0 \defeq \sm{x:X_0} Px$。
+  若 $a\jdeq (x,\alpha):A_0$，可记 $|a| \defeq x$。
+\item 对 $(x,\alpha):A_0$ 与 $(y,\beta):A_0$，定义
+  \[\hom_A((x,\alpha),(y,\beta)) \defeq \setof{ f:x \to y | H_{\alpha\beta}(f)}.\]
+\end{itemize}
+复合与恒等从 $X$ 继承；条件~\ref{item:sigid} 与 \ref{item:sigcmp} 保证它们可提升到 $A$。
+
+\begin{thm}[结构同一性原理]\label{thm:sip}
+  \indexdef{structure!identity principle}%
+  若 $X$ 是范畴，且 $(P,H)$ 是定义在 $X$ 上的标准结构概念，则预范畴 $\mathsf{Str}_{(P,H)}(X)$ 是范畴。
+\end{thm}
+\begin{proof}
+  由依值对类型中的相等定义可知，给出相等 $(x,\alpha)=(y,\beta)$ 等价于给出
+  \begin{itemize}
+  \item 一个等式 $p:x=y$，以及
+  \item 一个等式 $\trans{p}{\alpha}=\beta$。
+  \end{itemize}
+  由于 $P$ 取值于集合，后者是纯命题。
+  另一方面，容易看出 $\mathsf{Str}_{(P,H)}(X)$ 中同构 $(x,\alpha)\cong (y,\beta)$ 等价于
+  \begin{itemize}
+  \item $X$ 中同构 $f:x\cong y$，并且
+  \item $H_{\alpha\beta}(f)$ 与 $H_{\beta\alpha}(\inv f)$。
+  \end{itemize}
+  当然，第二条也是纯命题。
+  又因为 $X$ 是范畴，函数 $(x=y) \to (x\cong y)$ 是等价。
+  因此只需证明：对任意 $p:x=y$ 及任意 $(\alpha:Px)$、$(\beta:Py)$，有
+  $\trans{p}{\alpha}=\beta$ 当且仅当 $H_{\alpha\beta}(\idtoiso (p))$ 与 $H_{\beta\alpha}(\inv{\idtoiso(p)})$ 同时成立。
+
+  “仅若”方向就是范畴 $\mathsf{Str}_{(P,H)}(X)$ 中函数 $\idtoiso$ 的存在性。
+  对“若”方向，按 $p$ 归纳可设 $y\jdeq x$ 且 $p\jdeq\refl x$。
+  此时 $\idtoiso (p)\jdeq 1_x$，因此 $\inv{\idtoiso(p)}=1_x$。
+  于是 $\alpha\leq_x \beta$ 且 $\beta\leq_x \alpha$，而 $(P,H)$ 是标准结构概念，故可得 $\alpha=\beta$。
+\end{proof}
+
+作为例子，这一方法给出了表达 \cref{ct:functor-cat} 证明的另一种方式。
+
+\begin{eg}\label{ct:sip-functor-cat}
+  设 $A$ 为预范畴，$B$ 为范畴。
+  存在一个预范畴 $B^{A_0}$，其对象是函数 $A_0 \to B_0$，从 $F_0:A_0 \to B_0$ 到 $G_0:A_0 \to B_0$ 的态射集是 $\prd{a:A_0} \hom_B(F_0 a, G_0 a)$。
+  复合与恒等直接由 $B$ 中相应结构继承。
+  易证：$\gamma:\hom_{B^{A_0}}(F_0, G_0)$ 是同构，当且仅当每个分量 $\gamma_a$ 都是同构，因此有 $\eqv{(F_0 \cong G_0)}{\prd{a:A_0} (F_0 a \cong G_0 a)}$。
+  此外，$B^{A_0}$ 的映射 $\idtoiso : (F_0 = G_0) \to (F_0 \cong G_0)$ 等于复合
+  \[ (F_0 = G_0) \longrightarrow \prd{a:A_0} (F_0 a  = G_0 a) \longrightarrow \prd{a:A_0} (F_0 a \cong G_0 a) \longrightarrow (F_0 \cong G_0) \]
+  其中第一箭头由函数外延性是等价，第二箭头因为它是依值乘积的等价（因 $B$ 是范畴），第三箭头如上所述。
+  因而 $B^{A_0}$ 是范畴。
+
+  现在在 $B^{A_0}$ 上定义一种结构概念：其中 $P(F_0)$ 是操作 $F:\prd{a,a':A_0} \hom_A(a,a') \to \hom_B(F_0 a,F_0 a')$ 的类型，这些操作把 $F_0$ 扩展为函子（即保持复合与恒等）。
+  由于每个 $\hom_B(\blank,\blank)$ 都是集合，该类型是集合。
+  给定这类 $F$ 与 $G$，定义当且仅当 $\gamma:\hom_{B^{A_0}}(F_0, G_0)$ 构成自然变换\index{natural!transformation}时，它是一个同态。
+  在 \cref{ct:functor-precat} 中我们本质上已验证这是一种结构概念。
+  另外，若 $F,F'$ 都是 $F_0$ 上的结构，且恒等是从 $F$ 到 $F'$ 的自然变换，则对任意 $f:\hom_A(a,a')$，有
+  $F'f = F'f \circ 1_{F_0 a} = 1_{F_0 a}\circ F f = F f$。
+  施加函数外延性可得 $F = F'$。
+  因而得到一个\emph{标准}结构概念，再由 \cref{thm:sip} 可知预范畴 $B^A$ 是范畴。
+\end{eg}
+
+另一个例子是：一阶符号的结构范畴。
+定义一个\define{一阶符号}
+\indexdef{first-order!signature}%
+\indexdef{signature!first-order}%
+$\Omega$，由函数符号集合 $\Omega_0$ 与关系符号集合 $\Omega_1$ 组成，$\omega:\Omega_0$ 与 $\omega:\Omega_1$ 的每个符号都带有一个作为集合的元数\index{arity} $|\omega|$。
+一个\define{$\Omega$-结构}
+\indexdef{structure!Omega@$\Omega$-}%
+\indexsee{omega-structure@$\Omega$-structure}{structure}%
+$a$ 由一个集合 $|a|$ 以及如下赋值组成：对每个函数符号 $\omega$，赋予一个定义在 $|a|$ 上的 $|\omega|$ 元函数 $\omega^a:|a|^{|\omega|}\to |a|$；对每个关系符号，赋予一个定义在 $|a|$ 上的 $|\omega|$ 元关系 $\omega^a$，即对每个 $x:|a|^{|\omega|}$ 指派一个纯命题 $\omega^ax$。
+给定 $\Omega$-结构 $a,b$，函数 $f:|a|\to |b|$ 称为\define{同态 $a\to b$}
+\indexdef{homomorphism!of Omega-structures@of $\Omega$-structures}%
+\indexdef{structure!homomorphism of Omega@homomorphism of $\Omega$-}%
+，若它保持结构；即对符号中的每个 $\omega$ 以及每个 $x:|a|^{|\omega|}$，
+\begin{enumerate}
+\item 若 $\omega:\Omega_0$，则有 $f(\omega^ax) = \omega^b(f\circ x)$，并且
+\item 若 $\omega:\Omega_1$，则有 $\omega^ax\to\omega^b(f\circ x)$。
+\end{enumerate}
+注意每个 $x:|a|^{|\omega|}$ 都是函数 $x:|\omega|\to |a|$，故 $f\circ x : b^\omega$。
+
+现在假设给定一个（单价）宇宙 $\bbU$ 与一个 $\bbU$-小符号 $\Omega$；即 $|\Omega|$ 是 $\bbU$-小集合，且对每个 $\omega:|\Omega|$，集合 $|\omega|$ 也是 $\bbU$-小的。
+于是有 $\bbU$-小集合范畴 $\uset_\bbU$。
+我们希望在 $\uset_\bbU$ 上定义 $\bbU$-小 $\Omega$-结构的预范畴，并用 \cref{thm:sip} 证明它是范畴。
+
+我们使用一阶符号 $\Omega$ 在 $\uset_\bbU$ 上给出一个标准结构概念 $(P,H)$。
+
+\begin{defn}\label{defn:fo-notion-of-structure}
+\mbox{}
+\begin{enumerate}
+\item 对每个 $\bbU$-小集合 $x$，定义
+  \[ Px \defeq P_0x\times P_1x.\]
+  其中
+  %
+  \begin{align*}
+    P_0x &\defeq \prd{\omega:\Omega_0} x^{|\omega|}\to x, \mbox{ and } \\
+    P_1x &\defeq \prd{\omega:\Omega_1} x^{|\omega|}\to \propU,
+  \end{align*}
+\item 对 $\bbU$-小集合 $x,y$ 以及
+  $\alpha:P^\omega x,\;\beta:P^\omega y,\; f:x\to y$，定义
+  \[ H_{\alpha\beta}(f) \defeq H_{0,\alpha\beta}(f)\wedge H_{1,\alpha\beta}(f).\]
+  其中
+  \begin{align*}
+    H_{0,\alpha\beta}(f) &\defeq
+    \fall{\omega:\Omega_0}{u:x^{|\omega|}} f(\alpha u)=\;\beta(f\circ u),
+    \mbox{ and }\\
+    H_{1,\alpha\beta}(f) &\defeq
+    \fall{\omega:\Omega_1}{u:x^{|\omega|}} \alpha u\to\beta(f\circ u).
+  \end{align*}
+\end{enumerate}
+\end{defn}
+
+现在例行检查可知 $(P,H)$ 是定义在 $\uset_\bbU$ 上的标准结构概念，因此可用 \cref{thm:sip} 得到预范畴 $Str_{(P,H)}(\uset_\bbU)$ 是范畴。剩下只需注意：它本质上就是定义在 $\uset_\bbU$ 上的 $\bbU$-小 $\Omega$-结构预范畴。
+ \index{structure!identity principle|)}
+
+\section{Rezk 完备化}
+\label{sec:rezk}
+
+本节我们将给出一种把预范畴替换为范畴的泛用方法。
+事实上我们会给出两种。
+二者都依赖这样一个事实：\textquotedblleft 范畴把弱等价看作等价\textquotedblright 。
+
+为证明这一点，我们先给出几个完全标准的范畴论引理，并仔细表述以确保我们正确使用了 $\truncf{-1}$ 的消去子。
+如果在经典\index{mathematics!classical}\index{classical!category theory}范畴论中想避免使用选择公理，也必须同样小心：每当我们要定义一个函数时，都需要以某种方式唯一刻画其取值。
+
+\begin{lem}\label{ct:esosurj-postcomp-faithful}
+  若 $A,B,C$ 是预范畴，且 $H:A\to B$ 是本质满函子，则 $(\blank\circ H):C^B \to C^A$ 是忠实的。
+\end{lem}
+\begin{proof}
+  取 $F,G:B\to C$，以及 $\gamma,\delta:F\to G$，满足 $\gamma H = \delta H$；需证 $\gamma=\delta$。
+  于是取 $b:B$；我们要证明 $\gamma_b=\delta_b$。
+  这是一条纯命题，因此由于 $H$ 本质满，可设给定 $a:A$ 与同构 $f:Ha\cong b$。
+  于是有
+  \[ \gamma_b = G(f) \circ \gamma_{Ha} \circ F(\inv{f})
+  = G(f) \circ \delta_{Ha} \circ F(\inv{f})
+  = \delta_b.\qedhere
+  \]
+\end{proof}
+
+\begin{lem}\label{ct:esofull-precomp-ff}
+  若 $A,B,C$ 是预范畴，且 $H:A\to B$ 本质满且满，则 $(\blank\circ H):C^B \to C^A$ 是完全忠实的。
+\end{lem}
+\begin{proof}
+  还需证明满性。
+  取 $F,G:B\to C$ 与 $\gamma:FH \to GH$。
+  我们断言：对任意 $b:B$，类型
+  \begin{equation}\label{eq:fullprop}
+    \sm{g:\hom_C(Fb,Gb)} \prd{a:A}{f:Ha\cong b} (\gamma_a =  \inv{Gf}\circ g\circ Ff)
+  \end{equation}
+  是可缩的。
+  由于可缩性是纯性质，且 $H$ 本质满，可设给定 $a_0:A$ 与 $h:Ha_0\cong b$。
+
+  现取 $g\defeq Gh \circ \gamma_{a_0} \circ \inv{Fh}$。
+  然后对任意 $a:A$ 与 $f:Ha\cong b$，需证 $\gamma_a =  \inv{Gf}\circ g\circ Ff$。
+  因为 $H$ 是满的，仅存在态射 $k:\hom_A(a,a_0)$ 使 $Hk = \inv{h}\circ f$。
+  而目标是纯命题，所以可设给定这样的 $k$。
+  于是
+  \begin{align*}
+    \gamma_a &= \inv{GHk}\circ \gamma_{a_0} \circ FHk\\
+    &= \inv{Gf} \circ Gh \circ \gamma_{a_0} \circ \inv{Fh} \circ Ff\\
+    &= \inv{Gf}\circ g\circ Ff.
+  \end{align*}
+  故~\eqref{eq:fullprop} 可居住。
+  还需证明它是纯命题。
+  设 $g,g':\hom_C(Fb, Gb)$，并且对所有 $a:A$ 与 $f:Ha\cong b$，均有 $(\gamma_a =  \inv{Gf}\circ g\circ Ff)$ 及 $(\gamma_a =  \inv{Gf}\circ g'\circ Ff)$。
+  依值乘积类型是纯命题，所以只需证明 $g=g'$。
+  但这也是纯命题，因此可设 $a_0:A$ 与 $h:Ha_0\cong b$，此时有
+  \[ g = Gh \circ \gamma_{a_0} \circ \inv{Fh} = g'.\]
+  %
+  这就证明了对所有 $b:B$，~\eqref{eq:fullprop} 都可缩。
+  现在定义 $\delta:F\to G$：把 $\delta_b$ 取为该 $b$ 下~\eqref{eq:fullprop} 中唯一的 $g$。
+  要看其自然性，设 $f:\hom_B(b,b')$；需证 $Gf \circ \delta_b = \delta_{b'}\circ Ff$。
+  与前面一样，可设 $a:A,h:Ha\cong b$，以及 $a':A,h':Ha'\cong b'$。
+  由于 $H$ 既满又本质满，也可设 $k:\hom_A(a,a')$ 使 $Hk = \inv{h'}\circ f\circ h$。
+
+  由 $\gamma$ 的自然性，$GHk\circ \gamma_a = \gamma_{a'} \circ FHk$。
+  利用 $\delta$ 的定义，有
+  \begin{align*}
+    Gf \circ \delta_b
+    &= Gf \circ Gh \circ \gamma_a \circ \inv{Fh}\\
+    &= Gh' \circ GHk\circ \gamma_a \circ \inv{Fh}\\
+    &= Gh' \circ \gamma_{a'} \circ FHk \circ \inv{Fh}\\
+    &= Gh' \circ \gamma_{a'} \circ \inv{Fh'} \circ Ff\\
+    &= \delta_{b'} \circ Ff.
+  \end{align*}
+  因此 $\delta$ 自然。
+  最后，对任意 $a:A$，把 $\delta_{Ha}$ 的定义应用于 $a$ 与 $1_a$，得 $\gamma_a = \delta_{Ha}$。
+  故 $\delta \circ H = \gamma$。
+\end{proof}
+
+该定理其余部分几乎完全沿同样思路进行，只是在一个关键步骤中插入了 $C$ 的“为范畴”性质；我们在下文用斜体强调了此处。
+这正是我们在不使用选择的情况下试图定义一个取值于\emph{对象}的函数之处，因此必须谨慎处理“对象被唯一刻画”到底意味着什么。
+在经典\index{mathematics!classical}\index{classical!category theory}范畴论中，只能说该对象在唯一同构意义下被刻画；但在集合论基础中，这种唯一性不足以在不诉诸 \choice{} 的情况下给出函数。
+而在单价基础中，若 $C$ 是范畴，则同构即相等，从而我们获得所需的唯一性（即落在可缩空间中）。
+
+\index{weak equivalence!of precategories|(}%
+
+\begin{thm}\label{ct:cat-weq-eq}
+  若 $A,B$ 是预范畴，$C$ 是范畴，且 $H:A\to B$ 是弱等价，则 $(\blank\circ H):C^B \to C^A$ 是同构。
+\end{thm}
+\begin{proof}
+  由 \cref{ct:functor-cat}，$C^B$ 与 $C^A$ 都是范畴。
+  因此由 \cref{ct:eqv-levelwise}，只需证明 $(\blank\circ H)$ 是等价。
+  但由前两引理已知它完全忠实，因此由 \cref{ct:catweq}，只需证明它本质满。
+  于是取 $F:A\to C$；我们希望仅存在某个 $G:B\to C$ 使得 $GH\cong F$。
+
+  对每个 $b:B$，令 $X_b$ 为如下类型，其元素由下列数据组成：
+  \begin{enumerate}
+  \item 一个元素 $c:C$；以及
+  \item 对每个 $a:A$ 与 $h:Ha\cong b$，一个同构 $k_{a,h}:Fa\cong c$；并满足\label{item:eqvprop2}
+  \item 对每组如~\ref{item:eqvprop2} 的 $(a,h)$ 与 $(a',h')$，以及任意满足 $h'\circ Hf = h$ 的 $f:\hom_A(a,a')$，有 $k_{a',h'}\circ Ff = k_{a,h}$。\label{item:eqvprop3}
+  \end{enumerate}
+  我们断言：任意 $b:B$ 下，$X_b$ 可缩。
+  由于这是纯命题，可设给定 $a_0:A$ 与 $h_0:Ha_0 \cong b$。
+  令 $c^0\defeq Fa_0$。
+  再给定 $a:A$ 与 $h:Ha\cong b$，由于 $H$ 完全忠实，存在唯一同构 $g_{a,h}:a\to a_0$ 使 $Hg_{a,h} = \inv{h_0}\circ h$；定义 $k^0_{a,h} \defeq Fg_{a,h}$。
+  最后若 $h'\circ Hf = h$，则 $\inv{h_0}\circ h'\circ Hf = \inv{h_0}\circ h$，故 $g_{a',h'} \circ f = g_{a,h}$，从而 $k^0_{a',h'}\circ Ff = k^0_{a,h}$。
+  因此 $X_b$ 可居住。
+
+  现在设另给 $(c^1,k^1): X_b$。
+  则 $k^1_{a_0,h_0}:c^0 \jdeq Fa_0 \cong c^1$。
+  \emph{由于 $C$ 是范畴，我们有 $p:c^0=c^1$ 且 $\idtoiso(p) = k^1_{a_0,h_0}$。}
+  对任意 $a:A$ 与 $h:Ha\cong b$，由 $(c^1,k^1)$ 的~\ref{item:eqvprop3}（取 $f\defeq g_{a,h}$）可得
+  \[k^1_{a,h} = k^1_{a_0,h_0} \circ k^0_{a,h} = \trans{p}{k^0_{a,h}}\]
+  这正给出等式 $(c^0,k^0)=(c^1,k^1)$ 所需的数据，从而完成 $X_b$ 可缩的证明。
+
+  由于每个 $b$ 下 $X_b$ 都可缩，类型 $\prd{b:B} X_b$ 也可缩。
+  特别地，它可居住，于是我们有一个函数给每个 $b:B$ 指派一个 $c$ 与一个 $k$。
+  定义 $G_0(b)$ 为该 $c$；由此得到函数 $G_0 :B_0 \to C_0$。
+
+  接着定义 $G$ 在态射上的作用。
+  对每个 $b,b':B$ 与 $f:\hom_B(b,b')$，令 $Y_f$ 为如下类型，其元素由下列数据组成：
+  \begin{enumerate}[resume]
+  \item 一个态射 $g:\hom_C(Gb,Gb')$，并满足
+  \item 对每个 $a:A$ 与 $h:Ha\cong b$，每个 $a':A$ 与 $h':Ha'\cong b'$，以及任意 $\ell:\hom_A(a,a')$，都有\label{item:eqvprop5}
+    \[ (h' \circ H\ell = f \circ h)
+    \to
+    (k_{a',h'} \circ F\ell = g\circ k_{a,h}). \]
+  \end{enumerate}
+  我们断言：任意 $b,b',f$ 下，$Y_f$ 可缩。
+  由于这是纯命题，可设给定 $a_0:A,h_0:Ha_0\cong b$，以及 $a'_0:A,h'_0:Ha'_0\cong b'$。
+  又由于 $H$ 完全忠实，存在唯一 $\ell_0:\hom_A(a_0,a_0')$ 使 $h'_0 \circ H\ell_0 = f \circ h_0$。
+  定义 $g_0 \defeq k_{a_0',h_0'} \circ F \ell_0 \circ \inv{(k_{a_0,h_0})}$。
+
+  现在给定任意 $a,h,a',h'$ 以及满足 $(h' \circ H\ell = f \circ h)$ 的 $\ell$，有 $\inv{h}\circ h_0:Ha_0\cong Ha$，故存在唯一 $m:a_0\cong a$ 使 $Hm = \inv{h}\circ h_0$，从而 $h\circ Hm = h_0$。
+  同理存在唯一 $m':a_0'\cong a'$ 使 $h'\circ Hm' = h_0'$。
+  由~\ref{item:eqvprop3}，有 $k_{a,h}\circ Fm = k_{a_0,h_0}$ 与 $k_{a',h'}\circ Fm' = k_{a_0',h_0'}$。
+  另有
+  \begin{align*}
+    Hm' \circ H\ell_0
+    &= \inv{(h')} \circ h_0' \circ H\ell_0\\
+    &= \inv{(h')} \circ f \circ h_0\\
+    &= \inv{(h')} \circ f \circ h \circ \inv{h} \circ h_0\\
+    &= H\ell \circ Hm
+  \end{align*}
+  由于 $H$ 完全忠实，故 $m'\circ \ell_0 = \ell\circ m$。
+  最后可计算
+  \begin{align*}
+    g_0 \circ k_{a,h}
+    &= k_{a_0',h_0'} \circ F \ell_0 \circ \inv{(k_{a_0,h_0})} \circ k_{a,h}\\
+    &= k_{a_0',h_0'} \circ F \ell_0 \circ \inv{Fm}\\
+    &= k_{a_0',h_0'} \circ \inv{(Fm')} \circ F\ell\\
+    &= k_{a',h'}\circ F\ell.
+  \end{align*}
+  这就完成了 $Y_f$ 可居住的证明。
+  要证明它可缩，由于 hom-集是集合，只需取另一个满足~\ref{item:eqvprop5} 的 $g_1:\hom_C(Gb,Gb')$ 并证明 $g_0=g_1$。
+  但我们仍有已指定的 $a_0,h_0,a_0',h_0',\ell_0$，而~\ref{item:eqvprop5} 蕴含 $g_0,g_1$ 都必须等于 $k_{a_0',h_0'} \circ F \ell_0 \circ \inv{(k_{a_0,h_0})}$。
+
+  至此完成对每个 $b,b':B$ 与 $f:\hom_B(b,b')$ 的 $Y_f$ 可缩性证明。
+  因而有函数把每个此类 $f$ 指派给其唯一元素；记为 $G_{b,b'}:\hom_B(b,b') \to \hom_C(Gb,Gb')$。
+  证明 $G$ 是函子是直接的；每种情形都可选取 $a,h$ 并应用~\ref{item:eqvprop5}。
+
+  最后，对任意 $a_0:A$，定义 $c\defeq Fa_0$，并定义 $k_{a,h}\defeq F g$，其中 $g:\hom_A(a,a_0)$ 是满足 $Hg = h$ 的唯一同构，则得到 $X_{Ha_0}$ 的一个元素。
+  因此它与指定元素相等，从而 $GHa=Fa$。
+  类似地，对 $f:\hom_A(a_0,a_0')$，可沿这些等式传送构造 $Y_{Hf}$ 的一个元素，因此它必与指定元素相等。
+  故有 $GH=F$，从而 $GH\cong F$，如所需。
+\end{proof}
+
+\index{universal!property!of Rezk completion}%
+因此，若预范畴 $A$ 存在一个弱等价函子 $A\to \widehat{A}$ 映入某个范畴，那么它就是 $A$ 到范畴的“反射”：任何从 $A$ 到范畴的函子都将通过 $\widehat{A}$ 本质唯一地分解。
+现在我们给出这种弱等价的两种构造。
+
+\indexsee{Rezk completion}{completion, Rezk}%
+\index{completion!Rezk|(defstyle}%
+
+\begin{thm}\label{thm:rezk-completion}
+  对任意预范畴 $A$，存在一个范畴 $\widehat A$ 和一个弱等价 $A\to\widehat{A}$。
+\end{thm}
+
+\begin{proof}[第一种证明]
+  令 $\widehat{A}_0 \defeq \setof{ F:\uset^{A\op} | \exis{a:A} (\y a \cong F)}$，其 hom-集从 $\uset^{A\op}$ 继承。
+  则包含函子 $\widehat{A} \to \uset^{A\op}$ 完全忠实，且在对象上是嵌入。
+  又因为 $\uset^{A\op}$ 是范畴（由 \cref{ct:functor-cat}，而 \uset 由单价性是范畴），故 $\widehat A$ 也是范畴。
+
+  令 $A\to\widehat A$ 为 Yoneda 嵌入。
+  它由 \cref{ct:yoneda-embedding} 可知完全忠实，而由 $\widehat{A}_0$ 的定义可知本质满。
+  因此它是弱等价。
+\end{proof}
+
+这个证明非常简洁，但缺点是会提升宇宙层级。
+若 $A$ 是宇宙 \bbU 中的范畴，则此证明中的 \uset 至少要与 $\uset_\bbU$ 一样大。
+于是 $\uset_\bbU$ 与 $(\uset_\bbU)^{A\op}$ 本身并不是 \bbU 中的范畴，只是在更高宇宙中是；并且\emph{先验地}，$\widehat A$ 也同样如此。
+可以设想用一个重整化公理来处理此事，但也可以直接用高阶归纳类型给出构造。
+
+\begin{proof}[第二种证明]
+  我们定义一个高阶归纳类型 $\widehat A_0$，其构造子如下：
+  \begin{itemize}
+  \item 一个函数 $i:A_0 \to \widehat A_0$。
+  \item 对每个 $a,b:A$ 与 $e:a\cong b$，一个等式 $je:\id{ia}{ib}$。
+  \item 对每个 $a:A$，一个等式 $\id{j(1_a)}{\refl{ia}}$。
+  \item 对每个 $(a,b,c:A)$、$(f:a\cong b)$ 与 $(g:b\cong c)$，一个等式 $\id{j(g \circ f)}{j(f)\ct j(g)}$。
+  \item 1-截断：对所有 $x,y:\widehat A_0$、$p,q:\id x y$ 与 $r,s:\id p q$，一个等式 $\id r s$。
+  \end{itemize}
+  注意对任意 $a,b:A$ 与 $p:\id a b$，有 $\id{j(\idtoiso(p))}{\map i p}$。
+  这可由对 $p$ 的路径归纳与第三个构造子得到。
+
+  类型 $\widehat A_0$ 将作为 $\widehat A$ 的对象类型；接下来构造其余结构。
+  （这类证明非常适合计算机证明助手\index{proof!assistant}：它“宽而浅”，包含许多短小分支，且很大一部分工作是把需检查的内容写出来。）
+
+  \mentalpause
+
+  \emph{步骤 1：} 通过对 $\widehat A_0$ 的双重归纳，定义类型族 $\hom_{\widehat A}:\widehat A_0\to \widehat A_0 \to \set$。
+  因为 \set 是 1-类型，可忽略 1-截断构造子。
+  当 $x,y$ 形如 $ia,ib$ 时，取 $\hom_{\widehat A}(ia,ib) \defeq \hom_A(a,b)$。
+  还需考虑其余构造子组合。
+
+  先固定 $x=ia$。
+  若 $y$ 沿某个同构 $e:b\cong b'$ 诱导的等式 $je:\id{ib}{ib'}$ 变化，需要一个等式 $\id{\hom_A(a,b)}{\hom_A(a,b')}$。
+  由单价性，只需给出一个等价 $\eqv{\hom_A(a,b)}{\hom_A(a,b')}$。
+  取函数 $(e\circ \blank ):\hom_A(a,b)\to \hom_A(a,b')$。
+  要看它是等价，其逆取为 $(\inv e\circ \blank )$，逆性见证来自 $\inv e$ 是 $e$ 在 $A$ 中的逆。
+
+  当 $y$ 沿等式 $\id{j(1_b)}{\refl{ib}}$ 变化时，需要等式 $\id{(1_b\circ \blank )}{\refl{\hom_A(a,b)}}$；这来自预范畴的恒等公理 $\id{1_b\circ g}{g}$。
+  类似地，当 $y$ 沿等式 $\id{j(g\circ f)}{j(f)\ct j(g)}$ 变化时，需要等式 $\id{((g\circ f)\circ \blank )}{(g\circ (f\circ \blank ))}$，它来自结合律。
+  % Finally, as $y$ varies along the 1-truncation constructor, we need only to observe that \\set is 1-truncated.
+
+  现在考虑 $x$ 的其他构造子。
+  设 $x$ 沿某个同构 $e:a \cong a'$ 诱导的等式 $j(e):\id{ia}{ia'}$ 变化；同样需处理 $y$ 的所有构造子。
+  若 $y$ 为 $ib$，则需等式 $\id{\hom_A(a,b)}{\hom_A(a',b)}$。
+  由单价性可由一个等价给出，这里用 $(\blank\circ \inv e)$，其逆为 $(\blank\circ e)$。
+
+  仍在 $x$ 沿 $j(e)$ 变化时，若 $y$ 也沿某个 $f:b\cong b'$ 的 $j(f)$ 变化，则需证明两条连接等式
+  \begin{gather*}
+    \hom_A(a,b) = \hom_A(a',b) = \hom_A(a',b') \mathrlap{\qquad\text{和}}\\
+    \hom_A(a,b) = \hom_A(a,b') = \hom_A(a',b')
+  \end{gather*}
+  相同。
+  这由结合律得出：$(f\circ \blank)\circ \inv e = f\circ (\blank\circ \inv e)$。
+  $y$ 的另外两个构造子则是平凡的，因为它们是集合中的二重等式。
+
+  对 $x$ 的后两个构造子，除 $y$ 的第一个构造子外其余同样平凡。
+  当 $x$ 沿 $j(1_a)=\refl{ia}$ 变化且 $y$ 为 $ib$ 时，再次使用恒等公理。
+  类似地，当 $x$ 沿 $\id{j(g\circ f)}{j(f)\ct j(g)}$ 变化时，再次使用结合律。
+  至此完成 $\hom_{\widehat A}:\widehat A_0 \to \widehat A_0 \to \set$ 的构造。
+
+  \mentalpause
+
+  \emph{步骤 2：} 给出 $\widehat A$ 的预范畴结构，始终按 $\widehat A_0$ 归纳。
+  % The reader is probably getting bored at this point, so we skip the details.
+  现在消去到集合（即 $\widehat A$ 的 hom-集），因此除前两个构造子外都平凡。
+
+  关于恒等：若 $x$ 是 $ia$，则 $\hom_{\widehat A}(x,x) \jdeq \hom_A(a,a)$，定义 $1_x \defeq 1_{ia}$。
+  若 $x$ 沿某个 $e:a\cong a'$ 的 $je$ 变化，需证 $\transfib{x\mapsto \hom_{\widehat A}(x,x)}{je}{1_{ia}} = 1_{ia'}$。
+  但按 $\hom_{\widehat A}$ 的定义，沿 $je$ 的传送由与 $e,\inv e$ 复合给出，而有 $e\circ 1_{ia} \circ \inv{e} = 1_{ia'}$。
+
+  关于复合：若 $x,y,z$ 分别是 $ia,ib,ic$，则 $\hom_{\widehat A}$ 退化为 $\hom_A$，可把 $\widehat A$ 中复合定义为 $A$ 中复合。
+  当 $x,y,z$ 中某个沿 $je$ 变化时，要验证如下等式：
+  \begin{align*}
+    e \circ (g\circ f) &= (e\circ g) \circ f,\\
+    g\circ f &= (g\circ \inv e) \circ (e\circ f),\\
+    (g\circ f) \circ \inv e &= g \circ (f\circ \inv e).
+  \end{align*}
+  最后，结合律与幺元律公理是纯命题，因此除第一个构造子外都平凡；而该情形在 $A$ 中已有对应公理。
+
+  \mentalpause
+
+  \emph{步骤 3：} 证明 $\widehat A$ 是范畴。
+  即需证明对所有 $x,y:\widehat A$，函数 $\idtoiso:(x=y) \to (x\cong y)$ 是等价。
+  先通过归纳定义函数 $k_{x,y}:(x\cong y) \to (x=y)$。
+  与之前一样，由于目标是集合，只需处理前两个构造子。
+
+  当 $x,y$ 分别为 $ia,ib$ 时，$\hom_{\widehat A}(ia,ib)\jdeq \hom_A(a,b)$，复合与恒等也继承而来，于是 $(ia\cong ib)$ 等价于 $(a\cong b)$。
+  这时我们有构造子 $j:(a\cong b) \to (ia=ib)$。
+
+  接着，若 $y$ 沿某个 $e:b\cong b'$ 的 $j(e)$ 变化，则需证明对 $f:a\cong b$ 有 $j(\trans{j(e)}{f}) = j(f) \ct j(e)$。
+  但按 $\hom_{\widehat A}$ 的定义，沿 $j(e)$ 的传送等价于右复合 $e$，故该等式由 $\widehat A_0$ 的最后一个构造子得到。
+  其余 $x$ 沿某个 $e:a\cong a'$ 的 $j(e)$ 变化的情形类似。
+  至此完成 $k:\prd{x,y:\widehat A_0} (x\cong y) \to (x=y)$ 的定义。
+
+  现在我们需证明的一件事是：若 $p:x=y$，则 $k(\idtoiso(p))=p$。
+  对 $p$ 归纳可设其为 $\refl x$，故 $\idtoiso(p)\jdeq 1_x$。
+  再对 $x:\widehat A_0$ 归纳；因目标是纯命题（$\widehat A_0$ 是 1-类型），除第一个构造子外都平凡。
+  若 $x$ 是 $ia$，则 $k(1_{ia}) \jdeq j(1_a)$，而由 $\widehat A_0$ 第三个构造子知其等于 $\refl{ia}$。
+
+  要完成“$\widehat A$ 是范畴”的证明，还需证明：若 $f:x\cong y$，则 $\idtoiso(k(f))=f$。
+  归纳可设 $x,y$ 分别是 $ia,ib$，此时 $f$ 必来自某个同构 $g:a\cong b$，且 $k(f)\jdeq j(g)$。
+  然而对任意 $p$，有 $\idtoiso(p) = \trans{p}{1}$，特别地 $\idtoiso (j(g)) = \trans{j(g)}{1_{ia}}$。
+  按 $\hom_{\widehat A}$ 对等式的定义，这由把 $1_{ia}$ 与等价 $g$ 复合给出，因此等于 $g$。
+
+  \index{encode-decode method}%
+  注意这一步与 \cref{sec:compute-coprod,sec:compute-nat,cha:homotopy} 中的 encode-decode 方法非常相似。一次我们又是在刻画某个高阶归纳类型（这里是 $\widehat A_0$）的恒等类型：递归定义一族编码（这里是 $(x,y)\mapsto (x\cong y)$），并通过对 $\widehat A_0$ 及路径归纳定义编码与解码函数。
+
+  \mentalpause
+
+  \emph{步骤 4：} 定义一个弱等价 $I:A \to \widehat A$。
+  取 $I_0 \defeq i : A_0 \to \widehat A_0$，并且按 $\hom_{\widehat A}$ 的构造有函数 $I_{a,b}:\hom_A(a,b) \to \hom_{\widehat A}(Ia,Ib)$，从而形成函子 $I:A \to \widehat A$。
+  该函子按构造即完全忠实，因此剩下证明其本质满。
+  即对所有 $x:\widehat A$，仅需存在某个 $a:A$ 使 $Ia\cong x$。
+  与惯例一样，对 $x$ 归纳；因目标是纯命题，除第一个构造子外都平凡。
+  若 $x$ 为 $ia$，则当然有 $a:A$ 且 $Ia\jdeq ia$，故 $Ia \cong ia$。
+  （注意若我们要证明 $I$ \emph{可分裂}本质满就会卡住，因为我们对 $A_0$ 中等式毫无信息，无法处理后续构造子。）
+\end{proof}
+
+我们把构造 $A\mapsto \widehat A$ 称为\define{Rezk 完备化}，
+尽管也有一种论证（来自更高拓扑斯语义）
+\index{.infinity1-topos@$(\infty,1)$-topos}%
+支持把它称为\define{层叠完备化（stack 完备化）}。
+\index{stack}%
+\index{completion!Rezk|)}%
+
+我们已看到，实践中多数预范畴都是范畴，因为它们由 \uset 构造，而 \uset 由单价公理是范畴。
+不过仍有少数情形需要 Rezk 完备化才能得到范畴。
+
+\begin{eg}\label{ct:rezk-fundgpd-trunc1}
+  回忆 \cref{ct:fundgpd}：任意类型 $X$ 都有一个原群胚，其对象类型为 $X$，且 $\hom(x,y) \defeq \pizero{x=y}$。
+  \indexdef{fundamental!groupoid}%
+  \index{fundamental!pregroupoid}%
+  \indexsee{groupoid!fundamental}{fundamental group\-oid}%
+  它的 Rezk 完备化就是 $X$ 的\emph{基本群胚}。
+  回忆群胚与 1-类型等价，不难把该群胚识别为 $\trunc1X$。
+\end{eg}
+
+\begin{eg}\label{ct:hocat}
+  回忆 \cref{ct:hoprecat}：存在一个预范畴，其对象类型是 \type，且 $\hom(X,Y) \defeq \pizero{X\to Y}$。
+  它的 Rezk 完备化可称为\define{类型的同伦范畴}。
+  \index{category!of types}%
+  \index{homotopy!category of types@(pre)category of types}%
+  其对象类型可识别为 $\trunc1\type$（见 \cref{ct:ex:hocat}）。
+\end{eg}
+
+Rezk 完备化还使我们能够说明：“范畴”这一概念由“预范畴弱等价”这一概念确定。
+因此，只要后者不可避免，前者也同样不可避免。
+
+\begin{thm}\label{ct:weq-iso-precat-cat}
+  一个预范畴 $C$ 是范畴，当且仅当对每个预范畴弱等价 $H:A\to B$，诱导函子 $(\blank\circ H):C^B \to C^A$ 是预范畴同构。
+\end{thm}
+\begin{proof}
+  “仅当”方向即 \cref{ct:cat-weq-eq}。
+  反向中令 $H$ 为 $I:A\to\widehat A$。
+  由于 $(\blank\circ I)_0$ 是等价，存在 $R:\widehat A\to A$ 使 $RI=1_A$。
+  因而 $IRI=I$，再次利用 $(\blank\circ I)_0$ 为等价，得 $IR =1_{\widehat A}$。
+  由 \cref{ct:isoprecat}\ref{item:ct:ipc3}，$I$ 是预范畴同构。
+  但 $\widehat A$ 是范畴，故 $A$ 也是范畴。
+\end{proof}
+
+\index{weak equivalence!of precategories|)}%
+
+
+\newpage
+
+\sectionNotes
+
+范畴最初的定义当然是在集合论基础中给出的，因此一个范畴的对象汇集构成一个集合（或对大范畴而言是一个类）。
+随着发展，人们逐渐认识到，对象的一切“范畴论”性质都在同构下不变，而范畴中对象相等通常并不是很有用的概念。
+许多作者~\cite{blanc:eqv-log,freyd:invar-eqv,makkai:folds,makkai:comparing} 发现：依值类型逻辑使得可以在不调用对象相等概念的情况下表述范畴定义，而且在该逻辑中可证明的命题恰是那些在同构下不变的“范畴论”命题。
+\index{evil}%
+
+尽管范畴论的大部分内容看起来在对象同构与范畴等价下都不变，但也存在一些有趣例外，从而引发了关于“何谓范畴论的”哲学讨论。
+例如，\cref{ct:galois} 在 2010 年 5 月由 Peter May 在 categories 邮件列表提出：那是一个两类范畴（按集合论常规定义）必须同构而不仅是等价的案例。
+$\dagger$-范畴的情形也一度让主张“同构不变”版本范畴论的人感到困惑，因为 $\dagger$-范畴对象之间“正确”的相同性不是普通同构，而是\emph{酉}同构。
+\index{isomorphism!invariance under}%
+
+满足 \cref{ct:category} 所述“饱和”或“单价”原则的范畴，最早由 Hofmann 与 Streicher~\cite{hs:gpd-typethy} 考虑。
+数年后，该条件又被 Voevodsky、Shulman 以及可能的其他人独立发现，并由 Ahrens 与 Kapulkin~\cite{aks:rezk} 形式化。
+这一框架把以上例子放入统一语境：有些预范畴是范畴，另一些是严格范畴，等等。
+Coquand 与 Danielsson 证明了一个一般定理：在假设单价公理下，对一大类代数结构都有“同构蕴含相等”；而 \cref{sec:sip} 中结构同一性原理的表述来自 Aczel。
+
+独立于关于范畴论的哲学讨论，Rezk~\cite{rezk01css} 发现：在定义 $(\infty,1)$-范畴概念时，
+\index{.infinity1-category@$(\infty,1)$-category}%
+使用的不应仅是一个\emph{对象集合}及其间态射空间，而应是一个包含所有等价与同伦信息的\emph{对象空间}，这样非常方便。
+这会得到一种对 $(\infty,1)$-范畴行为很好的模型：某类特殊单纯空间，Rezk 称之为\emph{完备 Segal 空间}。
+\index{complete!Segal space}%
+\index{Segal!space}%
+该模型的一个显著优点是 \cref{ct:eqv-levelwise} 的类比成立：完备 Segal 空间之间的映射是等价，当且仅当它在单纯空间的每一层都是等价。
+
+在 Voevodsky 的单纯\index{simplicial!sets}集合单价基础模型中，我们的预范畴类似于 Rezk“Segal 空间”的一种截断对应物，而我们的范畴对应他的“完备 Segal 空间”。
+\index{Segal!category}%
+严格范畴则对应（弱化并截断后的）所谓“Segal 范畴”。
+已知 Segal 范畴与完备 Segal 空间是 $(\infty,1)$-范畴的等价模型（见如~\cite{bergner:infty-one}），因此在单纯集合模型中，范畴与严格范畴给出的范畴论是“等价”的——尽管我们已看到前者仍有诸多优势。
+但在更一般的更高拓扑斯范畴语义中，
+\index{.infinity1-topos@$(\infty,1)$-topos}%
+严格范畴对应于相应 1-拓扑斯\index{topos}（层范畴）中的内部范畴（传统意义），而范畴对应于\emph{stack}。
+\index{stack}%
+后者通常是相对于一个拓扑斯更合适的“范畴”概念。
+
+在 Rezk 的语境下，我们称为“Rezk 完备化”的东西对应于完备 Segal 空间模型范畴中的纤维替换
+\index{fibrant replacement}
+。由于其构造使用超限归纳，它与我们的第二种高阶归纳类型构造最为贴近。
+然而在同伦类型论的更高拓扑斯模型中，Rezk 完备化对应于\emph{stack 完备化}，\index{completion!stack}\index{stack!completion}它既可通过超限归纳构造~\cite{jt:strong-stacks}，也可通过 Yoneda 嵌入构造 \cite{bunge:stacks-morita-internal}。
+
+
+\sectionExercises
+
+\begin{ex}\label{ex:slice-precategory}
+  对预范畴 $A$ 与 $a:A$，定义\define{切片预范畴} $A/a$。
+  \indexsee{precategory!slice}{category, slice}%
+  \indexsee{slice (pre)category}{category, slice}%
+  证明：若 $A$ 是范畴，则 $A/a$ 也是范畴。
+  \indexdef{category!slice}%
+\end{ex}
+
+\begin{ex}\label{ex:set-slice-over-equiv-functor-category}
+  对任意集合 $X$，证明切片范畴 $\uset/X$ 与函子范畴 $\uset^X$ 等价，其中后者把 $X$ 视作离散范畴。
+\end{ex}
+
+\begin{ex}\label{ex:functor-equiv-right-adjoint}
+  \index{adjoint!functor}%
+  \index{adjoint!equivalence}%
+  证明：一个函子是范畴等价当且仅当它是一个\emph{右}伴随，且其单位与余单位都是同构。
+\end{ex}
+
+\begin{ex}\label{ct:pre2cat}
+  定义\define{预 2-范畴（pre-2-category）}的概念。
+  \indexdef{pre-2-category}%
+  证明：按 \cref{sec:transfors} 定义的预范畴、函子与自然变换构成一个 pre-2-category。
+  类似地，定义\define{预双范畴（pre-bicategory）}
+  \indexdef{pre-bicategory}%
+  ：把等式（如 \cref{ct:functor-assoc,ct:units} 中）替换为满足相应相干条件的自然同构。
+  定义从 pre-2-categories 到 pre-bicategories 的函数，并证明：当定义域与值域都限制在 hom-预范畴是范畴的那些对象上时，它成为等价。
+\end{ex}
+
+\begin{ex}\label{ct:2cat}
+  定义\define{2-范畴（2-category）}
+  \indexdef{2-category}%
+  为满足与 \cref{ct:category} 类似条件的 pre-2-category。
+  验证范畴的 pre-2-category \ucat 是一个 2-category。
+  本章有多少内容可以在任意 2-category 的内部完成？
+\end{ex}
+
+\begin{ex}\label{ct:groupoids}
+  定义一个 2-category：其对象是 1-类型、态射是函数、2-态射是同伦。
+  证明它在适当意义下与 \ucat 的一个满子 2-category 等价，该子范畴由\emph{群胚}张成（即每条箭头都是同构的范畴）。
+\end{ex}
+
+\begin{ex}\label{ex:2strict-cat}
+  \index{strict!category}%
+  回忆：\emph{严格范畴}是对象类型为集合的预范畴。
+  证明：严格范畴的 pre-2-category 与下述 pre-2-category 等价。
+  \begin{itemize}
+  \item 其对象是配备满射的范畴 $A$
+    % \footnote{Recall that a function $f:X\to Y$ is a \emph{surjection} if for every $y:Y$, there \emph{merely exists} an $x:X$ such that $f(x)=y$.  This is to be distinguished from a \emph{split surjection}, which has the property that for every $y:Y$ there \emph{exists} an $x:X$ such that $f(x)=y$.}
+    $p_A:A_0'\to A_0$，其中 $A_0'$ 是集合。
+  \item 其态射是配备函数 $F_0':A_0' \to B_0'$ 的函子 $F:A\to B$，满足 $p_B \circ F_0' = F_0 \circ p_A$。
+  \item 其 2-态射就是自然变换。
+  \end{itemize}
+\end{ex}
+
+\begin{ex}\label{ex:pre2dagger-cat}
+  定义 $\dagger$-范畴的 pre-2-category，其中其 hom-预范畴带有 $\dagger$-结构。
+  证明：两个 $\dagger$-范畴相等，当且仅当它们在某种合适意义下“酉等价”。
+\end{ex}
+
+\begin{ex}\label{ct:ex:hocat}
+  证明：函数 $X\to Y$ 是等价，当且仅当它在 \cref{ct:hocat} 的同伦范畴中的像是同构。
+  证明该范畴的对象类型是 $\trunc1\type$。
+\end{ex}
+
+\begin{ex}\label{ex:dagger-rezk}
+  把 $\dagger$-预范畴构造为 $\dagger$-范畴的 $\dagger$-Rezk 完备化，并给出其合适的泛性质。
+\end{ex}
+
+\begin{ex}\label{ex:rezk-vankampen}
+  \index{van Kampen theorem}%
+  \index{theorem!van Kampen}%
+  \index{fundamental!groupoid}%
+  \index{fundamental!pregroupoid}%
+  使用 \cref{ct:fundgpd,ct:rezk-fundgpd-trunc1} 的基本（原）群胚与 \cref{sec:rezk} 的 Rezk 完备化，给出 van Kampen 定理（\cref{sec:van-kampen}）的另一种证明。
+\end{ex}
+
+\begin{ex}\label{ex:stack}
+  设 $X,Y$ 是集合，$p:Y\to X$ 是满射。
+  \begin{enumerate}
+  \item 对任意预范畴 $A$，定义相对于 $p$ 的 $A$ 中\define{下降数据}范畴 $\mathrm{Desc}(A,p)$。
+    \indexdef{descent data}%
+  \item 证明任意预范畴 $A$ 对 $p$ 都是\define{预层叠（prestack）}，
+    \indexdef{prestack}%
+    即典范函子 $A^X \to \mathrm{Desc}(A,p)$ 完全忠实。
+  \item 证明若 $A$ 是范畴，则它对 $p$ 是\define{层叠（stack）}，
+    \indexdef{stack}%
+    即 $A^X \to \mathrm{Desc}(A,p)$ 是等价。
+  \item 证明命题“每个严格范畴对每个集合满射都是 stack”与选择公理等价。
+    \index{axiom!of choice}%
+    \index{strict!category}%
+  \end{enumerate}
+\end{ex}
+
+% Local Variables:
+% TeX-master: "hott-online"
+% End:

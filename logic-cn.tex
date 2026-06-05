@@ -1,0 +1,1274 @@
+\chapter{集合与逻辑}
+\label{cha:logic}
+
+无论是形式化还是非形式化的类型论，都是一套用于操纵类型及其元素的规则。
+但当我们用自然语言非形式地书写数学时，通常会使用熟悉的词语，特别是诸如 ``and'' 和 ``or'' 这样的逻辑联结词，以及诸如 ``for all'' 和 ``there exists'' 这样的逻辑量词。
+与集合论不同，类型论为我们提供了不止一种方式，把这些英文短语视为作用于类型的运算。
+这种潜在的歧义需要被消解：可以通过设定局部或全局约定、为非形式数学引入新的标注，或两者并用。
+这需要一些适应，但其代价被抵消了：正因为类型论允许对逻辑做这种更细致的分析，我们可以更忠实地表述数学，并比集合论基础中的做法更少诉诸“语言上的滥用”。
+本章将解释其中涉及的问题，并说明我们所作选择的理由。
+\section{集合与 \texorpdfstring{$n$}{n}-类型}
+\label{sec:basics-sets}
+
+\index{set|(defstyle}%
+
+为了说明类型论逻辑与集合论逻辑之间的联系，在类型论中拥有 \emph{集合} 这一概念会很有帮助。
+虽然一般类型的行为更像空间或高阶群胚，但其中有一个子类的行为更接近传统集合论系统中的集合。
+从范畴论角度，我们可以考虑 \emph{离散}群胚：它由一个对象集合决定，且高阶态射只有恒等态射；从拓扑角度，我们可以考虑带离散拓扑的空间。\index{discrete!space}
+更一般地，我们可以考虑与此类对象\emph{等价}的群胚或空间；由于我们在类型论中所做的一切都只在同伦意义下成立，我们不能指望区分它们。
+
+直观上，在这个意义下，一个类型要“是集合”，应当意味着它不包含更高阶同伦信息：任意两条平行路径都相等（直到同伦），并且在所有维度上的平行高阶路径也同样如此。
+幸运的是，由于同伦类型论中的一切自动具有函子性/连续性，
+\index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+\index{functoriality of functions in type theory@``functoriality'' of functions in type theory}%
+结果是只需在最底层要求这一点就足够了。
+
+\begin{defn}\label{defn:set}
+  类型 $A$ 称为 \define{集合}
+  当且仅当对任意 $x,y:A$ 与任意 $p,q:x=y$，都有 $p=q$。
+\end{defn}
+
+更精确地，命题 $\isset(A)$ 被定义为如下类型
+\[ \isset(A) \defeq \prd{x,y:A}{p,q:x=y} (p=q). \]
+
+正如 \cref{sec:types-vs-sets} 所述，
+同伦类型论中的集合并不像 ZF 集合论中的集合，因为这里没有全局的“隶属谓词” $\in$。
+它们更像结构数学与范畴论中使用的集合：其元素是“抽象点”，我们通过函数和关系在其上赋予结构。
+这已足够把它们用作大多数基于集合的数学之基础系统；我们将在 \cref{cha:set-math} 中看到一些例子。
+
+哪些类型是集合？
+在 \cref{cha:hlevels} 中我们会更深入地研究这一问题的一般形式；但现在我们可以先观察一些简单例子。
+
+\begin{eg}\label{eg:isset-unit}
+  类型 \unit 是一个集合。
+  由 \cref{thm:path-unit}，对任意 $x,y:\unit$，类型 $(x=y)$ 与 \unit 等价。
+  由于 \unit 的任意两个元素都相等，这就推出 $x=y$ 的任意两个元素也相等。
+\end{eg}
+
+\begin{eg}\label{eg:isset-empty}
+  类型 $\emptyt$ 是一个集合，因为给定任意 $x,y:\emptyt$，由 $\emptyt$ 的归纳原理我们可以推出任何结论。
+\end{eg}
+
+\begin{eg}\label{thm:nat-set}
+  自然数类型 \nat 也是一个集合。
+  这由 \cref{thm:path-nat} 得出：所有等同类型 $\id[\nat]xy$ 都等价于 \unit 或 \emptyt，而 \unit 或 \emptyt 的任意两个住留元都相等。
+  我们将在 \cref{cha:hlevels} 中看到这一事实的另一种证明。
+\end{eg}
+
+到目前为止我们见过的大多数类型构造操作也都保持“集合性”。
+
+\begin{eg}\label{thm:isset-prod}
+  若 $A$ 与 $B$ 都是集合，则 $A\times B$ 也是集合。
+  给定 $x,y:A\times B$ 与 $p,q:x=y$，由 \cref{thm:path-prod} 有 $p= \pairpath(\projpath1(p),\projpath2(p))$ 且 $q= \pairpath(\projpath1(q),\projpath2(q))$。
+  但因为 $A$ 是集合，$\projpath1(p)=\projpath1(q)$；又因为 $B$ 是集合，$\projpath2(p)=\projpath2(q)$；故 $p=q$。
+
+  类似地，若 $A$ 是集合且 $B:A\to\type$ 满足每个 $B(x)$ 都是集合，则 $\sm{x:A} B(x)$ 也是集合。
+\end{eg}
+
+\begin{eg}\label{thm:isset-forall}
+  若 $A$ 是\emph{任意}类型，且 $B:A\to \type$ 满足每个 $B(x)$ 都是集合，则类型 $\prd{x:A} B(x)$ 是集合。
+  设 $f,g:\prd{x:A} B(x)$ 与 $p,q:f=g$。
+  由函数外延性，有
+  %
+  \begin{equation*}
+    p = {\funext (x \mapsto \happly(p,x))}
+    \quad\text{and}\quad
+    q = {\funext (x \mapsto \happly(q,x))}.
+  \end{equation*}
+  %
+  但对任意 $x:A$，有
+  %
+  \begin{equation*}
+   \happly(p,x):f(x)=g(x)
+   \qquad\text{and}\qquad
+   \happly(q,x):f(x)=g(x),
+  \end{equation*}
+  %
+  因而由于 $B(x)$ 是集合，得到 $\happly(p,x) = \happly(q,x)$。
+  再次使用函数外延性，这两个依值函数 $(x \mapsto \happly(p,x))$ 与 $(x \mapsto \happly(q,x))$ 相等，于是（施用 $\apfunc{\funext}$）$p$ 与 $q$ 也相等。
+\end{eg}
+
+更多例子见 \cref{ex:isset-coprod,ex:isset-sigma}。关于同伦类型论中全体集合所构成子系统（范畴）的更系统研究，见 \cref{cha:set-math}。
+
+\index{n-type@$n$-type|(}%
+
+集合只是所谓\emph{同伦 $n$-类型}这把梯子的第一级。
+下一级是 \emph{$1$-类型}，它在范畴论中对应于 $1$-群胚。
+集合（也可称为 \emph{$0$-类型}）的定义性质是：它没有非平凡路径。
+类似地，$1$-类型的定义性质是：路径之间没有非平凡路径：
+
+\begin{defn}\label{defn:1type}
+  类型 $A$ 称为 \define{1-类型}
+  \indexdef{1-type}%
+  当且仅当对任意 $x,y:A$、$p,q:x=y$ 以及 $r,s:p=q$，都有 $r=s$。
+\end{defn}
+
+类似地，我们可以定义 $2$-类型、$3$-类型，等等。
+我们将在 \cref{cha:hlevels} 中以归纳方式定义一般的 $n$-类型概念，并研究不同 $n$ 取值下各类 $n$-类型之间的关系。
+
+不过，现在先记住两点会很有帮助。
+第一，这些层级是向上封闭的：若 $A$ 是 $n$-类型，则 $A$ 也是 $(n+1)$-类型。
+例如：
+%%  will make precise the sense in which this
+%% ``suffices for all higher levels'', but as an example, we observe that
+%% it suffices for the next level up.
+
+\begin{lem}\label{thm:isset-is1type}
+  若 $A$ 是集合（即 $\isset(A)$ 可住留），则 $A$ 是 $1$-类型。
+\end{lem}
+\begin{proof}
+  设 $f:\isset(A)$；则对任意 $x,y:A$ 与 $p,q:x=y$，有 $f(x,y,p,q):p=q$。
+  固定 $x$、$y$ 与 $p$，定义 $g: \prd{q:x=y} (p=q)$ 为 $g(q) \defeq f (x,y,p,q)$。
+  则对任意 $r:q=q'$，有 $\apdfunc{g}(r) : \trans{r}{g(q)} = g(q')$。
+  因此由 \cref{cor:transport-path-prepost}，我们有 $g(q) \ct r = g(q')$。
+
+  特别地，按 \cref{defn:1type}，设给定 $x,y,p,q$ 与 $r,s:p=q$，并按上面定义 $g$。
+  则 $g(p) \ct r = g(q)$，且 $g(p) \ct s = g(q)$，故由消去律得 $r=s$。
+\end{proof}
+
+第二，按层级对类型进行分层并非退化的，
+也就是说并非所有类型都是集合：
+
+\begin{eg}\label{thm:type-is-not-a-set}
+  \index{type!universe}%
+  宇宙 \type 不是集合。
+  要证明这一点，只需给出某个类型 $A$ 与一条路径 $p:A=A$，且 $p$ 不等于 $\refl A$。
+  取 $A=\bool$，并定义 $f:A\to A$ 为 $f(\bfalse)\defeq \btrue$ 与 $f(\btrue)\defeq \bfalse$。
+  则对所有 $x$ 都有 $f(f(x))=x$（做一次简单分类讨论即可），所以 $f$ 是等价。
+  因而由泛等，$f$ 诱导出一条路径 $p:A=A$。
+
+  若 $p$ 等于 $\refl A$，则（再次由泛等）$f$ 将等于 $A$ 的恒等函数。
+  但这将推出 $\bfalse=\btrue$，与 \cref{rmk:true-neq-false} 矛盾。
+\end{eg}
+
+在 \cref{cha:hits,cha:homotopy} 中我们将证明：对任意 $n$，都存在不是 $n$-类型的类型。
+
+注意，$A$ 是 $1$-类型当且仅当对任意 $x,y:A$，等同类型 $\id[A]xy$ 是集合。
+（因此，\cref{thm:isset-is1type} 也可等价理解为：一个集合的等同类型仍是集合。）
+这将成为我们在 \cref{cha:hlevels} 中给出的 $n$-类型递归定义的基础。
+
+我们还可以把这种刻画从集合向“下”扩展。
+也就是说，类型 $A$ 是集合，当且仅当对任意 $x,y:A$，$\id[A]xy$ 的任意两个元素都相等。
+既然集合等价地就是 $0$-类型，就自然把满足后一性质（其任意两个元素都相等）的类型称为 \emph{$(-1)$-类型}。
+这类类型可看作\emph{狭义命题}，而对它们的研究正是通常所说的“逻辑”；本章余下部分都将围绕这一点展开。
+
+\index{n-type@$n$-type|)}%
+\index{set|)}%
+\section{命题即类型？}
+\label{subsec:pat?}
+
+\index{proposition!as types|(}%
+\index{logic!constructive vs classical|(}%
+\index{anger|(}%
+到目前为止，我们一直遵循 \cref{sec:pat} 中所述那种直接的“命题即类型”哲学：像“存在 $x:A$ 使得 $P(x)$”这样的英文语句，被解释为对应的类型 $\sm{x:A} P(x)$；而一个陈述的证明，则被看作对某个具体元素属于该类型的判定。
+然而，我们也已经看到：按这种解读得到的“逻辑”在一些方面对经典数学家而言并不熟悉。
+例如在 \cref{thm:ttac} 中我们看到如下陈述
+\index{axiom!of choice!type-theoretic}%
+\begin{equation}\label{eq:english-ac}
+  \parbox{\textwidth-2cm}{“若对所有 $x:X$ 都存在某个 $a:A(x)$ 使得 $P(x,a)$，则存在一个函数 $g:\prd{x:X} A(x)$，使得对所有 $x:X$ 都有 $P(x,g(x))$”，}
+\end{equation}
+它看起来像经典\index{mathematics!classical}的\emph{选择公理}，但在这种解读下总为真。这是命题即类型逻辑中一个值得注意且常常有用的特征；但它也说明了它与经典逻辑解释之间差异之大：在后者中，选择公理并非逻辑真理，而是额外的“公理”。
+
+另一方面，我们现在也能证明，与经典\emph{双重否定律}和\emph{排中律}对应的陈述与泛等公理并不相容。
+\index{univalence axiom}%
+
+\begin{thm}\label{thm:not-dneg}
+  \index{double negation, law of}%
+  并非对所有 $A:\UU$ 都有 $\neg(\neg A) \to A$。
+\end{thm}
+\begin{proof}
+  回忆 $\neg A \jdeq (A\to\emptyt)$。
+  我们也把 ``并非 \dots'' 读作算子 $\neg$。
+  因而要证明该陈述，只需假设给定某个 $f:\prd{A:\UU} (\neg\neg A \to A)$，并构造出 $\emptyt$ 的一个元素。
+
+  下述证明的思路是：观察到 $f$ 与类型论中的任何函数一样，都是“连续”的。
+  \index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+  \index{functoriality of functions in type theory@``functoriality'' of functions in type theory}%
+  由泛等可知，这意味着 $f$ 对类型等价是\emph{自然}的。
+  借助这一点以及一个无不动点的自等价\index{automorphism!fixed-point-free}，我们将导出矛盾。
+
+  令 $e:\eqv\bool\bool$ 为如下等价：$e(\btrue)\defeq\bfalse$ 且 $e(\bfalse)\defeq\btrue$，如 \cref{thm:type-is-not-a-set}。
+  令 $p:\bool=\bool$ 为由泛等与 $e$ 对应的路径，即 $p\defeq \ua(e)$。
+  则有 $f(\bool) : \neg\neg\bool \to\bool$，以及
+  \[\apd f p : \transfib{A\mapsto (\neg\neg A \to A)}{p}{f(\bool)} = f(\bool).\]
+  因而对任意 $u:\neg\neg\bool$，有
+  \[\happly(\apd f p,u) : \transfib{A\mapsto (\neg\neg A \to A)}{p}{f(\bool)}(u) = f(\bool)(u).\]
+
+  现在由~\eqref{eq:transport-arrow}，在类型族 ${A\mapsto (\neg\neg A \to A)}$ 中沿 $p$ 传送 $f(\bool):\neg\neg\bool\to\bool$，等于如下函数：先在类型族 $A\mapsto \neg\neg A$ 中沿 $\opp p$ 传送其参数，再应用 $f(\bool)$，然后在类型族 $A\mapsto A$ 中沿 $p$ 传送结果：
+  \begin{narrowmultline*}
+    \transfib{A\mapsto (\neg\neg A \to A)}{p}{f(\bool)}(u) =
+    \narrowbreak
+    \transfib{A\mapsto A}{p}{f(\bool) (\transfib{A\mapsto \neg\neg
+        A}{\opp{p}}{u})}.
+  \end{narrowmultline*}
+  %
+  然而，由函数外延性，任意两点 $u,v:\neg\neg\bool$ 都相等：因为对任意 $x:\neg\bool$，有 $u(x):\emptyt$，于是可推出任意结论，特别是 $u(x)=v(x)$。
+  因此有 $\transfib{A\mapsto \neg\neg A}{\opp{p}}{u} = u$，从而由 $\happly(\apd f p,u)$ 得到等式
+  \[ \transfib{A\mapsto A}{p}{f(\bool)(u)} = f(\bool)(u).\]
+  最后，如 \cref{sec:compute-universe} 所述，在类型族 $A\mapsto A$ 中沿路径 $p\jdeq \ua(e)$ 的传送等价于施用等价 $e$；因此有
+  \begin{equation}
+    e(f(\bool)(u)) = f(\bool)(u).\label{eq:fpaut}
+  \end{equation}
+  %
+  然而我们也可证明
+  \begin{equation}
+    \prd{x:\bool} \neg(e(x)=x).\label{eq:fpfaut}
+  \end{equation}
+  这可由对 $x$ 的分类讨论得到：两种情形都直接来自 $e$ 的定义及 $\bfalse\neq\btrue$（\cref{rmk:true-neq-false}）。
+  因而把~\eqref{eq:fpfaut} 施用于 $f(\bool)(u)$，再结合~\eqref{eq:fpaut}，即可得到 $\emptyt$ 的一个元素。
+\end{proof}
+
+\begin{rmk}
+  \index{choice operator}%
+  \indexsee{operator!choice}{choice operator}%
+  特别地，这意味着不可能存在 Hilbert 风格的“选择算子”，能够从每个非空类型中选出一个元素。
+  要点在于：这样的算子不可能是\emph{自然}的；而在泛等公理下，所有作用于类型的函数都必须对等价保持自然性。
+\end{rmk}
+
+\begin{rmk}
+  但对任意 $A$，$\neg\neg\neg A \to \neg A$ 仍然成立；见 \cref{ex:neg-ldn}。
+\end{rmk}
+
+\begin{cor}\label{thm:not-lem}
+  \index{excluded middle}%
+  并非对所有 $A:\UU$ 都有 $A+(\neg A)$。
+\end{cor}
+\begin{proof}
+  假设我们有 $g:\prd{A:\UU} (A+(\neg A))$。
+  我们将证明于是有 $\prd{A:\UU} (\neg\neg A \to A)$，从而可应用 \cref{thm:not-dneg}。
+  因此设 $A:\UU$ 与 $u:\neg\neg A$；我们要构造 $A$ 的一个元素。
+
+  现在 $g(A):A+(\neg A)$，故经分类讨论，可设要么 $g(A)\jdeq \inl(a)$（某个 $a:A$），要么 $g(A)\jdeq \inr(w)$（某个 $w:\neg A$）。
+  第一种情形下我们直接有 $a:A$；第二种情形下有 $u(w):\emptyt$，于是可得到任意我们想要的结论（例如 $A$）。
+  因而两种情形下都可得到 $A$ 的元素，得证。
+\end{proof}
+
+因此，若我们既要假设泛等公理（当然要假设），又希望保留采用经典\index{mathematics!classical}推理的选项（这同样可取），就不能用未经修改的命题即类型原则把\emph{所有}非形式数学陈述都解释进类型论，因为那样排中律将为假。
+但我们也不想完全抛弃命题即类型，因为它有许多优点（如简单性、构造性与可计算性）。
+下面我们讨论命题即类型的一种修正，它可以解决这些问题；在 \cref{subsec:when-trunc} 中我们将回到“何时使用哪种逻辑”的问题。
+\index{anger|)}%
+\index{proposition!as types|)}%
+\index{logic!constructive vs classical|)}%
+\section{纯命题}
+\label{subsec:hprops}
+
+\index{logic!of mere propositions|(}%
+\index{mere proposition|(defstyle}%
+\indexsee{proposition!mere}{mere proposition}%
+我们已经看到，命题即类型逻辑同时具有优点与缺点。
+两者有共同原因：当把类型视为命题时，它们可能携带多于真假本身的信息，而所有对它们的“逻辑”构造都必须尊重这些附加信息。
+这提示我们：若只关注那些\emph{不}包含超过真值信息的类型，并且只把这些类型当作逻辑命题，就有可能得到一种更常规的逻辑。
+
+这样的类型 $A$ 在可住留时为“真”，而在其可住留会导出矛盾时为“假”（即当 $\neg A \jdeq (A\to\emptyt)$ 可住留时）。
+\index{inhabited type}%
+为了得到更传统的逻辑，我们要避免把如下类型当作逻辑命题：给出其一个元素所提供的信息，多于“该类型可住留”这一事实本身。
+例如，若给定 \bool 的一个元素，我们得到的信息多于“\bool 至少有一个元素”这一事实。
+实际上，我们恰好多得到\emph{一位}信息
+\index{bit}%
+即我们知道得到的是 \bool 的\emph{哪个}元素。
+相反，若给定 \unit 的一个元素，我们并不会得到超出“\unit 有元素”这一事实之外的信息，因为 \unit 的任意两个元素彼此相等。
+这引出如下定义。
+
+\begin{defn}\label{defn:isprop}
+  类型 $P$ 称为 \define{纯命题}
+  当且仅当对任意 $x,y:P$ 都有 $x=y$。
+\end{defn}
+
+注意，由于我们仍然是在类型论\emph{内部}做数学，这一定义也是类型论\emph{内部}的定义，这意味着它本身是一个类型，更准确地说是一个类型族。
+具体地，对任意 $P:\type$，类型 $\isprop(P)$ 定义为
+\[ \isprop(P) \defeq \prd{x,y:P} (x=y). \]
+因此，断言“$P$ 是纯命题”意味着给出 $\isprop(P)$ 的一个住留元，也即一个把 $P$ 的任意两元素用路径连接起来的依值函数。
+该函数的连续性/自然性蕴含：不仅 $P$ 的任意两元素相等，而且 $P$ 也不包含更高阶同伦。
+
+\begin{lem}\label{thm:inhabprop-eqvunit}
+  若 $P$ 是纯命题且 $x_0:P$，则 $\eqv P \unit$。
+\end{lem}
+\begin{proof}
+  定义 $f:P\to\unit$ 为 $f(x)\defeq \ttt$，并定义 $g:\unit\to P$ 为 $g(u)\defeq x_0$。
+  结论由下一条引理以及“\unit 是纯命题”（见 \cref{thm:path-unit}）这一事实立得。
+\end{proof}
+
+\begin{lem}\label{lem:equiv-iff-hprop}
+  若 $P$ 与 $Q$ 是纯命题，且 $P\to Q$ 与 $Q\to P$ 都成立，则 $\eqv P Q$。
+\end{lem}
+\begin{proof}
+  设给定 $f:P\to Q$ 与 $g:Q\to P$。
+  则对任意 $x:P$，由于 $P$ 是纯命题，有 $g(f(x))=x$。
+  类似地，对任意 $y:Q$，由于 $Q$ 是纯命题，有 $f(g(y))=y$；因此 $f$ 与 $g$ 互为拟逆。
+\end{proof}
+
+也就是说，正如 \cref{sec:pat} 中所承诺的：若两个纯命题在逻辑上等价，则它们在类型论中等价。
+
+在同伦论中，与 \unit 同伦等价的空间称为\emph{可缩}。
+因此，任何可住留的纯命题都是可缩的（另见 \cref{sec:contractibility}）。
+另一方面，不可住留类型 \emptyt 也（真空地）是纯命题。
+至少在经典\index{mathematics!classical}数学中，这就是仅有的两种可能。
+
+纯命题也被称为 \emph{subterminal objects}（若从范畴论角度思考）、\emph{subsingletons}（若从集合论角度思考）或 \emph{h-propositions}。
+\indexsee{object!subterminal}{mere proposition}%
+\indexsee{subterminal object}{mere proposition}%
+\indexsee{subsingleton}{mere proposition}%
+\indexsee{h-proposition}{mere proposition}
+\cref{sec:basics-sets} 中的讨论表明，我们也应称其为 \emph{$(-1)$-types}；我们将在 \cref{cha:hlevels} 回到这一点。
+形容词 ``mere'' 强调：虽然任何类型都可被视为命题（通过给出其住留元来证明），但一个是纯命题的类型并不能有意义地被看作超出命题\emph{本身}的东西：其为真的见证不携带额外信息。
+
+注意，类型 $A$ 是集合当且仅当对任意 $x,y:A$，等同类型 $\id[A]xy$ 是纯命题。
+另一方面，仿照并简化 \cref{thm:isset-is1type} 的证明，可得：
+
+\begin{lem}\label{thm:prop-set}
+  每个纯命题都是集合。
+\end{lem}
+\begin{proof}
+  设 $f:\isprop(A)$；于是对任意 $x,y:A$ 都有 $f(x,y):x=y$。固定 $x:A$，
+  定义 $g(y)\defeq f(x,y)$。则对任意 $y,z:A$ 与 $p:y=z$，有 $\apd
+  g p : \trans{p}{g(y)}={g(z)}$。因此由 \cref{cor:transport-path-prepost}，有
+  $g(y)\ct p = g(z)$，也即 $p=\opp{g(y)}\ct g(z)$。于是对任意
+  $p,q:x=y$，都有 $p = \opp{g(x)}\ct g(y) = q$。
+\end{proof}
+
+特别地，这推出：
+
+\begin{lem}\label{thm:isprop-isprop}\label{thm:isprop-isset}
+  对任意类型 $A$，类型 $\isprop(A)$ 与 $\isset(A)$ 都是纯命题。
+\end{lem}
+\begin{proof}
+  设 $f,g:\isprop(A)$。由函数外延性，要证 $f=g$，
+  只需证任意 $x,y:A$ 下 $f(x,y)=g(x,y)$。而 $f(x,y)$ 与 $g(x,y)$
+  都是 $A$ 中的路径，因此相等；因为由 $f$ 或 $g$ 任一者都可知
+  $A$ 是纯命题，进而由 \cref{thm:prop-set} 可知它是集合。
+  类似地，设 $f,g:\isset(A)$，也即对所有
+  $a,b:A$ 与 $p,q:a=b$，有 $f(a,b,p,q):p=q$ 与 $g(a,b,p,q):p=q$。
+  由于这时 $A$ 是集合（由 $f$ 或 $g$ 任一者可得），从而是 $1$-类型，
+  遂得 $f(a,b,p,q)=g(a,b,p,q)$；再由函数外延性，$f=g$。
+\end{proof}
+
+到目前为止我们还见过另一个例子：\cref{sec:basics-equivalences} 中条件~\ref{item:be3} 断言，对任意函数 $f$，类型 $\isequiv (f)$ 应当是纯命题。
+
+\index{logic!of mere propositions|)}%
+\index{mere proposition|)}%
+\section{经典逻辑与直觉主义逻辑}
+\label{sec:intuitionism}
+
+\index{logic!constructive vs classical|(}%
+\index{denial|(}%
+有了纯命题这一概念，我们现在可以在同伦类型论中给出\define{排中律}
+\indexdef{excluded middle}%
+\indexsee{axiom!excluded middle}{excluded middle}%
+\indexsee{law!of excluded middle}{excluded middle}%
+的恰当表述：
+\begin{equation}
+  \label{eq:lem}
+  \LEM{}\;\defeq\;
+  \prd{A:\UU} \Big(\isprop(A) \to (A + \neg A)\Big).
+\end{equation}
+类似地，\define{双重否定律}
+\indexdef{double negation, law of}%
+\indexdef{axiom!double negation}%
+\indexdef{law!of double negation}%
+是
+\begin{equation}
+  \label{eq:ldn}
+  % \mathsf{DN}\;\defeq\;
+  \prd{A:\UU} \Big(\isprop(A) \to (\neg\neg A \to A)\Big).
+\end{equation}
+也很容易看出二者彼此等价——见 \cref{ex:lem-ldn}——因此从现在起我们通常只讨论 \LEM{}。
+
+这种 \LEM{} 的表述避开了 \cref{thm:not-dneg,thm:not-lem} 中的“悖论”，因为 \bool 不是纯命题。
+为了将其与更一般的“命题即类型”表述区分开来，我们将后者重命名为：
+\symlabel{lem-infty}
+\begin{equation*}
+  \LEM\infty \defeq \prd{A:\UU} (A + \neg A).
+\end{equation*}
+为强调起见，恰当版本~\eqref{eq:lem}
+也可记作 $\LEM{-1}$；
+另见 \cref{ex:lemnm}。
+尽管 $\LEM{}$
+不是 \cref{cha:typetheory} 所述基础类型论的推论，但它可以在一致的前提下作为公理加入（这与其 $\infty$ 对应版本不同）。
+例如，我们会在 \cref{sec:wellorderings} 中假设它。
+
+不过，不使用 \LEM{} 我们往往也能走得很远，这一点常常令人惊讶。
+很多时候，只需对定义或定理做一个简单改写，就能避免调用排中律。
+虽然这有时需要一点适应，但通常值得这样做，因为它会得到更优雅、更一般的证明。
+我们在导言里讨论过其中的一些好处。
+
+例如，在经典\index{mathematics!classical}数学中，双重否定经常被不必要地使用。
+一个非常简单的例子是常见的假设“集合 $A$ 非空”，其字面意思是“$A$ 不含任何元素”这一断言\emph{不}成立。
+而在绝大多数情况下，真正想表达的是正面断言：$A$ \emph{确实}至少包含一个元素；去掉双重否定后，命题对 \LEM{} 的依赖也更弱。
+回忆一下：当我们把类型 $A$ 本身作为一个命题来断言时（即构造一个通常不命名的 $A$ 的元素），就称类型 $A$ 是\emph{可居留}
+\index{inhabited type}%
+的。
+因此，在把经典证明翻译为构造逻辑时，我们常常将“非空”替换为“可居留”（当然，有时必须替换为“merely inhabited”；见 \cref{subsec:prop-trunc}）。
+
+类似地，在经典数学中也不罕见不必要的反证法。
+\index{proof!by contradiction}%
+当然，经典形式的反证法通过双重否定律进行：先假设 $\neg A$ 并导出矛盾，从而得到 $\neg \neg A$，再由双重否定律推出 $A$。
+但很多时候，把“由 $\neg A$ 导出矛盾”的推导稍作改写，就可以直接给出 $A$ 的证明，从而无需 \LEM{}。
+
+还要注意，如果目标是证明一个\emph{否定}\index{negation}，那么“反证法”并不涉及 \LEM{}。
+事实上，由于 $\neg A$ 按定义是类型 $A\to\emptyt$，因此按定义证明 $\neg A$ 就是在假设 $A$ 下证明矛盾（\emptyt）。
+类似地，双重否定律对否定命题确实成立：$\neg\neg\neg A \to \neg A$。
+经过练习，人们会更仔细地区分被否定与未被否定的命题，并能识别何时使用了 \LEM{}、何时没有使用。
+
+因此，与表面印象相反，以“构造性”方式做数学通常并不意味着放弃重要定理，而是要找到表述定义的最佳方式，使重要定理能够被构造性地证明。
+也就是说，在最初研究某个主题时我们可以自由使用 \LEM{}；但当该主题理解得更充分后，我们就有希望精炼其定义与证明，以避免该公理。
+% For instance, the theory of ordinal numbers, which classically makes heavy use of \LEM{}, works quite well constructively once we choose the correct definition of ``ordinal''; see \cref{sec:ordinals}.
+在\emph{同伦}类型论中，这一点更加明显：泛等与高阶归纳类型这两种强有力工具，使我们能够以构造性方式处理许多在传统上需要经典\index{mathematics!classical}推理的问题。
+我们会在 \cref{part:mathematics} 中看到若干这样的例子。
+% For instance, none of the ``synthetic'' homotopy theory we will develop in \cref{cha:homotopy} requires \LEM{} --- despite the fact that classical homotopy theory (formulated using topological spaces or simplicial sets) makes heavy use of them (as well as the axiom of choice).
+
+还值得一提的是，即便在构造数学中，排中律也可能对\emph{某些}命题成立。
+这类命题在传统上称为\emph{可判定}。
+
+\begin{defn}\label{defn:decidable-equality}
+  \mbox{}
+  \begin{enumerate}
+  \item 若 $A+\neg A$，则称类型 $A$ 是\define{可判定的}
+    \indexdef{decidable!type}%
+    \indexdef{type!decidable}%
+    。
+  \item 类似地，若 \narrowequation{\prd{a:A} (B(a)+\neg B(a)).} \label{item:decidable-equality2}
+    则称类型族 $B:A\to \type$ 是\define{可判定的}
+    \indexdef{decidable!type family}%
+    \indexdef{type!family of!decidable}%
+    。
+  \item 特别地，若 \narrowequation{\prd{a,b:A} ((a=b) + \neg(a=b)).}
+    则称 $A$ 具有\define{可判定相等性}
+    \indexdef{decidable!equality}%
+    \indexsee{equality!decidable}{decidable equality}%
+    。
+  \end{enumerate}
+\end{defn}
+
+因此，$\LEM{}$ 恰好断言所有纯命题都是可判定的，于是所有纯命题族也都是可判定的。
+特别地，$\LEM{}$ 蕴含所有集合（按 \cref{sec:basics-sets} 的意义）都具有可判定相等性。
+这种意义下的可判定相等性非常强；见 \cref{thm:hedberg}。
+
+\index{denial|)}%
+\index{logic!constructive vs classical|)}%
+
+\section{子集与命题缩放}
+\label{subsec:prop-subsets}
+
+\index{mere proposition|(}%
+
+作为纯命题有用性的另一个例子，我们讨论子集（更一般地，讨论子类型）。
+设 $P:A\to\type$ 是一个类型族，并把每个类型 $P(x)$ 都视为一个命题。
+那么 $P$ 本身就是 $A$ 上的一个\emph{谓词}，或元素所满足的一个\emph{性质}。
+
+在集合论中，只要给定集合 $A$ 上的谓词 $P$，我们就可以构造子集 $\setof{x\in A | P(x)}$。
+如 \cref{sec:pat} 略述，在类型论中最直接的对应物是 $\Sigma$-类型 $\sm{x:A} P(x)$。
+$\sm{x:A} P(x)$ 的一个居留元当然是一对 $(x,p)$，其中 $x:A$ 且 $p$ 是 $P(x)$ 的证明。
+但是，对一般的 $P$ 而言，若命题 $P(a)$ 有多个不同证明，则同一个元素 $a:A$ 可能对应 $\sm{x:A} P(x)$ 中多个不同元素。
+这与通常对子集的直觉不一致。
+但若 $P$ 是\emph{纯}命题，这种情况就不会发生。
+
+\begin{lem}\label{thm:path-subset}
+  设 $P:A\to\type$ 是一个类型族，并且对所有 $x:A$，$P(x)$ 都是纯命题。
+  若 $u,v:\sm{x:A} P(x)$ 满足 $\proj1(u) = \proj1(v)$，则 $u=v$。
+\end{lem}
+\begin{proof}
+  设 $p:\proj1(u) = \proj1(v)$。
+  由 \cref{thm:path-sigma}，要证 $u=v$，只需证 $\trans{p}{\proj2(u)} = \proj2(v)$。
+  但 $\trans{p}{\proj2(u)}$ 与 $\proj2(v)$ 都是 $P(\proj1(v))$ 的元素，而后者是纯命题；故二者相等。
+\end{proof}
+
+例如，回忆在 \cref{sec:basics-equivalences} 中我们定义了
+\[(\eqv A B) \;\defeq\; \sm{f:A\to B} \isequiv (f),\]
+其中每个类型 $\isequiv (f)$ 都应当是纯命题。
+因此，若两个等价的底层函数相等，则这两个等价本身也相等。
+
+\label{defn:setof}%
+从现在起，若 $P:A\to \type$ 是纯命题族（即每个 $P(x)$ 都是纯命题），我们可写
+%
+\begin{equation}
+  \label{eq:subset}
+  \setof{x:A | P(x)}
+\end{equation}
+%
+作为 $\sm{x:A} P(x)$ 的另一种记法。
+（技术上也可以把这一记法用于任意 $P$，但那样可能因不期望的语义联想而引起混淆。）
+若 $A$ 是集合，我们称 \eqref{eq:subset} 为 $A$ 的一个\define{子集}
+\indexdef{subset}%
+\indexdef{type!subset}%
+；对一般的 $A$，我们可称其为一个\define{子类型}。
+\indexdef{subtype}%
+我们也可把 $P$ 本身称作 $A$ 的一个\emph{子集}或\emph{子类型}；这其实更准确，因为类型~\eqref{eq:subset} 单独看并不记住它与 $A$ 的关系。
+
+\symlabel{membership}
+给定这样的 $P$ 与 $a:A$，我们可写 $a\in P$ 或 $a\in \setof{x:A | P(x)}$，来表示纯命题 $P(a)$。
+若它成立，我们称 $a$ 是 $P$ 的一个\define{成员}。
+\symlabel{subset}
+类似地，若 $\setof{x:A | Q(x)}$ 是 $A$ 的另一个子集，那么当我们有 $\prd{x:A}(P(x)\rightarrow Q(x))$ 时，称 $P$\define{包含于}
+\indexdef{containment!of subsets}%
+\indexdef{inclusion!of subsets}%
+$Q$，并记作 $P\subseteq Q$。
+
+作为子类型的进一步例子，我们可定义宇宙 \UU 中“集合子宇宙”和“纯命题子宇宙”：
+\symlabel{setU}\symlabel{propU}
+\begin{align*}
+  \setU &\defeq \setof{A:\UU | \isset(A) },\\
+  \propU &\defeq \setof{A:\UU | \isprop(A) }.
+\end{align*}
+$\setU$ 的一个元素是类型 $A:\UU$ 及其证据 $s:\isset(A)$，$\propU$ 也同理。
+\cref{thm:path-subset} 蕴含 $\id[\setU]{(A,s)}{(B,t)}$ 与 $\id[\UU]AB$ 等价（因此也与 $\eqv AB$ 等价）。
+因此，我们将经常滥用记号，直接写 $A:\setU$，而不写 $(A,s):\setU$。
+若无需指明具体宇宙，也可省略下标 \UU。
+
+回忆：对任意两个宇宙 $\UU_i$ 和 $\UU_{i+1}$，若 $A:\UU_i$，则也有 $A:\UU_{i+1}$。
+因此，对任意 $(A,s):\set_{\UU_i}$，也有 $(A,s):\set_{\UU_{i+1}}$；对 $\prop_{\UU_i}$ 同理，于是得到自然映射
+\begin{align}
+  \set_{\UU_i} &\to \set_{\UU_{i+1}}\label{eq:set-up},\\
+  \prop_{\UU_i} &\to \prop_{\UU_{i+1}}.\label{eq:prop-up}
+\end{align}
+映射~\eqref{eq:set-up} 不可能是等价，否则我们可重现 Cantorian 集合论中熟知的自指\index{paradox}悖论。
+然而，虽然在目前给出的类型论中，\eqref{eq:prop-up} 并不会自动成为等价，但一致地假设它是等价是可行的。
+也就是说，我们可以考虑向类型论加入下列公理。
+
+\begin{axiom}[命题缩放]
+  \indexsee{axiom!propositional resizing}{propositional resizing}%
+  \indexdef{propositional!resizing}%
+  \indexsee{resizing!propositional}{propositional resizing}%
+  映射 $\prop_{\UU_i} \to \prop_{\UU_{i+1}}$ 是一个等价。
+\end{axiom}
+
+我们将该公理称为\define{命题缩放}，
+因为它意味着：宇宙 $\UU_{i+1}$ 中任意纯命题都可“缩放”为较小宇宙 $\UU_i$ 中与之等价的一个命题。
+若 $\UU_{i+1}$ 满足 \LEM{}（见 \cref{ex:lem-impred}），该结论会自动成立。
+一般而言我们不会默认此公理，尽管在某些地方会把它作为显式假设使用。
+它是纯命题层面的一种\emph{非直谓性}，而避免使用它时，类型论就称为保持\emph{直谓}。
+\indexsee{impredicativity!for mere propositions}{propositional resizing}%
+\indexdef{mathematics!predicative}%
+
+在实践中，我们更常需要的是一个略有不同的断言：当前考虑的某个宇宙 \UU 中包含一个“分类所有纯命题”的类型。
+换言之，我们希望有一个类型 $\Omega:\UU$，连同一个由 $\Omega$ 索引的纯命题族，使其在等价意义下覆盖每一个纯命题。
+若 \UU 不是最小宇宙 $\UU_0$，则该断言可由上述命题缩放推出，因为这时可定义 $\Omega\defeq \prop_{\UU_0}$。
+
+非直谓性的一个用途是定义幂集。
+把集合 $A$ 的\define{幂集}\indexdef{power set}自然地定义为 $A\to\propU$；但在缺乏非直谓性时，这一定义会依赖于宇宙 \UU 的选择
+（即使在等价意义下也是如此）。
+而有了命题缩放后，我们可以把幂集定义为
+\symlabel{powerset}%
+\[ \power A \defeq (A\to\Omega),\]
+于是它就与 \UU 无关。
+另见 \cref{subsec:piw}。
+
+\section{纯命题的逻辑}
+\label{subsec:logic-hprop}
+
+\index{logic!of mere propositions|(}%
+我们在 \cref{sec:types-vs-sets} 中提到过：与只有一种基本概念（类型）的类型论不同，以集合论为基础的体系有两种基本概念：集合与命题。
+因此，经典\index{mathematics!classical}数学家习惯于分别处理这两类对象。
+
+在类型论中也可以恢复类似的二分，其中集合论里命题所扮演的角色由那些作为\emph{纯}命题的类型（及类型族）承担。
+在许多情况下，只需将对应的类型构造子限制在纯命题上，就可以在此逻辑中表示逻辑联结词和量词。
+当然，这要求我们知道相应的类型构造子会保持纯命题性。
+
+\begin{eg}
+  若 $P$ 与 $Q$ 都是纯命题，则 $P\times Q$ 也是纯命题。
+  这可由乘积类型中的路径刻画轻松证明，与 \cref{thm:isset-prod} 类似但更简单。
+  因此，联结词“且”保持纯命题性。
+\end{eg}
+
+\begin{eg}\label{thm:isprop-forall}
+  设 $A$ 为任意类型，$P:A\to \type$ 满足：对每个 $x:A$，类型 $P(x)$ 都是纯命题，则 $\prd{x:A} P(x)$ 也是纯命题。
+  证明与 \cref{thm:isset-forall} 类似但更简单：给定 $f,g:\prd{x:A} P(x)$，对任意 $x:A$，因 $P(x)$ 是纯命题，故有 $f(x)=g(x)$。
+  于是由函数外延性得到 $f=g$。
+
+  特别地，若 $P$ 是纯命题，则无论 $A$ 是什么，$A\to P$ 都是纯命题。
+  更特别地，由于 \emptyt 是纯命题，所以 $\neg A \jdeq (A\to\emptyt)$ 也是纯命题。
+  \index{quantifier!universal}%
+  因此，联结词“蕴含”“非”以及量词“对所有”都保持纯命题性。
+\end{eg}
+
+另一方面，有些类型构造子并不保持纯命题性。
+即使 $P$ 与 $Q$ 都是纯命题，$P+Q$ 一般也不是纯命题。
+例如，\unit 是纯命题，但 $\bool=\unit+\unit$ 不是。
+从逻辑上说，$P+Q$ 表达的是一种“纯构造性”的“或”：其见证额外包含了\emph{哪一个}析取支为真的信息。
+这在某些场合非常有用；但若我们想要一种更经典、且保持纯命题性的“或”，就需要一种方式把该类型“截断”为纯命题，忘掉这些额外信息。
+
+\index{quantifier!existential}%
+同样的问题也出现在 $\Sigma$-类型 $\sm{x:A} P(x)$ 中，其中 $A$ 是任意类型。
+这是对“存在某个 $x:A$ 使得 $P(x)$ 成立”的一种纯构造性解释，它会记住见证 $x$，因此即使每个类型 $P(x)$ 都是纯命题，它一般也不是纯命题。
+（回忆我们在 \cref{subsec:prop-subsets} 中指出：$\sm{x:A} P(x)$ 也可看作“所有满足 $P(x)$ 的 $x:A$ 所成的子集”。）
+
+\section{命题截断}
+\label{subsec:prop-trunc}
+
+\index{truncation!propositional|(defstyle}%
+\indexsee{type!squash}{truncation, propositional}%
+\indexsee{squash type}{truncation, propositional}%
+\indexsee{bracket type}{truncation, propositional}%
+\indexsee{type!bracket}{truncation, propositional}%
+\emph{命题截断}（也称为\emph{$(-1)$-截断}、\emph{括号类型}或\emph{压缩类型}）是一种额外的类型构造子，它将一个类型“压缩”或“截断”为纯命题，除了该类型有元素这一事实之外，忘却其元素所携带的全部信息。
+
+更精确地说，对任意类型 $A$，都有一个类型 $\brck{A}$。
+它有两个构造子：
+\begin{itemize}
+\item 对任意 $a:A$，有 $\bproj a : \brck A$。
+\item 对任意 $x,y:\brck A$，有 $x=y$。
+\end{itemize}
+第一个构造子意味着：若 $A$ 有元素，则 $\brck A$ 也有元素。
+第二个构造子保证 $\brck A$ 是纯命题；通常我们不为这一事实的见证命名。
+
+\index{recursion principle!for truncation}%
+$\brck A$ 的递归原理表明：
+\begin{itemize}
+\item 若 $B$ 是纯命题且有 $f:A\to B$，则存在诱导映射 $g:\brck A \to B$，使得对所有 $a:A$ 都有 $g(\bproj a) \jdeq f(a)$。
+\end{itemize}
+换言之，由 $A$（有元素）可推出的任意纯命题，也已经可由 $\brck A$ 推出。
+因此，作为纯命题的 $\brck A$ 所含信息不超过 $A$ 的有元素性。
+（$\brck A$ 还有一个归纳原理，但并不特别有用；见 \cref{ex:prop-trunc-ind}。）
+
+在 \cref{ex:lem-brck,ex:impred-brck,sec:hittruncations} 中，我们将说明若干用更一般构造来构造 $\brck{A}$ 的方法。
+现在我们只把它当作与 \cref{cha:typetheory} 各条规则并列的一条附加规则。
+
+借助命题截断，我们可以把“纯命题的逻辑”扩展到析取与存在量词。
+具体地，$\brck{A+B}$ 是“$A$ 或 $B$”的纯命题版本，它不“记住”到底哪个析取支为真。
+
+截断的递归原理蕴含：当我们试图证明纯命题时，仍可对 $\brck{A+B}$ 做分类讨论。
+也就是说，设我们有假设 $u:\brck{A+B}$，并且正在证明一个纯命题 $Q$。
+换言之，我们在定义 $\brck{A+B} \to Q$ 的一个元素。
+由于 $Q$ 是纯命题，由命题截断的递归原理可知，构造一个函数 $A+B\to Q$ 即可。
+而这时我们就可以对 $A+B$ 做分类讨论。
+
+类似地，对于类型族 $P:A\to\type$，可考虑 $\brck{\sm{x:A} P(x)}$，它是“存在某个 $x:A$ 使得 $P(x)$”的纯命题版本。
+与析取情形一样，结合截断与 $\Sigma$-类型的归纳原理，若我们有类型 $\brck{\sm{x:A} P(x)}$ 的假设，则在试图证明纯命题时，可以引入新假设 $x:A$ 与 $y:P(x)$。
+换言之，若我们知道存在某个 $x:A$ 使 $P(x)$ 成立，但手头没有具体这样的 $x$，则只要我们不试图构造任何可能依赖该 $x$ 具体取值的对象，就可以自由使用这样的 $x$。
+要求余域是纯命题，正表达了结论对见证的这种独立性，因为此类类型中的任意可能元素都必须相等。
+
+在 \cref{cha:real-numbers,cha:set-math} 的集合层次数学中，
+我们主要处理集合与纯命题，因此只用“命题截断逻辑”的意义来使用传统逻辑记号会更方便。
+
+\begin{defn} \label{defn:logical-notation}
+  我们按如下方式用截断定义\define{传统逻辑记号}：
+  \indexdef{implication}%
+  \indexdef{traditional logical notation}%
+  \indexdef{logical notation, traditional}%
+  \index{quantifier}%
+  \indexsee{existential quantifier}{quantifier, existential}%
+  \index{quantifier!existential}%
+  \indexsee{universal!quantifier}{quantifier, universal}%
+  \index{quantifier!universal}%
+  \indexdef{conjunction}%
+  \indexdef{disjunction}%
+  \indexdef{true}%
+  \indexdef{false}%
+  其中 $P$ 与 $Q$ 表示纯命题（或其类型族）：
+  {\allowdisplaybreaks
+  \begin{align*}
+    \top            &\ \defeq \ \unit \\
+    \bot            &\ \defeq \ \emptyt \\
+    P \land Q       &\ \defeq \ P \times Q \\
+    P \Rightarrow Q &\ \defeq \ P \to Q \\
+    P \Leftrightarrow Q &\ \defeq \ P = Q \\
+    \neg P          &\ \defeq \ P \to \emptyt \\
+    P \lor Q        &\ \defeq \ \brck{P + Q} \\
+    \fall{x : A} P(x) &\ \defeq \ \prd{x : A} P(x) \\
+    \exis{x : A} P(x) &\ \defeq \ \Brck{\sm{x : A} P(x)}
+  \end{align*}}
+\end{defn}
+
+记号 $\land$ 与 $\lor$ 在同伦论中也用于有基点空间的 smash 积与 wedge 和，我们将在 \cref{cha:hits} 中引入它们。
+这在技术上确实可能引发冲突，但通常不会造成混淆。
+
+类似地，在讨论如 \cref{subsec:prop-subsets} 的子集时，我们也可使用交、并与补集的传统记号：
+\indexdef{intersection!of subsets}%
+\symlabel{intersection}%
+\indexdef{union!of subsets}%
+\symlabel{union}%
+\indexdef{complement, of a subset}%
+\symlabel{complement}%
+\begin{align*}
+  \setof{x:A | P(x)} \cap \setof{x:A | Q(x)}
+  &\defeq \setof{x:A | P(x) \land Q(x)},\\
+  \setof{x:A | P(x)} \cup \setof{x:A | Q(x)}
+  &\defeq \setof{x:A | P(x) \lor Q(x)},\\
+  A \setminus \setof{x:A | P(x)}
+  &\defeq \setof{x:A | \neg P(x)}.
+\end{align*}
+当然，在没有 \LEM{} 的情况下，后者并非通常意义上的“补集”：对于 $A$ 的每个子集 $B$，未必有 $B \cup (A\setminus B) = A$。
+
+\index{truncation!propositional|)}%
+\index{mere proposition|)}%
+\index{logic!of mere propositions|)}%
+
+
+\section{选择公理}
+\label{sec:axiom-choice}
+
+\index{axiom!of choice|(defstyle}%
+\index{denial|(}%
+我们现在可以在同伦类型论中恰当地表述选择公理。
+设有一个类型 $X$，以及类型族
+%
+\begin{equation*}
+  A:X\to\type
+  \qquad\text{and}\qquad
+  P:\prd{x:X} A(x)\to\type,
+\end{equation*}
+%
+并且还满足
+\begin{itemize}
+\item $X$ 是一个集合，
+\item 对所有 $x:X$，$A(x)$ 是集合，且
+\item 对所有 $x:X$ 与 $a:A(x)$，$P(x,a)$ 是纯命题。
+\end{itemize}
+\define{选择公理}
+$\choice{}$ 断言在这些假设下，
+\begin{equation}\label{eq:ac}
+  \Parens{\prd{x:X} \Brck{\sm{a:A(x)} P(x,a)}}
+  \to
+  \Brck{\sm{g:\prd{x:X} A(x)} \prd{x:X} P(x,g(x))}.
+\end{equation}
+当然，这只是对~\eqref{eq:english-ac} 的直接翻译：我们把“存在 $x:A$ 使得 $B(x)$”读作 $\brck{\sm{x:A}B(x)}$，因此也可用熟悉的逻辑记号写成
+\begin{narrowmultline*}
+  \textstyle
+  \Big(\fall{x:X}\exis{a:A(x)} P(x,a)\Big)
+  \Rightarrow \narrowbreak
+  \Big(\exis{g : \prd{x:X} A(x)} \fall{x : X} P(x,g(x))\Big).
+\end{narrowmultline*}
+%
+特别地，注意命题截断在此出现了两次。
+定义域中的截断表示：我们只假设对每个 $x$ 都存在某个 $a:A(x)$ 使 $P(x,a)$ 成立，但这些值并未以任何已知方式被选定或给出。
+余域中的截断表示：我们得出存在某个函数 $g$，但这个函数也未以任何已知方式被确定或给出。
+
+事实上，由于 \cref{thm:ttac}，该公理还可写成一个更简单的形式。
+
+\begin{lem}\label{thm:ac-epis-split}
+  选择公理~\eqref{eq:ac} 等价于如下断言：对任意集合 $X$ 与任意 $Y:X\to\type$，若每个 $Y(x)$ 都是集合，则有
+  \begin{equation}
+    \Parens{\prd{x:X} \Brck{Y(x)}}
+    \to
+    \Brck{\prd{x:X} Y(x)}.\label{eq:epis-split}
+  \end{equation}
+\end{lem}
+
+这对应于经典\index{mathematics!classical}选择公理一个著名的等价形式，即“一族非空集合的笛卡尔积非空”。
+
+\begin{proof}
+  由 \cref{thm:ttac}，~\eqref{eq:ac} 的余域等价于
+  \[\Brck{\prd{x:X} \sm{a:A(x)} P(x,a)}.\]
+  因而，~\eqref{eq:ac} 等价于~\eqref{eq:epis-split} 在 
+  \narrowequation{Y(x) \defeq \sm{a:A(x)} P(x,a).}
+  这一取值下的特例。
+  （由 \cref{thm:isset-prod,thm:prop-set}，它是集合。）
+  反过来，~\eqref{eq:epis-split} 等价于~\eqref{eq:ac} 在 $A(x)\defeq Y(x)$ 且 $P(x,a)\defeq\unit$ 时的特例。
+  因此二者在逻辑上等价。
+  由于它们都是纯命题，由 \cref{lem:equiv-iff-hprop} 可知它们是等价类型。
+\end{proof}
+
+与 \LEM{} 一样，等价形式~\eqref{eq:ac} 与~\eqref{eq:epis-split} 都不是我们基础类型论的推论，但可在一致性上作为公理加入。
+
+\begin{rmk}
+  很容易证明~\eqref{eq:epis-split} 的右边总能推出左边。
+  由于两边都是纯命题，由 \cref{lem:equiv-iff-hprop} 可知选择公理也等价于要求一个等价
+  \[ \eqv{\Parens{\prd{x:X} \Brck{Y(x)}}}{\Brck{\prd{x:X} Y(x)}} \]
+  这说明了一个常见误区：尽管依值函数类型保持纯命题（\cref{thm:isprop-forall}），它们并不与截断可交换：$\brck{\prd{x:A} P(x)}$ 一般并不等价于 $\prd{x:A} \brck{P(x)}$。
+  若我们假设选择公理，它说明这件事对\emph{集合}成立；而如下将见，在一般情形下并不成立。
+\end{rmk}
+
+选择公理中把类型限制为集合，在一定程度上可以放宽。
+例如，可允许~\eqref{eq:ac} 中的 $A$ 与 $P$，或~\eqref{eq:epis-split} 中的 $Y$，是任意类型族；这会得到看似更强、但同样一致的陈述。
+我们还可以把命题截断替换为将在 \cref{cha:hlevels} 中讨论的更一般 $n$-截断，从而得到一族公理 $\choice n$，它在~\eqref{eq:ac}（我们简称为 \choice{}，或为强调写作 $\choice{-1}$）与 \cref{thm:ttac}（我们将称之为 $\choice\infty$）之间插值。
+另见 \cref{ex:acnm,ex:acconn}。
+不过要注意，我们不能放宽 $X$ 必须是集合这一要求。
+
+\begin{lem}\label{thm:no-higher-ac}
+  存在某个类型 $X$ 与某个族 $Y:X\to \type$，使得每个 $Y(x)$ 都是集合，但~\eqref{eq:epis-split} 为假。
+\end{lem}
+\begin{proof}
+  定义 $X\defeq \sm{A:\type} \brck{\bool = A}$，并令 $x_0 \defeq (\bool, \bproj{\refl{\bool}}) : X$。
+  由 $\Sigma$-类型中路径的刻画、$\brck{A=\bool}$ 是纯命题这一事实，以及泛等可得：对任意 $(A,p),(B,q):X$，有 $\eqv{(\id[X]{(A,p)}{(B,q)})}{(\eqv AB)}$。
+  特别地，$\eqv{(\id[X]{x_0}{x_0})}{(\eqv \bool\bool)}$，所以如 \cref{thm:type-is-not-a-set}，$X$ 不是集合。
+
+  另一方面，若 $(A,p):X$，则 $A$ 是集合；这是由对 $p:\brck{\bool=A}$ 使用截断归纳以及 $\bool$ 是集合得出的。
+  由于当 $A$ 与 $B$ 都是集合时 $\eqv A B$ 是集合，遂得对任意 $x_1,x_2:X$，$\id[X]{x_1}{x_2}$ 是集合，即 $X$ 是一个 1-类型。
+  特别地，若定义 $Y:X\to\UU$ 为 $Y(x) \defeq (x_0=x)$，则每个 $Y(x)$ 都是集合。
+
+  现在按定义，对任意 $(A,p):X$ 都有 $\brck{\bool=A}$，从而有 $\brck{x_0 = (A,p)}$。
+  因此我们有 $\prd{x:X} \brck{Y(x)}$。
+  若~\eqref{eq:epis-split} 对此 $X$ 与 $Y$ 成立，则还会有 $\brck{\prd{x:X} Y(x)}$。
+  由于我们要导出矛盾（$\emptyt$），而它是纯命题，因此可假设 $\prd{x:X} Y(x)$，即假设 $\prd{x:X} (x_0=x)$。
+  但这会推出 $X$ 是纯命题，从而是集合，矛盾。
+\end{proof}
+
+\index{denial|)}%
+\index{axiom!of choice|)}%
+
+\section{唯一选择原理}
+\label{sec:unique-choice}
+
+\index{unique!choice|(defstyle}%
+\indexsee{axiom!of choice!unique}{unique choice}%
+
+下面的观察很平凡，但非常有用。
+
+\begin{lem}\label{thm:prop-equiv-trunc}
+  若 $P$ 是纯命题，则 $\eqv P {\brck P}$。
+\end{lem}
+\begin{proof}
+  当然，由定义有 $P\to \brck{P}$。
+  又由于 $P$ 是纯命题，将 $\brck P$ 的泛性质应用于 $\idfunc[P] :P\to P$，得到 $\brck P \to P$。
+  由 \cref{lem:equiv-iff-hprop}，这两个函数互为拟逆。
+\end{proof}
+
+其重要推论之一如下。
+
+\begin{cor}[唯一选择原理]\label{cor:UC}
+  设类型族 $P:A\to \type$ 满足
+  \begin{enumerate}
+  \item 对每个 $x$，类型 $P(x)$ 是纯命题，且
+  \item 对每个 $x$ 都有 $\brck {P(x)}$。
+  \end{enumerate}
+  则有 $\prd{x:A} P(x)$。
+\end{cor}
+\begin{proof}
+  由上述两个假设和前一引理立即得到。
+\end{proof}
+
+这个推论也概括了一种非常有用的推理技巧。
+也就是说，设我们已知 $\brck A$，并希望用它构造某个其他类型 $B$ 的元素。
+我们希望在构造 $B$ 的元素时使用一个 $A$ 的元素；但这只在 $B$ 是纯命题时才被允许，因为只有这样才能对命题截断 $\brck A$ 应用归纳原理；一般而言，我们最多只能期望证明 $\brck B$。
+%
+一种替代办法是：给 $B$ 增添额外数据，以\emph{唯一地}刻画我们想构造的对象。
+具体地，定义谓词 $Q:B\to\type$，使得 $\sm{x:B} Q(x)$ 是纯命题。
+然后由 $A$ 的一个元素构造出某个 $b:B$ 且满足 $Q(b)$；于是由 $\brck A$ 可构造 $\brck{\sm{x:B} Q(x)}$，并且由于 $\brck{\sm{x:B} Q(x)}$ 与 $\sm{x:B} Q(x)$ 等价，就可以从中投影出一个 $B$ 的元素。
+一个例子见 \cref{ex:decidable-choice}。
+
+在集合论数学中也会出现类似问题，只是表现形式略有不同。
+如果我们试图定义函数 $f: A \to B$，并且针对某个
+元素 $a : A$ 能证明某个 $b : B$ 的纯存在性，那么事情还没完成，
+因为我们需要真正确定一个~$B$ 的元素，而不只是证明其存在。
+一种办法当然是把论证加强为 $b : B$ 的唯一存在，就像我们在类型论中做的那样。
+但在集合论里，这个问题往往可更简单地通过应用选择公理来避免，它会为我们选出所需元素。
+然而在同伦类型论中，撇开是否想避免选择不谈，现有的选择形式本身适用性更弱，因为它们要求选择的定义域是\emph{集合}。
+因此，如果 $A$ 不是集合（例如可能是某个宇宙 $\UU$），就不存在一致的选择形式，能让我们为每个 $a : A$ 直接选出一个 $B$ 的元素来定义 $f(a)$。
+
+\index{unique!choice|)}%
+
+
+\section{命题何时被截断？}
+\label{subsec:when-trunc}
+
+\index{logic!of mere propositions|(}%
+\index{mere proposition|(}%
+\index{logic!truncated}%
+
+乍看之下，$+$ 与 $\Sigma$ 的截断版本似乎比未截断版本更接近日常数学中 ``or'' 与 ``there exists'' 的含义。
+当然，在作为形式集合论基础的一阶逻辑\index{first-order!logic}中，它们确实更接近 ``or'' 与 ``there exists'' 的\emph{精确}含义，因为后者并不试图记住命题为真的任何见证。
+然而，令人意外的是，\emph{非形式}数学的实际做法往往更准确地由未截断形式来刻画。
+
+\index{prime number}%
+例如，考虑“每个素数要么是 $2$，要么是奇数”这样的断言。
+从事研究的数学家在使用这一事实时，完全不会只把它用于证明关于素数的\emph{定理}，也会把它用于对素数进行\emph{构造}：在 $2$ 的情形做一件事，在奇素数的情形做另一件事。
+这类构造的最终结果并不只是某个命题的真值，而是一段可能依赖该素数奇偶性的数据。
+因此，从类型论视角看，这样的构造自然应当表述为使用余积类型 ``$(p=2)+(p\text{ is odd})$'' 的归纳原理，而不是其命题截断。
+
+诚然，这并非理想例子，因为 ``$p=2$'' 与 ``$p$ is odd'' 互斥，所以 $(p=2)+(p\text{ is odd})$ 实际上本就已经是 纯命题，因而与其截断等价（见 \cref{ex:disjoint-or}）。
+更有说服力的例子来自存在量词。
+我们常常先证明“存在某个 $x$ 使得 \dots”这一类定理，随后又提到“定理 Y 中构造出的那个 $x$”（注意这里使用定冠词）。
+此外，在继续推导该 $x$ 的性质时，也会说“根据定理 Y 证明里对 $x$ 的构造”。
+
+一个非常常见的例子是“$A$ 与 $B$ 同构”，其严格含义仅是 $A$ 与 $B$ 之间存在\emph{某个}同构。
+但几乎总是如此：在证明这类陈述时，人们会给出一个具体同构，或证明某个已知映射是同构；并且在后续论证中，究竟给出了哪一个同构往往是重要的。
+
+受集合论训练的数学家对这类“语言滥用”常会有一丝负疚感。\index{abuse!of language}
+我们可能尝试为其辩解、在定稿中删去它们，或用诸如 ``canonical'' 这样的含混词语来回避。
+问题还因以下事实而加剧：在形式化集合论里，严格来说根本无法“构造”对象，我们只能证明具有某些性质的对象存在。
+因此，类型论中的未截断逻辑能够捕捉非形式数学中的一些常见实践，而集合论式重建会掩盖这些实践。
+（这与泛等公理使一种常见但形式上并无正当性的做法合法化是类似的：把同构对象直接认同起来。）
+
+另一方面，有时截断逻辑又是必不可少的。
+我们已经在 \LEM{} 与 \choice{} 的表述中见到这一点；本书后文还会出现其他例子。
+因此我们面临一个问题：在撰写非形式类型论时，词语 ``or'' 与 ``there exists''（以及 ``there is''、``we have'' 等常见同义表达）应当表示什么？
+
+也许不可能有普遍共识。
+可能取决于所做数学的类型，某一种约定更有用；也可能两种约定的选择并不重要。
+在这种情况下，在论文开头加一段说明，告知读者本文采用的语言约定，或许就足够了。
+然而，即便选定了一个总体约定，另一类逻辑通常也会偶尔出现，因此我们需要一种方式来指称它。
+更一般地，人们还可以考虑用与命题截断行为相似的其他类型运算来替代它，例如双重否定运算 $A\mapsto \neg\neg A$，或将在 \cref{cha:hlevels} 中讨论的 $n$-截断。
+作为一种行文实验，下面我们有时会用\emph{副词}\index{adverb}来表示施加这类“模态”（如命题截断）。
+
+例如，若未截断逻辑是默认约定，我们可以使用副词 \define{merely}
+\indexdef{merely}%
+来表示命题截断。
+于是短语
+\begin{center}
+  ``there merely exists an $x:A$ such that $P(x)$''
+\end{center}
+表示类型 $\brck{\sm{x:A} P(x)}$。
+类似地，我们称一个类型 $A$ 是 \define{merely inhabited}
+\indexdef{merely!inhabited}%
+\indexdef{inhabited type!merely}%
+意即其命题截断 $\brck A$ 可居留（即我们有其某个未命名元素）。
+请注意，这是对副词 ``merely'' 在非形式数学英语中用法的\emph{定义}\index{definition!of adverbs}，其地位与我们赋予诸如 ``group''、``ring'' 这类名词\index{noun}以及 ``regular''、``normal'' 这类形容词\index{adjective}精确数学含义是一样的。
+我们并不是声称词典里 ``merely'' 的定义就是命题截断；选择这个词只是为了提醒数学读者：纯命题“仅仅”包含真值信息，而无更多数据。
+
+另一方面，如果当前默认约定是截断逻辑，我们可以使用诸如 \define{purely}
+\indexdef{purely}%
+或 \define{constructively} 的副词来表示其缺失，于是
+\begin{center}
+``there purely exists an $x:A$ such that $P(x)$''
+\end{center}
+表示类型 $\sm{x:A} P(x)$。
+即便未截断本来就是默认约定，我们也可用 ``purely'' 或 ``actually'' 来强调没有截断。
+
+在本书中，我们将继续采用未截断逻辑作为默认约定，理由如下。
+\begin{enumerate}[label=(\arabic*)]
+\item 我们希望鼓励初学者尝试这种做法，而不是仅因截断逻辑更熟悉就停留在后者。
+\item 在类型论里把截断逻辑设为默认，会遭遇与集合论基础同类的“语言滥用”\index{abuse!of language}问题，而未截断逻辑可避免此问题。
+  例如，我们把 ``$\eqv A B$'' 定义为 $A$ 与 $B$ 之间等价所成的类型，而非其命题截断；这意味着证明形如 ``$\eqv A B$'' 的定理在字面上就是构造一个特定等价。
+  这个具体等价随后就能被继续引用。
+\item 我们希望强调：“纯命题”这一概念并非类型论的基础组成部分。
+  正如将在 \cref{cha:hlevels} 中看到的，纯命题 只是无穷阶梯上的第二级；此外还有许多根本不在这条阶梯上的模态。
+\item 在经典上属于 纯命题 的许多陈述，在同伦类型论中不再如此。
+  其中最突出的当然是相等性。
+\item 另一方面，同伦类型论最有趣的观察之一是：数量惊人的类型会\emph{自动地}成为 纯命题，或只需稍作修改即可成为 纯命题，而无需任何截断。
+  （见 \cref{thm:isprop-isprop,cha:equivalences,cha:hlevels,cha:category-theory,cha:set-math}。）
+  因此，尽管这些类型除真值外不含其他数据，我们仍可用它们来构造未截断对象，因为不需要使用命题截断的归纳原理。
+  若默认对所有陈述都施加命题截断，这个有用事实反而更难表达。
+\item 最后，对于本书将开展的大多数数学内容，截断并不十分有用，因此在出现时显式标注它们更为简明。
+\end{enumerate}
+
+\index{mere proposition|)}%
+\index{logic!of mere propositions|)}%
+\section{可缩性}
+\label{sec:contractibility}
+
+\index{type!contractible|(defstyle}%
+\index{contractible!type|(defstyle}%
+
+在 \cref{thm:inhabprop-eqvunit} 中，我们观察到：一个可居留的 纯命题 必与 $\unit$ 等价，
+\index{type!unit}%
+而其逆命题也不难看出成立。
+具有这一性质的类型称为 \emph{可缩}。
+可缩性的另一个等价定义（有时也很方便）如下。
+
+\begin{defn}\label{defn:contractible}
+  若存在 $a:A$，称为 \define{收缩中心}，
+  \indexdef{center!of contraction}%
+  并且对所有 $x:A$ 都有 $a=x$，
+  则称类型 $A$ 是 \define{可缩}，
+  或称 \define{单点类型}。
+  \indexdef{type!singleton}%
+  \indexsee{singleton type}{type, singleton}%
+  我们把指定的路径 $a=x$ 记作 $\contr_x$。
+\end{defn}
+
+换言之，类型 $\iscontr(A)$ 定义为
+\[ \iscontr(A) \defeq \sm{a:A} \prd{x:A}(a=x). \]
+注意在通常的“命题即类型”解读下，$\iscontr(A)$ 可读作“$A$ 恰有一个元素”，更精确地说是“$A$ 含有一个元素，且 $A$ 的每个元素都等于该元素”。
+
+\begin{rmk}
+  从更拓扑的角度，$\iscontr(A)$ 也可读作“存在一点 $a:A$，使得对任意 $x:A$，都存在一条从 $a$ 到 $x$ 的路径”。
+  注意在经典语境下，这听起来更像 \emph{连通性} 的定义，而不是可缩性。
+  \index{continuity of functions in type theory@``continuity'' of functions in type theory}%
+  \index{functoriality of functions in type theory@``functoriality'' of functions in type theory}%
+  关键在于该句中 “there exists” 的含义是连续/自然的。
+
+  表达连通性更好的方式是 $\sm{a:A}\prd{x:A} \brck{a=x}$。
+  若假设 $A$ 带基点，这确实正确（见 \cref{thm:connected-pointed} 后的注记）；但一般而言，类型可以连通而不带基点。
+  在 \cref{sec:connectivity} 中，我们将把连通性定义为一般 $n$-连通性概念在 $n=0$ 时的情形；并在 \cref{ex:connectivity-inductively} 中要求读者证明：该定义等价于同时拥有 $\brck{A}$ 与 $\prd{x,y:A} \brck{x=y}$。
+\end{rmk}
+
+\begin{lem}\label{thm:contr-unit}
+  对任意类型 $A$，下列命题逻辑等价。
+  \begin{enumerate}
+  \item $A$ 按 \cref{defn:contractible} 的意义是 contractible。\label{item:contr}
+  \item $A$ 是 mere proposition，且存在一点 $a:A$。\label{item:contr-inhabited-prop}
+  \item $A$ 与 \unit 等价。\label{item:contr-eqv-unit}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  若 $A$ 是 可缩，则它当然有一点 $a:A$（收缩中心）；同时对任意 $x,y:A$，有 $x=a=y$；故 $A$ 是 纯命题。
+  反过来，若有 $a:A$ 且 $A$ 是 纯命题，则任意 $x:A$ 都满足 $x=a$；故 $A$ 是 可缩。
+  而 \cref{thm:inhabprop-eqvunit} 已证明~\ref{item:contr-inhabited-prop}$\Rightarrow$\ref{item:contr-eqv-unit}；其逆向成立是因为 \unit 显然满足性质~\ref{item:contr-inhabited-prop}。
+\end{proof}
+
+\begin{lem}\label{thm:isprop-iscontr}
+  对任意类型 $A$，类型 $\iscontr(A)$ 是 纯命题。
+\end{lem}
+\begin{proof}
+  设给定 $c,c':\iscontr(A)$。
+  可设 $c\jdeq(a,p)$ 且 $c'\jdeq(a',p')$，其中 $a,a':A$，$p:\prd{x:A} (a=x)$，$p':\prd{x:A} (a'=x)$。
+  由 $\Sigma$-类型中路径的刻画，要证 $c=c'$，只需给出 $q:a=a'$ 使得 $\trans{q}{p}=p'$。
+  %
+  取 $q\defeq p(a')$。
+  现在由于 $A$ 可缩（由 $c$ 或 $c'$），由 \cref{thm:contr-unit} 知其为 纯命题。
+  因而由 \cref{thm:prop-set,thm:isprop-forall}，$\prd{x:A}(a'=x)$ 也是 纯命题；于是 $\trans{q}{p}=p'$ 自动成立。
+\end{proof}
+
+\begin{cor}\label{thm:contr-contr}
+  若 $A$ 可缩，则 $\iscontr(A)$ 也可缩。
+\end{cor}
+\begin{proof}
+  由 \cref{thm:isprop-iscontr} 与 \cref{thm:contr-unit}\ref{item:contr-inhabited-prop} 即得。
+\end{proof}
+
+与 纯命题 类似，可缩类型在许多类型构造子下都保持可缩。
+例如：
+
+\begin{lem}\label{thm:contr-forall}
+  若 $P:A\to\type$ 是类型族，且每个 $P(a)$ 都可缩，则 $\prd{x:A} P(x)$ 可缩。
+\end{lem}
+\begin{proof}
+  由 \cref{thm:isprop-forall}，由于每个 $P(x)$ 都是 纯命题，故 $\prd{x:A} P(x)$ 也是 纯命题。
+  但它也有元素，即把每个 $x:A$ 送到 $P(x)$ 的收缩中心的函数。
+  因此由 \cref{thm:contr-unit}\ref{item:contr-inhabited-prop}，$\prd{x:A} P(x)$ 可缩。
+\end{proof}
+
+\index{function extensionality}%
+（事实上，\cref{thm:contr-forall} 的命题与函数外延公理等价。
+见~\cref{sec:univalence-implies-funext}。）
+
+当然，若 $A$ 与 $B$ 等价且 $A$ 可缩，则 $B$ 也可缩。
+更一般地，只要 $B$ 是 $A$ 的一个 \emph{缩回子} 即可。
+按定义，\define{缩回}
+\indexdef{retraction}%
+\indexdef{function!retraction}%
+是一个函数 $r : A \to B$，满足存在函数 $s : B \to A$（称为其 \define{截面}），
+\indexdef{section}%
+\indexdef{function!section}%
+以及同伦 $\epsilon:\prd{y:B} (r(s(y))=y)$；此时称 $B$ 是 $A$ 的 \define{缩回子}%
+\indexdef{retract!of a type}
+。
+
+\begin{lem}\label{thm:retract-contr}
+  若 $B$ 是 $A$ 的 缩回子，且 $A$ 可缩，则 $B$ 也可缩。
+\end{lem}
+\begin{proof}
+  设 $a_0 : A$ 为收缩中心。
+  我们断言 $b_0 \defeq r(a_0) : B$ 是 $B$ 的收缩中心。
+  任取 $b : B$；需给出路径 $b = b_0$。
+  但我们有 $\epsilon_b : r(s(b)) = b$ 和 $\contr_{s(b)} : s(b) = a_0$，故由复合得
+  \[ \opp{\epsilon_b} \ct \ap{r}{\contr_{s(b)}} : b = r(a_0) \jdeq b_0. \qedhere\]
+\end{proof}
+
+可缩类型乍看并不很有趣，因为它们都与 \unit 等价。
+这一概念有用的一个原因是：有时一些分别看来并不平凡的数据，合在一起却会形成一个可缩类型。
+一个重要例子是带一个自由端点的路径空间。
+正如我们将在 \cref{sec:identity-systems} 中看到的，这一事实本质上
+概括了恒等类型的带基路径归纳原理。
+
+
+\begin{lem}\label{thm:contr-paths}
+  对任意 $A$ 和任意 $a:A$，类型 $\sm{x:A} (a=x)$ 可缩。
+\end{lem}
+\begin{proof}
+  我们取点 $(a,\refl a)$ 作为中心。
+  现设 $(x,p):\sm{x:A}(a=x)$；需证 $(a,\refl a) = (x,p)$。
+  由 $\Sigma$-类型中路径的刻画，只需给出 $q:a=x$ 使得 $\trans{q}{\refl a} = p$。
+  取 $q\defeq p$ 即可；此时 $\trans{q}{\refl a} = p$ 由路径类型中传送的刻画得到。
+\end{proof}
+
+出现这种情况时，我们就能在等价意义下简化复杂构造，依据的非形式原则是：可缩数据可以自由忽略。
+该原则由许多引理组成，其中大部分留作读者练习；下面给出一例。
+
+\begin{lem}\label{thm:omit-contr}
+  设 $P:A\to\type$ 为类型族。
+  \begin{enumerate}
+  \item 若每个 $P(x)$ 都可缩，则 $\sm{x:A} P(x)$ 与 $A$ 等价。\label{item:omitcontr1}
+  \item 若 $A$ 以 $a$ 为中心可缩，则 $\sm{x:A} P(x)$ 与 $P(a)$ 等价。\label{item:omitcontr2}
+  \end{enumerate}
+\end{lem}
+\begin{proof}
+  在~\ref{item:omitcontr1} 的情形下，我们证明 $\proj1:\sm{x:A} P(x) \to A$ 是等价。
+  作为拟逆，定义 $g(x)\defeq (x,c_x)$，其中 $c_x$ 是 $P(x)$ 的中心。
+  复合 $\proj1 \circ g$ 显然是 $\idfunc[A]$；反向复合则可借助各 $P(x)$ 的收缩与恒等同伦。
+
+  ~\ref{item:omitcontr2} 的证明留给读者（见 \cref{ex:omit-contr2}）。
+\end{proof}
+
+可缩类型有趣的另一原因是：它把 \cref{sec:basics-sets} 中提到的 $n$-类型阶梯再向下延伸了一阶。
+
+\begin{lem}\label{thm:prop-minusonetype}
+  类型 $A$ 是 纯命题，当且仅当对所有 $x,y:A$，类型 $\id[A]xy$ 可缩。
+\end{lem}
+\begin{proof}
+  对“若”方向，只需注意任意可缩类型都是可居留的。
+  对“仅若”方向，我们在 \cref{subsec:hprops} 已观察到每个 纯命题 都是集合，因此每个类型 $\id[A]xy$ 都是 纯命题。
+  但它也可居留（因为 $A$ 是纯命题），故由 \cref{thm:contr-unit}\ref{item:contr-inhabited-prop}，它可缩。
+\end{proof}
+
+因此，可缩类型也可称为 \define{$(-2)$-types}。
+它们是 $n$-类型阶梯的最底层，并将作为 \cref{cha:hlevels} 中 $n$-类型递归定义的基例。
+
+\index{type!contractible|)}%
+\index{contractible!type|)}%
+
+\sectionNotes
+
+在类型论中可以定义集合、纯命题 与可缩类型，并且如 \cref{sec:basics-sets,subsec:hprops,sec:contractibility} 所示，高阶同伦会被自动处理；这一事实最早由 Voevodsky 指出。
+实际上，他通过归纳定义了完整的 $n$-类型层级，正如我们将在 \cref{cha:hlevels} 中所做的那样。\index{n-type@$n$-type!definable in type theory}%
+
+\cref{thm:not-dneg,thm:not-lem} 本质上依赖 Hedberg 的一个经典定理，
+\index{Hedberg's theorem}%
+\index{theorem!Hedberg's}%
+我们将在 \cref{sec:hedberg} 中证明它。
+Mart\'\i n Escard\'o 在 \Agda 邮件列表上观察到：\LEM{} 的“命题即类型”形式会与泛等相矛盾。
+我们给出的 \cref{thm:not-dneg} 证明则归功于 Thierry Coquand。
+
+命题截断最早由 Constable 在 1983 年引入到
+\index{proof!assistant!\NuPRL}%
+\NuPRL 的外延类型论中~\cite{Con85}，作为 ``subset'' 与 ``quotient'' 类型的一种
+应用。这里称作 ``propositional truncation'' 的构造，在 \NuPRL 类型论中称为 ``squashing''~\cite{constable+86nuprl-book}。
+在仍属外延类型论的背景下，直接刻画命题截断的规则见~\cite{ab:bracket-types}。
+同伦类型论中的内涵版本，先由 Voevodsky 通过非直谓\index{impredicative!truncation}量化构造，后由 Lumsdaine 通过高阶归纳类型构造（见 \cref{sec:hittruncations}）。
+
+\index{propositional!resizing}%
+Voevodsky~\cite{Universe-poly} 提出了与 \cref{subsec:prop-subsets} 所讨论同类的 resizing 规则。
+\index{axiom!of reducibility}\index{resizing}%
+这显然与 Russell 在其与 Whitehead 合著的 \emph{Principia Mathematica}~\cite{PM2} 中提出且颇具争议的 \emph{axiom of reducibility} 有关。\index{Russell, Bertrand}
+
+将 ``purely'' 用作指称未截断逻辑的副词，是在借用编程语言中以单子模态建模效应的用法；见 \cref{sec:modalities} 及 \cref{cha:hlevels} 的注记。
+
+相对于类型论，逻辑可被处理的方式有很多。
+例如，除 \cref{sec:pat} 所述朴素“命题即类型”逻辑以及 \cref{subsec:logic-hprop} 所述仅使用 纯命题 的替代方案外，还可以引入一个与类型相似但不与类型认同的独立命题“sort”。
+这正是逻辑增强类型论~\cite{aczel2002collection}、某些拓扑斯\index{topos}及相关范畴内部语言的表述（例如~\cite{jacobs1999categorical,elephant}）以及证明助手 \Coq 所采用的方法。\index{proof!assistant!Coq@\textsc{Coq}}
+这种方法更一般，但能力较弱。
+例如，唯一选择原理（\cref{sec:unique-choice}）在 \Coq 中所谓 setoid 的范畴~\cite{Spiwack}、逻辑增强类型论~\cite{aczel2002collection} 以及最小类型论~\cite{maietti2005toward} 中都不成立。\index{setoid}
+因此，泛等公理使我们的类型论更像拓扑斯的内部逻辑；另见 \cref{cha:set-math}。\index{topos}
+
+Martin-L\"of~\cite{martin2006100} 讨论了选择公理的历史。
+当然，构造性与直觉主义数学有着悠久且复杂的历史，这里不再展开；可参见~\cite{TroelstraI,TroelstraII}。
+
+\sectionExercises
+
+\begin{ex}\label{ex:equiv-functor-set}
+  证明：若 $\eqv A B$ 且 $A$ 是集合，则 $B$ 也是集合。
+\end{ex}
+
+\begin{ex}\label{ex:isset-coprod}
+  证明：若 $A$ 与 $B$ 都是集合，则 $A+B$ 也是集合。
+\end{ex}
+
+\begin{ex}\label{ex:isset-sigma}
+  证明：若 $A$ 是集合，且 $B:A\to \type$ 是一个类型族并满足对所有 $x:A$，$B(x)$ 都是集合，则 $\sm{x:A} B(x)$ 是集合。
+\end{ex}
+
+\begin{ex}\label{ex:prop-endocontr}
+  证明：$A$ 是 纯命题，当且仅当 $A\to A$ 可缩。
+\end{ex}
+
+\begin{ex}\label{ex:prop-inhabcontr}
+  证明 $\eqv{\isprop(A)}{(A\to\iscontr(A))}$。
+\end{ex}
+
+\begin{ex}\label{ex:lem-mereprop}
+  证明：若 $A$ 是 纯命题，则 $A+(\neg A)$ 也是 纯命题。
+  因而在~\eqref{eq:lem} 中无须插入命题截断。
+\end{ex}
+
+\begin{ex}\label{ex:disjoint-or}
+  更一般地，证明：若 $A$ 与 $B$ 是 纯命题 且 $\neg(A\times B)$，则 $A+B$ 也是 纯命题。
+\end{ex}
+
+% \begin{ex}\label{ex:hprop-iff-equiv}
+%   Show that if $A$ and $B$ are mere propositions such that $A\to B$ and $B\to A$, then $\eqv A B$.
+% \end{ex}
+
+% \begin{ex}\label{ex:isprop-isprop}
+%   Show that for any type $A$, the types $\isprop(A)$ and $\isset(A)$ are mere propositions.
+% \end{ex}
+
+% \begin{ex}\label{ex:prop-eqvtrunc}
+%   Show that if $A$ is already a 纯命题, then $\eqv A{\brck{A}}$.
+% \end{ex}
+
+\begin{ex}\label{ex:brck-qinv}
+  假设某个类型 $\isequiv(f)$ 满足 \cref{sec:basics-equivalences} 中条件~\ref{item:be1}--\ref{item:be3}，证明类型 $\brck{\qinv(f)}$ 满足同样条件，且与 $\isequiv(f)$ 等价。
+\end{ex}
+
+\begin{ex}\label{ex:lem-impl-prop-equiv-bool}
+  证明：若 \LEM{} 成立，则类型 $\prop \defeq \sm{A:\type} \isprop(A)$ 与 \bool 等价。
+\end{ex}
+
+\begin{ex}\label{ex:lem-impred}
+  证明：若 $\UU_{i+1}$ 满足 \LEM{}，则标准嵌入 $\prop_{\UU_i} \to \prop_{\UU_{i+1}}$ 是等价。
+\end{ex}
+
+\begin{ex}\label{ex:not-brck-A-impl-A}
+  证明：并非对所有 $A:\type$ 都有 $\brck{A} \to A$。
+  （不过，确实可能存在某些特定类型满足 $\brck{A}\to A$。
+  \cref{ex:brck-qinv} 蕴含 $\qinv(f)$ 就是这样的类型。）
+\end{ex}
+
+\begin{ex}\label{ex:lem-impl-simple-ac}
+  \index{axiom!of choice}%
+  证明：若 \LEM{} 成立，则对所有 $A:\type$ 都有 $\bbrck{(\brck A \to A)}$。
+  （该性质是选择公理的一种非常简单的形式；在缺少 \LEM{} 时它可能失效，见~\cite{krausgeneralizations}。）
+\end{ex}
+
+\begin{ex}\label{ex:naive-lem-impl-ac}
+  我们在 \cref{thm:not-lem} 中证明过，下述朴素形式的 \LEM{} 与泛等不相容：
+  \[ \prd{A:\type} (A+(\neg A)) \]
+  在没有泛等的情况下，该公理是一致的。
+  然而，证明它可推出选择公理~\eqref{eq:ac}。
+\end{ex}
+
+\begin{ex}\label{ex:lem-brck}
+  证明：在假设 \LEM{} 下，双重否定 $\neg \neg A$ 与命题截断 $\brck A$ 具有相同的递归原理，但其计算规则是命题层面的而非判断层面的。
+  换言之，证明在假设 \LEM{} 下，若 $B$ 是 纯命题 且给定 $f:A\to B$，则存在导出映射 $g:\neg\neg A \to B$，使得对所有 $a:A$ 都有 $g(\bproj a) = f(a)$。
+  由此推出（在假设 \LEM{} 下）$\eqv{\neg\neg A}{\brck{A}}$。
+  因而在 \LEM{} 下，命题截断可以被定义，而无需作为独立类型构造子引入。
+\end{ex}
+
+\begin{ex}\label{ex:impred-brck}\ 
+  \index{propositional!resizing}%
+  \begin{enumerate}
+  \item 证明：对任意 $A : \UU$，类型
+    \[\prd{P:\prop_{\UU}} \Parens{(A\to P)\to P}\]
+    与 $\brck A$ 具有相同的递归原理，至少相对于 $\UU$ 中的命题而言如此，并且\emph{具有}同样的判断型计算规则。
+  \item 上一问所考虑的类型不位于同一宇宙 $\UU$ 中，且其递归原理只适用于 $\UU$ 中的命题。
+    证明：若假设命题 resizing，则可定义一个确实位于同一宇宙 $\UU$ 的类型，并满足与 $\brck A$ 相同的递归原理，不过仅具有命题层面的计算规则。
+    因而在这种情况下我们也能定义命题截断。
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}\label{ex:lem-impl-dn-commutes}
+  在假设 \LEM{} 下，证明双重否定与集合上对 纯命题 的全称量化可交换。
+  即证明：若 $X$ 是集合且每个 $Y(x)$ 都是 纯命题，则 \LEM{} 蕴含
+  \begin{equation}
+    \eqv{\Parens{\prd{x:X} \neg\neg Y(x)}}{\Parens{\neg\neg \prd{x:X} Y(x)}}.\label{eq:dnshift}
+  \end{equation}
+  注意：若改为假设每个 $Y(x)$ 都是集合，则~\eqref{eq:dnshift} 与选择公理~\eqref{eq:epis-split} 等价。
+\end{ex}
+
+\begin{ex}\label{ex:prop-trunc-ind}
+  \index{induction principle!for truncation}%
+  证明：\cref{subsec:prop-trunc} 给出的命题截断规则足以推出如下归纳原理：对任意类型族 $B:\brck A \to \type$，若每个 $B(x)$ 都是 纯命题，且对每个 $a:A$ 都有 $B(\bproj a)$，则对每个 $x:\brck A$ 都有 $B(x)$。
+\end{ex}
+
+\begin{ex}\label{ex:lem-ldn}
+  证明：排中律~\eqref{eq:lem} 与双重否定律~\eqref{eq:ldn} 在逻辑上等价。
+\end{ex}
+
+\begin{ex}\label{ex:decidable-choice}
+  设 $P:\nat\to\type$ 是一个由纯命题组成的可判定族（见 \cref{defn:decidable-equality}\ref{item:decidable-equality2}）。
+  证明
+  \[ \Brck{\sm{n:\nat} P(n)} \;\to\; \sm{n:\nat}P(n).\]
+\end{ex}
+
+\begin{ex}\label{ex:omit-contr2}
+  证明 \cref{thm:omit-contr}\ref{item:omitcontr2}：若 $A$ 以中心 $a$ 可缩，则 $\sm{x:A} P(x)$ 与 $P(a)$ 等价。
+\end{ex}
+
+\begin{ex}\label{ex:isprop-equiv-equiv-bracket}
+  证明 $\isprop(P) \simeq (P \simeq \brck P)$。
+\end{ex}
+
+\begin{ex}\label{ex:finite-choice}
+  与经典集合论相同，选择公理的有限版本是一个定理。证明当 $X$ 为有限类型 $\Fin(n)$（定义见 \cref{ex:fin}）时，选择公理 \eqref{eq:ac} 成立。
+\end{ex}
+
+\begin{ex}\label{ex:decidable-choice-strong}
+  证明：若 $P:\nat\to\type$ 是任意可判定族，则 \cref{ex:decidable-choice} 的结论仍成立。
+\end{ex}
+
+\begin{ex}\label{ex:n-set}
+  先证明对所有 $m,n$，$\code(m,n)$ 是 纯命题，并据此简化 \cref{thm:path-nat} 的证明。
+\end{ex}
+
+% Local Variables:
+% TeX-master: "hott-online"
+% End:

@@ -109,13 +109,23 @@
 | tautology | 重言式 | 固定译法 |
 | de Morgan's laws | de Morgan 律 | 固定译法 |
 | law of excluded middle | 排中律 | 固定译法 |
+| law of double negation | 双重否定律 | 固定译法 |
 | propositional logic | 命题逻辑 | 固定译法 |
 | predicate logic | 谓词逻辑 | 固定译法 |
+| traditional logical notation | 传统逻辑记号 | 固定译法 |
 | quantifier | 量词 | 固定译法 |
 | universal quantifier | 全称量词 | 固定译法 |
 | existential quantifier | 存在量词 | 固定译法 |
+| set (as a type-theoretic notion) | 集合 | 与 set theory 区分语境 |
+| 1-type | 1-类型 | 固定译法 |
+| subset | 子集 | 固定译法 |
 | subtype | 子类型 | 固定译法 |
+| member | 成员 | 固定译法 |
+| contained (in) | 包含于 | 固定译法 |
+| decidable | 可判定的 | 固定译法 |
+| decidable equality | 可判定相等性 | 固定译法 |
 | semigroup | 半群 | 固定译法 |
+| homomorphism | 同态 | 固定译法 |
 | axiomatic freedom | 公理自由度 | 固定译法 |
 | logical equivalence | 逻辑等价 | 固定译法 |
 | inhabited | 可居留 | 固定译法 |
@@ -128,6 +138,26 @@
 | path induction | 路径归纳 | 固定译法 |
 | based path induction | 基路径归纳 | 固定译法 |
 | equivalence relation | 等价关系 | 固定译法 |
+| half adjoint equivalence | 半伴随等价 | 固定译法 |
+| isomorphism | 同构 | 固定译法 |
+| bijection | 双射 | 固定译法 |
+| surjective | 满射 | 固定译法 |
+| surjection | 满射映射 | 固定译法 |
+| injective | 单射 | 固定译法 |
+| injection | 单射映射 | 固定译法 |
+| embedding | 嵌入 | 固定译法 |
+| split surjection | 可分裂满射 | 固定译法 |
+| left inverse | 左逆 | 固定译法 |
+| right inverse | 右逆 | 固定译法 |
+| left invertible | 左可逆 | 固定译法 |
+| right invertible | 右可逆 | 固定译法 |
+| bi-invertible | 双可逆 | 固定译法 |
+| fiber | 纤维 | 固定译法 |
+| fiberwise map | 逐纤维映射 | 固定译法 |
+| fiberwise transformation | 逐纤维变换 | 固定译法 |
+| fiberwise equivalence | 逐纤维等价 | 固定译法 |
+| center of a category | 范畴的中心 | 固定译法 |
+| weak function extensionality principle | 弱函数外延性原理 | 固定译法 |
 | disequality | 不等 | 固定译法 |
 | unequal / not equal | 不等 / 不相等 | 固定译法 |
 | intensional type theory | 内涵类型论 | 固定译法 |
@@ -148,6 +178,7 @@
 | recursor | 递归器 | 固定译法 |
 | recursion principle | 递归原理 | 固定译法 |
 | induction principle | 归纳原理 | 固定译法 |
+| strict positivity | 严格正性 | 固定译法 |
 | dependent eliminator | 依值消去子 | 固定译法 |
 | non-dependent eliminator | 非依值消去子 | 固定译法 |
 | case analysis | 分情况分析 | 固定译法 |
@@ -169,6 +200,15 @@
 | ex falso quodlibet | ex falso quodlibet（由假命题可推出任意命题） | 逻辑原则固定表述 |
 | proof-relevant relation | 证明相关关系 | 固定译法 |
 | type-theoretic axiom of choice | 类型论的选择公理 | 固定译法 |
+| axiom of choice | 选择公理 | 固定译法 |
+| propositional resizing | 命题缩放 | 固定译法 |
+| propositional truncation | 命题截断 | 固定译法 |
+| bracket type | 括号类型 | 命题截断别名 |
+| squash type | 压扁类型 | 命题截断别名 |
+| merely inhabited | merely inhabited（仅可居留） | 语义副词术语 |
+| merely | merely | 语义副词术语 |
+| purely | purely | 语义副词术语 |
+| constructively | constructively | 语义副词术语 |
 | magma | 原群 | 固定译法 |
 | pointed magma | 带基点原群 | 固定译法 |
 | carrier | 载体 | 固定译法 |
@@ -198,10 +238,31 @@
 | quasi-inverse | 拟逆 | 固定译法 |
 | encode-decode method | 编码-解码方法 | 固定译法 |
 | semigroup structure | 半群结构 | 固定译法 |
+| singleton type | 单点类型 | 固定译法 |
+| center of contraction | 收缩中心 | 固定译法 |
+| retraction | 缩回 | 固定译法 |
+| retract (of a type) | 缩回子 | 固定译法 |
+| $(-2)$-type | $(-2)$-类型 | 固定译法 |
 | commutative square | 交换方块 | 固定译法 |
 | pullback square | 拉回方块 | 固定译法 |
 | contractible | 可缩 | 固定译法 |
 | universal property | 泛性质 | 固定译法 |
+| $\nat$-algebra | $\nat$-代数 | 固定译法 |
+| $\nat$-homomorphism | $\nat$-同态 | 固定译法 |
+| homotopy-initial | 同伦初始 | 固定译法 |
+| h-initial | h-初始 | 固定译法 |
+| polynomial functor | 多项式函子 | 固定译法 |
+| $P$-algebra | $P$-代数 | 固定译法 |
+| $\w$-algebra | $\w$-代数 | 固定译法 |
+| $\w$-homomorphism | $\w$-同态 | 固定译法 |
+| algebra $2$-cell | 代数 $2$-胞元 | 固定译法 |
+| vector | 向量 | 固定译法 |
+| index (in indexed families) | 索引 | 固定译法 |
+| inductive-inductive definition | 归纳-归纳定义 | 固定译法 |
+| inductive-recursive definition | 归纳-递归定义 | 固定译法 |
+| pointed predicate | 带点谓词 | 固定译法 |
+| identity system | 恒等系统 | 固定译法 |
+| fixed-point property | 不动点性质 | 固定译法 |
 | informal type theory | 非形式化类型论 | 固定译法 |
 | predicative | 直谓 | 固定译法 |
 | proof assistant | 证明助手 | 固定译法 |
@@ -210,3 +271,92 @@
 | Special Year | 专题年度项目 | IAS 项目语境 |
 | Special Year on Univalent Foundations of Mathematics | 泛等数学基础专题年度项目 | 项目全称 |
 | Institute for Advanced Study | Institute for Advanced Study | 机构名保持原文 |
+| higher inductive type | 高阶归纳类型 | 固定译法 |
+| point constructor | 点构造子 | 固定译法 |
+| path constructor | 路径构造子 | 固定译法 |
+| dependent path | 依值路径 | 固定译法 |
+| interval type | 区间类型 | 固定译法 |
+| suspension | 悬挂 | 固定译法 |
+| pushout | 余推 | 固定译法 |
+| cocone | 余锥 | 固定译法 |
+| flattening lemma | 展平引理 | 固定译法 |
+| set-quotient | 集合商 | 固定译法 |
+| cell complex | 胞腔复形 | 固定译法 |
+| CW complex | CW 复形 | 固定译法 |
+| attaching map | 附着映射 | 固定译法 |
+| homotopy n-type | 同伦 n-型 | 固定译法 |
+| truncatedness | 截断性 | 固定译法 |
+| connectedness | 连通性 | 固定译法 |
+| n-truncated map | n-截断映射 | 固定译法 |
+| n-connected map | n-连通映射 | 固定译法 |
+| orthogonal factorization system | 正交分解系统 | 固定译法 |
+| modality | 模态 | 固定译法 |
+| reflective subuniverse | 反射子宇宙 | 固定译法 |
+| exponential ideal | 指数理想 | 固定译法 |
+| Postnikov section | Postnikov 截面 | 固定译法 |
+| open modality | 开模态 | 固定译法 |
+| closed modality | 闭模态 | 固定译法 |
+| fiber sequence | 纤维序列 | 固定译法 |
+| long exact sequence | 长正合列 | 固定译法 |
+| homotopy group | 同伦群 | 固定译法 |
+| fundamental group | 基本群 | 固定译法 |
+| covering space | 覆盖空间 | 固定译法 |
+| Hopf fibration | Hopf 纤维化 | 人名保留原文 |
+| Freudenthal suspension theorem | Freudenthal 悬挂定理 | 人名保留原文 |
+| van Kampen theorem | van Kampen 定理 | 人名保留原文 |
+| Whitehead theorem | Whitehead 定理 | 人名保留原文 |
+| precategory | 预范畴 | 固定译法 |
+| natural transformation | 自然变换 | 固定译法 |
+| adjunction | 伴随 | 固定译法 |
+| Yoneda lemma | Yoneda 引理 | 人名保留原文 |
+| strict category | 严格范畴 | 固定译法 |
+| dagger-category | dagger-范畴 | 术语保留 dagger |
+| structure identity principle | 结构恒等原理 | 固定译法 |
+| Rezk completion | Rezk 完备化 | 人名保留原文 |
+| regular category | 正则范畴 | 固定译法 |
+| cardinal number | 基数 | 固定译法 |
+| ordinal number | 序数 | 固定译法 |
+| well-founded relation | 良基关系 | 固定译法 |
+| accessibility | 可达性 | 固定译法 |
+| simulation | 模拟 | 固定译法 |
+| cumulative hierarchy | 累积层级 | 固定译法 |
+| Dedekind real | Dedekind 实数 | 人名保留原文 |
+| Cauchy real | Cauchy 实数 | 人名保留原文 |
+| Cauchy approximation | Cauchy 近似 | 人名保留原文 |
+| modulus of convergence | 收敛模 | 固定译法 |
+| archimedean ordered field | 阿基米德有序域 | 固定译法 |
+| metric space | 度量空间 | 固定译法 |
+| complete metric space | 完备度量空间 | 固定译法 |
+| totally bounded | 全有界 | 固定译法 |
+| uniformly continuous function | 一致连续函数 | 固定译法 |
+| Heine-Borel compactness | Heine-Borel 紧致性 | 人名保留原文 |
+| Bolzano-Weierstrass property | Bolzano-Weierstrass 性质 | 人名保留原文 |
+| inductive cover | 归纳覆盖 | 固定译法 |
+| pointfree topology | 无点拓扑 | 固定译法 |
+| surreal numbers | 超现实数 | 固定译法 |
+| option (of a surreal number) | 选项（超现实数） | 固定译法 |
+| dyadic rational | 二进有理数 | 固定译法 |
+| Lebesgue number | Lebesgue 数 | 人名保留原文 |
+| span | 跨图 | 固定译法 |
+| span map | 跨图映射 | 固定译法 |
+| image | 像 | 固定译法 |
+| n-image | n-像 | 固定译法 |
+| n-truncated | n-截断 | 固定译法 |
+| modal | 模态的 / 模态类型 | 依上下文选“模态类型” |
+| f-local | f-局部 | 固定译法 |
+| graph | 图 | 固定译法 |
+| diagram | 图表 | 固定译法 |
+| colimit | 余极限 | 固定译法 |
+| join | 连接 | 固定译法 |
+| H-space | H-空间 | 固定译法 |
+| hypercomplete | 超完备 | 固定译法 |
+| pre-2-category | 预 2-范畴 | 固定译法 |
+| pre-bicategory | 预双范畴 | 固定译法 |
+| 2-category | 2-范畴 | 固定译法 |
+| prestack | 预层叠 | 固定译法 |
+| stack | 层叠 | 固定译法 |
+| smash product | 挤压积 | 固定译法 |
+| gaunt category | gaunt 范畴 | 术语名保留 gaunt |
+| monic | 单态射（monic） | 固定译法 |
+| stack completion | 层叠完备化 | 固定译法 |
+| n-connected axiom of choice | n-连通选择公理 | 固定译法 |
