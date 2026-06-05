@@ -14,7 +14,7 @@ DATE="$(date +"%B %-d, %Y")"
 
 function generate_www () {
   rm -rf -- "${WWW_DIR}" && mkdir -p -- "${WWW_DIR}" || exit 1
-  PDF_TARGETS=(hott-online hott-ebook hott-letter hott-a4 errata)
+  PDF_TARGETS=(hott-online hott-ebook hott-letter hott-a4 hott-book-cn hott-ebook-cn errata)
   for TARGET in "${PDF_TARGETS[@]}"; do
       echo "::group::Generating ${WWW_DIR}/$TARGET-$VERSION.pdf"
       if [ ! -f "$TARGET.pdf" ]; then
@@ -47,6 +47,8 @@ Below are links to "nightly builds" of the book, incorporating fixes and improve
 * [PDF for e-book readers](//hott.github.io/book/hott-ebook-$VERSION.pdf)
 * [PDF for printing on letter paper](//hott.github.io/book/hott-letter-$VERSION.pdf)
 * [PDF for printing on A4 paper](//hott.github.io/book/hott-a4-$VERSION.pdf)
+* [Chinese PDF for on-screen viewing](//hott.github.io/book/hott-book-cn-$VERSION.pdf)
+* [Chinese PDF for e-book readers](//hott.github.io/book/hott-ebook-cn-$VERSION.pdf)
 * [errata for previous versions](//hott.github.io/book/errata-$VERSION.pdf)
 EOF
   echo "::endgroup::"

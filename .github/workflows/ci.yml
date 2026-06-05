@@ -25,6 +25,11 @@ jobs:
       - name: Check em dash style
         run: "! grep -r '[^ ]---[^ ]' --include='*.tex' || { echo 'Please space the em dashes'; exit 1; }"
 
+      - name: Check Chinese TeX dependencies
+        run: |
+          kpsewhich xeCJK.sty
+          kpsewhich FandolSong-Regular.otf
+
       - name: Update ./errata.tex
         # ./mark-errata should only run on the master branch of the main repo.
         # This job is thus disabled for pull requests and forked repos.
