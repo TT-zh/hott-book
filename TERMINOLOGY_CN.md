@@ -178,6 +178,15 @@
 | recursor | 递归器 | 固定译法 |
 | recursion principle | 递归原理 | 固定译法 |
 | induction principle | 归纳原理 | 固定译法 |
+| theorem | 定理 | 固定译法 |
+| corollary | 推论 | 固定译法 |
+| lemma | 引理 | 固定译法 |
+| axiom | 公理 | 固定译法 |
+| definition | 定义 | 固定译法 |
+| remark | 注记 | 固定译法 |
+| example | 例 | 固定译法 |
+| notes | 附注 | 固定译法 |
+| exercise | 练习 | 固定译法 |
 | strict positivity | 严格正性 | 固定译法 |
 | dependent eliminator | 依值消去子 | 固定译法 |
 | non-dependent eliminator | 非依值消去子 | 固定译法 |

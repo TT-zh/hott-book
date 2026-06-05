@@ -704,9 +704,28 @@
   \aliascntresetthe{#1}
   %% This command tells cleveref's \cref what to call things
   \crefname{#1}{#2}{#3}% following brace must be on separate line to support poorman cleveref sed file
+  \Crefname{#1}{#2}{#3}%
 }
 
 % Now define a bunch of theorem-type environments.
+\ifOPTchinese
+\newtheorem{thm}{定理}[section]
+\crefname{thm}{定理}{定理}
+\Crefname{thm}{定理}{定理}
+%\defthm{prop}{命题}{命题}
+\defthm{cor}{推论}{推论}
+\defthm{lem}{引理}{引理}
+\defthm{axiom}{公理}{公理}
+% Since definitions and theorems in type theory are synonymous, should
+% we actually use the same theoremstyle for them?
+\theoremstyle{definition}
+\defthm{defn}{定义}{定义}
+\theoremstyle{remark}
+\defthm{rmk}{注记}{注记}
+\defthm{eg}{例}{例}
+\defthm{egs}{例}{例}
+\defthm{notes}{附注}{附注}
+\else
 \newtheorem{thm}{Theorem}[section]
 \crefname{thm}{Theorem}{Theorems}
 %\defthm{prop}{Proposition}   % Probably we shouldn't use "Proposition" in this way
@@ -722,6 +741,7 @@
 \defthm{eg}{Example}{Examples}
 \defthm{egs}{Examples}{Examples}
 \defthm{notes}{Notes}{Notes}
+\fi
 % Number exercises within chapters, with their own counter.
 \ifOPTchinese
 \newtheorem{ex}{练习}[chapter]
