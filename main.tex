@@ -69,10 +69,30 @@
 \usepackage{multicol}
 
 %%% Set the fonts
+\ifOPTchinese
+\ifdefined\XeTeXrevision
 \usepackage{mathpazo}
 \usepackage[scaled=0.95]{helvet}
 \usepackage{courier}
 \linespread{1.05} % Palatino looks better with this
+\setCJKmainfont{FandolSong-Regular}[
+  Extension=.otf,
+  BoldFont=FandolSong-Bold,
+  ItalicFont=FandolKai-Regular,
+  BoldItalicFont=FandolKai-Regular
+]
+\else
+\usepackage{mathpazo}
+\usepackage[scaled=0.95]{helvet}
+\usepackage{courier}
+\linespread{1.05} % Palatino looks better with this
+\fi
+\else
+\usepackage{mathpazo}
+\usepackage[scaled=0.95]{helvet}
+\usepackage{courier}
+\linespread{1.05} % Palatino looks better with this
+\fi
 
 \usepackage{ifpdf}
 
@@ -116,6 +136,11 @@
 
 \input{macros}
 
+\ifOPTchinese
+\renewcommand{\contentsname}{目录}
+\renewcommand{\proofname}{证明}
+\fi
+
 %%%% Indexing
 \usepackage{makeidx}
 \makeindex
@@ -140,7 +165,11 @@
 
 %%%% Chapter & part style
 \usepackage[raggedright]{titlesec}
+\ifOPTchinese
+\titleformat{\part}[display]{\fontsize{\OPTpartfont}{\OPTpartfont}\fontseries{m}\fontshape{sc}\selectfont}{\hfil 第\ \Roman{part}\ 部}{\OPTpartskip}{\fontsize{\OPTparttitlefont}{\OPTparttitlefont}\fontseries{b}\fontshape{sc}\selectfont\hfil}
+\else
 \titleformat{\part}[display]{\fontsize{\OPTpartfont}{\OPTpartfont}\fontseries{m}\fontshape{sc}\selectfont}{\hfil\partname\ \Roman{part}}{\OPTpartskip}{\fontsize{\OPTparttitlefont}{\OPTparttitlefont}\fontseries{b}\fontshape{sc}\selectfont\hfil}
+\fi
 \ifOPTchinese
 \titleformat{\chapter}[display]{\fontsize{\OPTchapterfont}{\OPTchapterfont}\fontseries{m}\fontshape{it}\selectfont}{第\thechapter 章}{\OPTchapterskip}{\fontsize{\OPTchaptertitlefont}{\OPTchaptertitlefont}\fontseries{b}\fontshape{n}\selectfont}
 \else
@@ -222,7 +251,11 @@
 
 % Add TOC to PDF Metadata but not printed TOC
 \hypertarget{toc}{}
+\ifOPTchinese
+\bookmark[dest=toc]{目录}
+\else
 \bookmark[dest=toc]{Table of Contents}
+\fi
 
 \setcounter{tocdepth}{1}        % chapters and sections for the toc
 \tableofcontents
@@ -241,7 +274,11 @@
 \include{introduction}
 \fi
 
+\ifOPTchinese
+\part{基础}
+\else
 \part{Foundations}
+\fi
 \label{part:foundations}
 
 \ifOPTchinese
@@ -287,7 +324,11 @@
 \fi
 
 \cleartooddpage[\thispagestyle{empty}] % Needed for correct TOC
+\ifOPTchinese
+\part{数学}
+\else
 \part{Mathematics}
+\fi
 \label{part:mathematics}
 
 \ifOPTchinese
@@ -318,7 +359,11 @@
 
 \cleartooddpage[\thispagestyle{empty}] % Needed for correct TOC
 \phantomsection % Needed for correct TOC also
+\ifOPTchinese
+\part*{附录}
+\else
 \part*{Appendix}
+\fi
 
 % We use magic to get the appendix look like Bibliography and Index
 
@@ -354,7 +399,11 @@
 
 %%%% Index of symbols
 
+\ifOPTchinese
+\include{symbols-cn}
+\else
 \include{symbols}
+\fi
 
 \cleartooddpage[\thispagestyle{empty}]
 

@@ -242,13 +242,14 @@
 | $n$-dimensional path | $n$ 维路径 | 固定译法 |
 | inverse (of a path) | 逆（路径逆） | 固定译法 |
 | concatenation (of paths) | 拼接（路径拼接） | 固定译法 |
-| whiskering | whiskering | 暂保留英文术语 |
+| whiskering | 胡须化 | 固定译法 |
 | horizontal composition | 水平复合 | 固定译法 |
 | quasi-inverse | 拟逆 | 固定译法 |
 | encode-decode method | 编码-解码方法 | 固定译法 |
 | semigroup structure | 半群结构 | 固定译法 |
 | singleton type | 单点类型 | 固定译法 |
 | center of contraction | 收缩中心 | 固定译法 |
+| apartness | 分离关系 | 固定译法 |
 | retraction | 缩回 | 固定译法 |
 | retract (of a type) | 缩回子 | 固定译法 |
 | $(-2)$-type | $(-2)$-类型 | 固定译法 |
@@ -404,3 +405,19 @@
 | machine implementation | 机器实现 | 固定译法 |
 | implicit foundation | 隐式基础 | 固定译法 |
 | intrinsic homotopical content | 内在同伦内容 | 固定译法 |
+| Index of symbols | 符号索引 | 固定译法 |
+| Index | 术语索引 | 固定译法（章节标题语境） |
+| natural transformation | 自然变换 | 固定译法 |
+| factorization system | 分解系统 | 固定译法 |
+| set-coequalizer | 集合余等化子 | 固定译法 |
+| set-pushout | 集合余推 | 固定译法 |
+| recursive definition | 递归定义 | 固定译法 |
+| non-dependent | 非依值 | 与 dependent/依值 体系一致 |
+| predicative | 直谓 | 固定译法 |
+| impredicative | 非直谓 | 与 predicative 对应 |
+| subsingleton | 亚单例 | 固定译法 |
+| pointfree | 无点 | 固定译法 |
+| cotransitive | 余传递 | 固定译法 |
+| locale | locale | 术语名暂保留原文 |
+| setoid | setoid | 术语名暂保留原文 |
+| operad | operad | 术语名暂保留原文 |

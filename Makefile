@@ -23,7 +23,8 @@ CNTEXFILES = front-cn.tex \
 	categories-cn.tex \
 	setmath-cn.tex \
 	reals-cn.tex \
-	formal-cn.tex
+	formal-cn.tex \
+	symbols-cn.tex
 
 # Top-level LaTeX files from which HoTT book can be generated
 TOPTEXFILES = $(DEFAULTTOPTEX) hott-ustrade.tex hott-letter.tex hott-letter-exercises.tex hott-a4.tex hott-a4-exercises.tex hott-ebook.tex hott-ebook-wide.tex hott-ebook-narrow.tex hott-arxiv.tex $(XELATEXTOPTEXFILES)
@@ -124,6 +125,11 @@ $(XELATEXTOPTEXFILES:.tex=.pdf) : %.pdf : %.tex $(TEXFILES) $(CNTEXFILES) refere
 	     (echo "run 2: xelatex $<"; xelatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null) ;\
 	     xelatex -halt-on-error $< ;\
 	     echo "HINT: If you think this took a long time you should install latexmk." ;\
+	fi
+	if [ "$<" = "hott-book-cn.tex" ];\
+	then python3 scripts/translate_index_cn.py \
+		$(patsubst %.tex,%.ind,$<) TERMINOLOGY_CN.md $(patsubst %.tex,%.ind,$<) && \
+	     xelatex -halt-on-error -interaction=batchmode $< 2>&1 >/dev/null ;\
 	fi
 
 $(TOPDVIFILES) : %.dvi : %.tex $(TEXFILES) references.bib cover-lores-front.png cover-lores-back.png
