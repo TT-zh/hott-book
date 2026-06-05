@@ -7,7 +7,10 @@ DEFAULTTOPTEX = hott-online.tex
 XELATEXTOPTEXFILES = hott-book-cn.tex
 
 # Chinese-localized source files used by the XeLaTeX target(s)
-CNTEXFILES = preface-cn.tex \
+CNTEXFILES = front-cn.tex \
+	frontpage-cn.tex \
+	blurb-cn.tex \
+	preface-cn.tex \
 	introduction-cn.tex \
 	preliminaries-cn.tex \
 	basics-cn.tex \

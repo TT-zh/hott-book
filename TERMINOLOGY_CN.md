@@ -382,3 +382,16 @@
 | elaboration | 精化 | 固定译法 |
 | type universe | 类型宇宙 | 固定译法 |
 | structural recursion | 结构递归 | 固定译法 |
+| homotopy groups of spheres | 球面的同伦群 | 固定译法 |
+| groupoid | 群胚 | 固定译法 |
+| higher groupoid | 高阶群胚 | 固定译法 |
+| $\infty$-groupoid | $\infty$-群胚 | 固定译法 |
+| 1-groupoid | 1-群胚 | 固定译法 |
+| pregroupoid | 预群胚 | 固定译法 |
+| fundamental groupoid | 基本群胚 | 固定译法 |
+| fundamental pregroupoid | 基本预群胚 | 固定译法 |
+| weak infinity-groupoid | 弱 $\infty$-群胚 | 固定译法 |
+| logic of homotopy types | 同伦类型逻辑 | 固定译法 |
+| machine implementation | 机器实现 | 固定译法 |
+| implicit foundation | 隐式基础 | 固定译法 |
+| intrinsic homotopical content | 内在同伦内容 | 固定译法 |

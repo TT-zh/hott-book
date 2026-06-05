@@ -193,7 +193,11 @@
 % Half-title, title, copyright page do not have displayed page numbers
 \pagestyle{empty}
 
+\ifOPTchinese
+\include{front-cn} %%% Title page and copyright (Chinese)
+\else
 \include{front} %%% Title page and copyright
+\fi
 
 \cleartooddpage
 

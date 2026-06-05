@@ -29,8 +29,8 @@
 \item 一个函数 $\suc:\nat\to\nat$
 \end{itemize}
 生成。
-如果把类型看作高阶原群，那么这种更一般的“生成”概念就非常自然：
-由于高阶原群是一个包含点、路径及更高阶路径的“多类对象”，我们理应允许在所有维度上给出“生成元”。
+如果把类型看作高阶群胚，那么这种更一般的“生成”概念就非常自然：
+由于高阶群胚是一个包含点、路径及更高阶路径的“多类对象”，我们理应允许在所有维度上给出“生成元”。
 
 我们把普通意义下的构造子（如 $\base$）称为\define{点构造子}
 \indexdef{constructor!point}%
@@ -53,12 +53,12 @@
 
 \index{free!generation of an inductive type}%
 首先，“生成”一词应当被严格理解，其含义与“一个群由某个集合自由生成”中的“生成”相同。
-特别地，由于高阶原群自带路径与更高阶路径上的\emph{运算}，当这样的对象由若干构造子“生成”时，这些运算会产生一些并非直接来自构造子本身的路径。
+特别地，由于高阶群胚自带路径与更高阶路径上的\emph{运算}，当这样的对象由若干构造子“生成”时，这些运算会产生一些并非直接来自构造子本身的路径。
 例如，在高阶归纳类型 $\Sn^1$ 中，构造子 $\lloop$ 并不是从 $\base$ 到 $\base$ 的唯一非平凡路径；我们还有“$\lloop\ct\lloop$”“$\lloop\ct\lloop\ct\lloop$”等等，以及 $\opp{\lloop}$ 等，它们彼此不同。
 这看起来也许不言自明，但它确实不同于“普通”归纳类型的行为：在普通归纳类型中，人们通常期待除了构造子直接“放进去”的内容外，不会再有别的结构。
 
 其次，这种生成确实是\emph{自由}生成：高阶归纳类型在技术上并不允许我们直接施加“公理”，例如强制“$\lloop\ct\lloop$”等于 $\refl{\base}$。
-然而，在 $\infty$-原群的语境中，%
+然而，在 $\infty$-群胚的语境中，%
 \index{.infinity-groupoid@$\infty$-groupoid}
 “自由生成”与“呈示”之间差别很小，
 \index{presentation!of an infinity-groupoid@of an $\infty$-groupoid}%
@@ -93,7 +93,7 @@
 \end{itemize}
 生成；此时存在一条从 $\refl{\refl{\base}}$ 到其自身的非平凡\emph{三维路径}。
 拓扑学家会把这条路径识别为 \emph{Hopf fibration} 的一种体现。
-从范畴论角度看，这与上文提到的现象本质相同：$\Sn^1$ 不仅包含 $\lloop$，还包含 $\lloop\ct\lloop$ 等等；差别只在于，对于\emph{高阶}原群，存在会提升维度的\emph{运算}。
+从范畴论角度看，这与上文提到的现象本质相同：$\Sn^1$ 不仅包含 $\lloop$，还包含 $\lloop\ct\lloop$ 等等；差别只在于，对于\emph{高阶}群胚，存在会提升维度的\emph{运算}。
 实际上，我们早在 \cref{sec:equality} 就见过许多这类运算：结合律与单位律不仅是性质，更是运算，它们以 1-路径为输入、以 2-路径为输出。
 
 \index{generation!of a type, inductive|)}%
@@ -1191,7 +1191,7 @@ $\brck A$ 也有归纳原理：给定任意 $B:\brck A \to \type$ 以及
 \end{itemize}
 我们有时把这个高阶归纳类型 $A/R$ 称为 $A$ 关于 $R$ 的\define{集合商}，以强调它按定义产出一个集合。
 （同伦理论中还有更一般的“商”概念，但大多超出本书范围。
-不过在 \cref{sec:rezk} 中，我们会考虑类型按一个 $1$-原群取“商”，这是比集合商高一层的情形。）
+不过在 \cref{sec:rezk} 中，我们会考虑类型按一个 $1$-群胚取“商”，这是比集合商高一层的情形。）
 
 \begin{rmk}\label{rmk:quotient-of-non-set}
   实际上，在集合商的定义及其多数性质中，并不需要 $A$ 本身是集合。
@@ -1781,7 +1781,7 @@ $H*K$，即群范畴中的余积。
 \indexdef{flattening lemma}%
 \indexdef{lemma!flattening}%
 它说，如果 $P:W\to\UU$ 如上递归定义，则其总空间 $\sm{x:W} P(x)$ 与一个“展平后的”高阶归纳类型等价；该类型的构造子可由 $W$ 的构造子与 $P$ 的定义推导得到。
-（从范畴论观点看，$\sm{x:W} P(x)$ 是 $P$ 的“Grothendieck\index{Grothendieck construction} 构造”，而展平引理把其泛性质表达为一个“lax\index{lax colimit} 余极限”。由于同伦类型论中的类型（如 $W$）在范畴上对应 $\infty$-原群（因为所有路径可逆），在这里 lax 余极限与 pseudo 余极限是一致的。）
+（从范畴论观点看，$\sm{x:W} P(x)$ 是 $P$ 的“Grothendieck\index{Grothendieck construction} 构造”，而展平引理把其泛性质表达为一个“lax\index{lax colimit} 余极限”。由于同伦类型论中的类型（如 $W$）在范畴上对应 $\infty$-群胚（因为所有路径可逆），在这里 lax 余极限与 pseudo 余极限是一致的。）
 
 我们在此证明展平引理的一个一般情形，它直接推出许多特例，也指示了证明其他情形的方法。
 设 $A,B:\type$ 与 $f,g:B\to{}A$，并令高阶归纳类型 $W$ 由下列构造子生成：

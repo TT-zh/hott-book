@@ -6,7 +6,7 @@
 在本章中，我们在类型论内部发展一些同伦理论。我们采用
 \cref{cha:basics} 引入的同伦理论\emph{综合方法}：空间、点、路径与同伦是基本概念，
 它们由类型及其元素来表示，尤其是恒等类型。路径与同伦的代数结构由类型上的自然
-$\infty$-原群
+$\infty$-群胚
 \index{.infinity-groupoid@$\infty$-groupoid}%
 结构来表示，而该结构由恒等类型的规则生成。借助
 \cref{cha:hits} 引入的高阶归纳类型，我们可以直接通过其泛性质来描述空间。
@@ -23,17 +23,17 @@ $\infty$-原群
 点、路径与同伦。另一方面，这种方法仍然抽离了
 这些对象的任何具体呈现方式。例如，路径拼接的结合性是通过路径归纳证明的，
 而不是通过对映射 $[0,1] \to X$ 进行重参数化，或通过 horn-filling 条件来证明。
-类型论似乎是一种研究 $\infty$-原群抽象同伦理论的便捷方式：利用恒等类型的规则，
-我们可以避免许多 $\infty$-原群定义中涉及的复杂组合学，
+类型论似乎是一种研究 $\infty$-群胚抽象同伦理论的便捷方式：利用恒等类型的规则，
+我们可以避免许多 $\infty$-群胚定义中涉及的复杂组合学，
 并且只在具体证明需要时才展开相应结构。
 
 类型论的抽象性意味着我们的证明会自动适用于多种语境。
 特别地，如前所述，同伦类型论在
 Kan\index{Kan complex} 单纯集合\index{simplicial!sets}
-中有一种解释，而这正是 $\infty$-原群同伦理论的一个模型。因此，
+中有一种解释，而这正是 $\infty$-群胚同伦理论的一个模型。因此，
 我们的证明适用于该模型；再经由从单纯集合到拓扑空间的几何实现\index{geometric realization}
 函子传递过去，就得到经典同伦理论中对应定理的证明。
-然而，尽管细节仍在推进中，我们也可以在大量其他“看起来像 $\infty$-原群范畴”的范畴里
+然而，尽管细节仍在推进中，我们也可以在大量其他“看起来像 $\infty$-群胚范畴”的范畴里
 解释类型论，例如
 $(\infty,1)$-拓扑斯\index{.infinity1-topos@$(\infty,1)$-topos}。
 因此，在类型论中证明的结果也会在这些语境下成立。
@@ -43,7 +43,7 @@ $(\infty,1)$-拓扑斯\index{.infinity1-topos@$(\infty,1)$-topos}。
 其次，我们的综合方法催生了新的类型论式方法与证明。
 其中一些证明相当于对经典证明的直接转写；
 另一些则更具类型论风格，主要由
-$\infty$-原群运算的计算构成，其风格与计算机科学家使用类型论推理程序非常相似。
+$\infty$-群胚运算的计算构成，其风格与计算机科学家使用类型论推理程序非常相似。
 这些新证明之所以出现，一个原因似乎在于类型论强调了同伦理论中与其他方法不同的侧面：
 尽管路径归纳与高阶归纳类型的泛性质这类工具在 Kan\index{Kan complex} 单纯集合等语境中也可用，类型
 论却提升了它们的重要性，因为它们是处理这些类型时\emph{唯一}可用的原始工具。
@@ -178,13 +178,13 @@ $\Z$ 是整数加法群\index{integers}，$\Z_{m}$ 是阶为 $m$ 的循环群\in
 
 
 理解这种复杂性的一种方式，是通过
-\cref{cha:basics} 引入的空间与 $\infty$-原群之间的对应。
+\cref{cha:basics} 引入的空间与 $\infty$-群胚之间的对应。
 \index{.infinity-groupoid@$\infty$-groupoid}%
 正如 \cref{sec:circle} 所述，2-球面由一个带一个点和一条二维回路的高阶归纳类型给出。
 因此，人们可能会疑惑：当类型 $\Sn ^2$ 并没有生成三维胞腔的构造子时，
 为何 $\pi_3(\Sn ^2)$ 却是 $\Z$？事实是，$\pi_3(\Sn ^2)$ 的生成元
 是利用 \cref{thm:EckmannHilton} 证明中描述的交换律构造出来的：
-$\infty$-原群的代数结构包含层级之间的非平凡相互作用，
+$\infty$-群胚的代数结构包含层级之间的非平凡相互作用，
 而这些相互作用会产生高阶同伦群的元素。
 
 \index{classical!homotopy theory|)}%
@@ -219,11 +219,11 @@ $\pi_n(A)$ 为阿贝尔群\index{group!abelian}。
 
 \index{presentation!of an infinity-groupoid@of an $\infty$-groupoid}%
 这个定义之所以适于研究同伦群，是因为类型 $X$ 的（高阶）归纳定义把 $X$ 呈现为
-一个自由类型，类似于自由 $\infty$-原群，
+一个自由类型，类似于自由 $\infty$-群胚，
 \index{.infinity-groupoid@$\infty$-groupoid}%
 而这种呈现会\emph{决定}但不会\emph{显式描述}
 $X$ 的高阶恒等类型。恒等类型中的元素既包括生成元（对圆而言是 $\lloop$），
-也包括对其施加原群全部运算所得结果
+也包括对其施加群胚全部运算所得结果
 （恒等、复合、逆元、结合、交换，\ldots）。
 因此，空间的高阶归纳呈现使我们可以提出“$X$ 的恒等类型究竟是什么？”这一问题，
 尽管回答它往往需要相当多的数学工作。
@@ -450,7 +450,7 @@ $\opp{\lloop}$ 对应前驱函数：
 \end{defn}
 Encode 的定义是把路径提升到通用覆盖中，
 从而确定一个等价，再把该等价作用于 $0$。
-这个函数的有趣之处在于：当圆上的回路以同伦类型论抽象的原群框架表示时，它能从中计算出一个具体整数。
+这个函数的有趣之处在于：当圆上的回路以同伦类型论抽象的群胚框架表示时，它能从中计算出一个具体整数。
 要形成直觉，注意由上面的引理可知，
 $\transfib \code \lloop x$ 是后继映射，而 $\transfib \code {\opp
   \lloop} x$ 是前驱映射。
@@ -504,7 +504,7 @@ ${\code(\base) \rightarrow (\base=\base)}$，我们取 $\lloop^{\blank}$，并
 第三行中，我们使用 \cref{lem:transport-s1-code} 给出的 $\code$ 对 $\opp \lloop$ 的作用。
 第四行中，我们只是做了函数复合的化简。
 因此，只需对所有 $n$ 证明 $\id{\lloop^{n - 1} \ct \lloop}{\lloop^{n}}$。
-这可由 \cref{thm:sign-induction} 和原群律轻松得到。
+这可由 \cref{thm:sign-induction} 和群胚律轻松得到。
 \end{proof}
 
 现在我们可以证明 $\encode$ 与 $\decode$ 互为拟逆。
@@ -1781,7 +1781,7 @@ van Kampen 定理用于计算（同伦）余推空间的基本群 $\pi_1$。
 事实证明，我们可以直接将同一技巧用于路径纤维化的截断版本，于是不仅能刻画基本\emph{群} $\pi_1(W)$，还能刻画整个基本\emph{群胚}。
 \index{fundamental!pregroupoid}%
 更具体地，对类型 $X$，记 $\Pi_1 X: X\to X\to \type$ 为其恒等类型的 $0$-截断，即 $\Pi_1 X(x,y) \defeq \trunc0{x=y}$。
-注意这诱导出原群（pregroupoid）运算
+注意这诱导出预群胚（pregroupoid）运算
 \begin{align*}
   (\blank\ct\blank) &\;:\; \Pi_1X(x,y) \to \Pi_1X(y,z) \to \Pi_1X(x,z)\\
   \opp{(\blank)} &\;:\; \Pi_1X(x,y) \to \Pi_1X(y,x)\\
@@ -1987,7 +1987,7 @@ van Kampen 定理用于计算（同伦）余推空间的基本群 $\pi_1$。
 
 由于 \cref{thm:naive-van-kampen} 只断言集合族间的双射，这里的同构 $\pi_1(S^1)\cong \Z$ 也仅是集合意义下的双射。
 不过我们可以在 $\code$ 上定义连接运算（通过连接序列），并证明 $\encode$ 与 $\decode$ 给出一个保持该结构的同构。
-（用 \cref{cha:category-theory} 的语言，这些将是“原群胚”。）
+（用 \cref{cha:category-theory} 的语言，这些将是“预群胚”。）
 细节留给读者。
 
 \index{fundamental!group|(}%
