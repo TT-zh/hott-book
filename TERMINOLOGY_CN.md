@@ -172,6 +172,36 @@
 | magma | 原群 | 固定译法 |
 | pointed magma | 带基点原群 | 固定译法 |
 | carrier | 载体 | 固定译法 |
+| transport | 传送 | 固定译法 |
+| fibration | 纤维化 | 固定译法 |
+| total space | 总空间 | 固定译法 |
+| section (of a type family/fibration) | 截面 | 固定译法 |
+| fiberwise | 逐纤维地 | 固定译法 |
+| pointed type | 带点类型 | 固定译法 |
+| basepoint | 基点 | 固定译法 |
+| loop space | 回路空间 | 固定译法 |
+| loop | 回路 | 固定译法 |
+| $n$-fold iterated loop space | $n$-重迭代回路空间 | 固定译法 |
+| $n$-loop | $n$-回路 | 固定译法 |
+| $k$-morphism | $k$-态射 | 固定译法 |
+| start point (of a path) | 起点（路径起点） | 固定译法 |
+| end point (of a path) | 终点（路径终点） | 固定译法 |
+| parallel (paths) | 平行（路径） | 固定译法 |
+| 2-path | 2-路径 | 固定译法 |
+| 2-dimensional path | 二维路径 | 固定译法 |
+| 3-dimensional path | 三维路径 | 固定译法 |
+| $n$-dimensional path | $n$ 维路径 | 固定译法 |
+| inverse (of a path) | 逆（路径逆） | 固定译法 |
+| concatenation (of paths) | 拼接（路径拼接） | 固定译法 |
+| whiskering | whiskering | 暂保留英文术语 |
+| horizontal composition | 水平复合 | 固定译法 |
+| quasi-inverse | 拟逆 | 固定译法 |
+| encode-decode method | 编码-解码方法 | 固定译法 |
+| semigroup structure | 半群结构 | 固定译法 |
+| commutative square | 交换方块 | 固定译法 |
+| pullback square | 拉回方块 | 固定译法 |
+| contractible | 可缩 | 固定译法 |
+| universal property | 泛性质 | 固定译法 |
 | informal type theory | 非形式化类型论 | 固定译法 |
 | predicative | 直谓 | 固定译法 |
 | proof assistant | 证明助手 | 固定译法 |
